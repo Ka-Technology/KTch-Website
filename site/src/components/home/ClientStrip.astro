@@ -1,0 +1,40 @@
+---
+import { stripNames } from '../../data/site';
+---
+<section class="strip" aria-labelledby="strip-title">
+  <div class="wrap head">
+    <h2 id="strip-title" class="label">Teams we’ve worked with</h2>
+  </div>
+  <div class="wrap"><div class="track" tabindex="0" aria-label="Client names, scrolling">
+    <ul class="row">
+      {stripNames.map((n) => <li>{n}</li>)}
+    </ul>
+    <ul class="row" aria-hidden="true">
+      {stripNames.map((n) => <li>{n}</li>)}
+    </ul>
+  </div></div>
+</section>
+
+<style>
+  .strip { padding-block: clamp(72px, 9vw, 132px) 0; }
+  .head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
+  .label { font-size: var(--t-lead); letter-spacing: -0.02em; font-weight: 700; }
+  .track { margin-top: 24px; display: flex; overflow: hidden; background: var(--surface); padding-block: 26px; padding-inline: 24px; }
+  .track:focus-visible { outline-offset: -3px; }
+  .row { display: flex; flex: none; list-style: none; gap: 0; }
+  .row li {
+    flex: none; padding-inline: 0.7em; font-size: var(--t-h2); font-weight: 800;
+    letter-spacing: -0.035em; white-space: nowrap;
+  }
+  .row li::after { content: ""; display: inline-block; width: 0.32em; height: 0.32em; background: var(--accent); margin-left: 1.4em; vertical-align: 0.12em; }
+  @media (prefers-reduced-motion: no-preference) {
+    .row { animation: marquee 60s linear infinite; }
+    .track:hover .row, .track:focus-within .row, .track:focus .row { animation-play-state: paused; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .track { flex-wrap: wrap; }
+    .row { flex-wrap: wrap; }
+    .row[aria-hidden] { display: none; }
+  }
+  @keyframes marquee { to { transform: translateX(-100%); } }
+</style>

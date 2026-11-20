@@ -1,0 +1,127 @@
+---
+import Base from '../layouts/Base.astro';
+import { site, img } from '../data/site';
+const formId = import.meta.env.PUBLIC_FORMSPREE_ID as string | undefined;
+const action = formId ? `https://formspree.io/f/${formId}` : `mailto:${site.email}`;
+const topics = ['AI', 'Software', 'Automation', 'Analytics', 'Website', 'Not sure'];
+---
+<Base og="contact" title="Contact" description="Tell Ka Technology what’s slowing you down. We’ll get back to you within 1–2 business days.">
+  <section class="wrap contact" aria-labelledby="c-title">
+    <div class="grid12 layout">
+      <div class="intro">
+        <h1 id="c-title" class="t-display lines"><span class="line"><span data-line style="--i:0">Let’s talk.</span></span></h1>
+        <p class="t-lead" data-load style="--d:300ms">Tell us what’s slowing you down. We’ll get back to you within 1–2 business days.</p>
+        <ul class="direct" data-load style="--d:380ms">
+          <li><a href={`mailto:${site.email}`}>{site.email}</a></li>
+          <li><a href={site.phoneHref}>{site.phone}</a></li>
+          <li><span>Based in {site.city}</span></li>
+        </ul>
+        <figure class="photo pic">
+          <img src={img('downtown-portland', 800)} width="800" height="368" loading="lazy" alt="Downtown Portland and the Hawthorne Bridge over the Willamette River." />
+        </figure>
+      </div>
+
+      <form data-reveal class="form" method="POST" action={action} enctype={formId ? undefined : 'text/plain'} data-contact novalidate={formId ? true : undefined}>
+        <input type="hidden" name="_subject" value="New enquiry from ka-tch.com" />
+        <div class="hp" aria-hidden="true">
+          <label for="f-company-website">Leave this field empty</label>
+          <input id="f-company-website" name="_gotcha" type="text" tabindex="-1" autocomplete="off" />
+        </div>
+        <div class="field">
+          <label for="f-name">Name <span class="req">(required)</span></label>
+          <input id="f-name" name="name" type="text" autocomplete="name" required />
+        </div>
+        <div class="field">
+          <label for="f-email">Email <span class="req">(required)</span></label>
+          <input id="f-email" name="email" type="email" autocomplete="email" required />
+        </div>
+        <div class="field">
+          <label for="f-company">Company</label>
+          <input id="f-company" name="company" type="text" autocomplete="organization" />
+        </div>
+        <fieldset class="field">
+          <legend>What do you need help with?</legend>
+          <div class="chips">
+            {topics.map((t, i) => (
+              <label class="chip"><input type="radio" name="topic" value={t} checked={i === topics.length - 1} /><span>{t}</span></label>
+            ))}
+          </div>
+        </fieldset>
+        <div class="field">
+          <label for="f-msg">Message <span class="req">(required)</span></label>
+          <textarea id="f-msg" name="message" rows="6" required></textarea>
+        </div>
+        <button class="button send" type="submit">Send message</button>
+        <p class="status" role="status" aria-live="polite" data-status></p>
+      </form>
+    </div>
+  </section>
+</Base>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-contact]');
+  const status = form?.querySelector<HTMLElement>('[data-status]');
+  if (form && status && form.action.startsWith('https://formspree.io')) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+      const btn = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+      status.dataset.state = '';
+      try {
+        const res = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
+        if (!res.ok) throw new Error(String(res.status));
+        form.classList.add('is-sent');
+        form.innerHTML = '<div class="thanks"><p class="t-h2">Thanks. Message received.</p><p class="t-lead">We’ll get back to you within 1–2 business days.</p></div>';
+      } catch {
+        status.dataset.state = 'error';
+        status.textContent = 'Something went wrong and your message wasn’t sent. Please try again, or email info@ka-tch.com.';
+        btn.disabled = false;
+        btn.textContent = 'Send message';
+      }
+    });
+  }
+</script>
+
+<style>
+  .contact { padding-top: clamp(24px, 5vh, 64px); padding-bottom: var(--section); }
+  .layout { row-gap: 56px; align-items: start; }
+  .intro { grid-column: 1 / 6; display: grid; gap: 28px; }
+  .intro .t-lead { max-width: 30ch; }
+  .direct { list-style: none; display: grid; gap: 6px; }
+  .direct a, .direct span { font-size: var(--t-lead); font-weight: 700; letter-spacing: -0.02em; text-decoration: none; }
+  .direct a { color: var(--accent-text); }
+  @media (hover: hover) and (pointer: fine) { .direct a:hover { text-decoration: underline; text-underline-offset: 4px; } }
+  .pic { aspect-ratio: 16 / 9; margin-top: 12px; }
+  .form { grid-column: 7 / -1; display: grid; gap: 26px; background: var(--surface); padding: clamp(24px, 3.5vw, 48px); }
+  .field { display: grid; gap: 8px; border: 0; margin: 0; padding: 0; min-width: 0; }
+  label, legend { font-weight: 700; padding: 0; }
+  .req { font-weight: 400; color: var(--muted); }
+  input[type='text'], input[type='email'], textarea {
+    width: 100%; font: inherit; color: var(--ink); background: var(--bg);
+    border: 2px solid var(--surface-2); border-radius: 0; padding: 12px 14px; min-height: 52px;
+    transition: border-color var(--t-hover) ease;
+  }
+  textarea { resize: vertical; }
+  input:focus-visible, textarea:focus-visible { outline: none; border-color: var(--accent); }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+  .chip { position: relative; }
+  .chip input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+  .chip span { display: inline-flex; align-items: center; min-height: 46px; padding: 0 16px; background: var(--bg); font-weight: 600; transition: background-color var(--t-hover) ease, color var(--t-hover) ease; }
+  .chip input:checked + span { background: var(--ink); color: var(--bg); }
+  .chip input:focus-visible + span { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .send { justify-self: start; min-width: 200px; }
+  .send:disabled { opacity: 0.7; cursor: progress; }
+  .status:empty { display: none; }
+  .status[data-state='error'] { color: var(--accent-text); font-weight: 700; }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; } /* taste-skill-ignore: honeypot, off-screen */
+  .form :global(.thanks) { display: grid; gap: 16px; padding-block: 40px; }
+  @media (max-width: 860px) {
+    .intro, .form { grid-column: 1 / -1; }
+    .form { margin-inline: calc(var(--margin) * -1); }
+  }
+</style>

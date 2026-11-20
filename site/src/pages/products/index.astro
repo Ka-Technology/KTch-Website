@@ -1,0 +1,46 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import PageHead from '../../components/PageHead.astro';
+import CloseCTA from '../../components/CloseCTA.astro';
+const products = (await getCollection('products', (p) => !p.data.hidden)).sort((a, b) => a.data.order - b.data.order);
+---
+<Base og="products" title="Our software" description="Kept, DoIGetGas and RealDoc: software Ka Technology builds and runs itself.">
+  <PageHead title="Our software" lede="Besides client work, we build our own products. Some started as a client’s problem that turned out to be everyone’s problem." />
+  {products.map((p, i) => (
+    <section class={`prod ${i % 2 ? 'inverse' : 'tone'}`} aria-labelledby={`p-${p.id}`}>
+      <div class="wrap grid12 inner" data-reveal>
+        <div class="left">
+          <h2 id={`p-${p.id}`} class="pname"><a href={`/products/${p.id}`}>{p.data.name}</a></h2>
+          <p class="t-lead tag">{p.data.tagline}</p>
+        </div>
+        <div class="right">
+          <p class="meta"><span class="dot"></span>{p.data.status}{p.data.url && <> · <a class="link" href={p.data.url} rel="noopener">{p.data.url.replace('https://', '')}</a></>}</p>
+          <p class="sum">{p.data.summary}</p>
+          <ul class="how">{p.data.how_it_works.map((s) => <li>{s}</li>)}</ul>
+          <a class="button button--ink" href={`/products/${p.id}`}>About {p.data.name}</a>
+        </div>
+      </div>
+    </section>
+  ))}
+  <CloseCTA title={['Your problem might be', 'everyone’s, too.']} text="Some of our products started as one client’s request. If yours sounds familiar, let’s talk." />
+</Base>
+
+<style>
+  .prod { padding-block: clamp(80px, 9vw, 140px); }
+  .tone { background: var(--surface); }
+  .inner { row-gap: 32px; }
+  .left { grid-column: 1 / 7; display: grid; gap: 18px; align-content: start; }
+  .right { grid-column: 7 / -1; display: grid; gap: 22px; justify-items: start; }
+  .pname { font-size: var(--t-display); letter-spacing: -0.05em; }
+  .pname a { text-decoration: none; transition: color var(--t-hover) ease; }
+  @media (hover: hover) and (pointer: fine) { .pname a:hover { color: var(--accent); } }
+  .tag { font-weight: 700; max-width: 26ch; }
+  .meta { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; font-weight: 700; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+  .sum { font-size: var(--t-lead); line-height: 1.4; max-width: 40ch; }
+  .how { list-style: none; display: grid; gap: 12px; max-width: 54ch; }
+  .how li { padding-left: 1.2em; position: relative; }
+  .how li::before { content: ""; position: absolute; left: 0; top: 0.62em; width: 0.45em; height: 0.45em; background: var(--accent); }
+  @media (max-width: 860px) { .left, .right { grid-column: 1 / -1; } }
+</style>

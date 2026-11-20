@@ -1,0 +1,80 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import { site } from '../data/site';
+const jobs = await getCollection('jobs', (j) => j.data.open);
+const ways = [
+  { name: 'Real client work, day one.', text: 'You ship software that real businesses use, not practice projects.' },
+  { name: 'Profit sharing.', text: 'Developers share in the profit of the projects they work on.' },
+  { name: 'Flexible hours.', text: 'Part-time-friendly involvement that fits around school or another job.' },
+];
+const process = [
+  { name: 'A short case study', text: 'A small, real-world problem to show how you think and build with AI.' },
+  { name: 'A get-to-know-you chat', text: 'Who you are, what you want to build, and how you like to work.' },
+  { name: 'A technical and behavioral interview', text: 'We go deeper on your case study and how you work on a team.' },
+];
+---
+<Base og="careers" title="Careers" description="Join Ka Technology: a small, remote-friendly team of AI-native developers shipping real software for real businesses.">
+  <PageHead title="Build with us" lede="We’re a small, remote-friendly team that ships real software for real businesses. We look for AI-native developers: people who know how to build with AI and use it well." />
+
+  <section class="wrap grid12 how" aria-labelledby="how-t">
+    <h2 id="how-t" class="t-h2 bh">How we work</h2>
+    <ul class="wl" data-reveal>{ways.map((w) => <li><h3>{w.name}</h3><p>{w.text}</p></li>)}</ul>
+  </section>
+
+  <section class="roles inverse" aria-labelledby="roles-t">
+    <div class="wrap grid12">
+      <h2 id="roles-t" class="t-h2 bh">Open roles</h2>
+      <div class="rl" data-reveal>
+        {jobs.length > 0 ? (
+          <ul>
+            {jobs.map((j) => (
+              <li>
+                <h3>{j.data.title}</h3>
+                <p class="jm">{j.data.type} · {j.data.location}</p>
+                <p>{j.data.summary}</p>
+                <a class="link" href={`mailto:${site.email}?subject=${encodeURIComponent(`Application: ${j.data.title}`)}`}><span class="arrow">Apply by email</span></a>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div class="none">
+            <p class="t-h2 nt">No open roles right now.</p>
+            <p class="t-lead">Send us a note anyway. Tell us what you’ve built and what you’d like to build next.</p>
+            <a class="button" href={`mailto:${site.email}?subject=${encodeURIComponent('Working with Ka Technology')}`}>Email {site.email}</a>
+          </div>
+        )}
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap grid12 proc section" aria-labelledby="proc-t">
+    <h2 id="proc-t" class="t-h2 bh">How we hire</h2>
+    <ol class="pl" data-reveal>{process.map((p) => <li><h3>{p.name}</h3><p>{p.text}</p></li>)}</ol>
+  </section>
+</Base>
+
+<style>
+  .how { row-gap: 40px; }
+  .bh { grid-column: 1 / 6; }
+  .wl, .pl { grid-column: 6 / -1; list-style: none; display: grid; gap: 36px; }
+  .wl li, .pl li { display: grid; gap: 8px; max-width: 52ch; }
+  .wl h3, .pl h3 { font-size: var(--t-lead); letter-spacing: -0.02em; }
+  .pl { counter-reset: s; }
+  .pl li { padding-left: 64px; position: relative; }
+  .pl li::before { content: ""; position: absolute; left: 0; top: 0.3em; width: calc(16px + var(--w, 0px)); height: 16px; background: var(--accent); }
+  .pl li:nth-child(2)::before { --w: 12px; }
+  .pl li:nth-child(3)::before { --w: 24px; }
+  .roles { margin-top: var(--section); padding-block: clamp(80px, 9vw, 140px); }
+  .rl { grid-column: 6 / -1; }
+  .rl ul { list-style: none; display: grid; gap: 40px; }
+  .rl h3 { font-size: var(--t-lead); }
+  .jm { color: var(--muted); font-weight: 600; margin: 4px 0 10px; }
+  .none { display: grid; gap: 20px; justify-items: start; }
+  .nt { line-height: 1; }
+  @media (max-width: 860px) {
+    .bh, .wl, .pl, .rl { grid-column: 1 / -1; }
+    .rl { margin-top: 28px; }
+  }
+</style>

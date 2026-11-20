@@ -1,0 +1,128 @@
+---
+import { getCollection } from 'astro:content';
+import { serviceLabel, img } from '../data/site';
+interface Props { heading?: string; headingTag?: 'h1' | 'h2'; filter?: boolean; limit?: number; id?: string; lede?: string }
+const { heading = 'Our work', headingTag = 'h2', filter = false, limit, id = 'work-title', lede } = Astro.props;
+const all = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+const projects = limit ? all.slice(0, limit) : all;
+const tags = ['ai', 'software', 'automation', 'web', 'analytics'];
+const H = headingTag;
+const yearOf = (y: string) => y.replace('–present', '–now');
+const seen = new Set<string>();
+const firstUse = projects.map((p) => { const f = !seen.has(p.data.cover_image); seen.add(p.data.cover_image); return f; });
+---
+<section class="work wrap" aria-labelledby={id} data-work>
+  <div class="top">
+    <div class="ht">
+      <H id={id} class={headingTag === 'h1' ? 't-display' : 't-h2'}>{heading}</H>
+      {lede && <p class="t-lead lede">{lede}</p>}
+    </div>
+    {filter && (
+      <div class="filters" role="group" aria-label="Filter by kind of work">
+        <button type="button" aria-pressed="true" data-filter="all">All</button>
+        {tags.map((t) => <button type="button" aria-pressed="false" data-filter={t}>{serviceLabel[t]}</button>)}
+      </div>
+    )}
+  </div>
+  <div class="layout">
+    <ol class="names">
+      {projects.map((p, i) => (
+        <li data-item data-tags={p.data.services.join(' ')} class={i === 0 ? 'is-active' : ''} data-i={i}>
+          <figure class={`photo m-pic ${firstUse[i] ? '' : 'm-pic--dup'}`}>
+            <img src={img(p.data.cover_image, 800)} width="800" height="500" alt={p.data.cover_alt} loading="lazy" />
+          </figure>
+          <a href={`/work/${p.id}`} class="row">
+            <span class="name">{p.data.client}</span>
+            <span class="meta">{p.data.services.map((s) => serviceLabel[s]).join(' · ')}, {yearOf(p.data.year)}</span>
+          </a>
+        </li>
+      ))}
+    </ol>
+    <div class="preview" aria-hidden="true">
+      <div class="frame">
+        {projects.map((p, i) => (
+          <figure class={`photo pv ${i === 0 ? 'is-active' : ''}`} data-pv={i}>
+            <img src={img(p.data.cover_image, 800)} width="800" height="1000" alt="" loading="lazy" />
+          </figure>
+        ))}
+      </div>
+      <div class="captions">
+        {projects.map((p, i) => (
+          <p class={`cap ${i === 0 ? 'is-active' : ''}`} data-cap={i}>
+            <strong>{p.data.title}.</strong> {p.data.summary} <span class="cap-meta">{p.data.services.map((s) => serviceLabel[s]).join(' · ')}, {yearOf(p.data.year)}</span>
+          </p>
+        ))}
+      </div>
+    </div>
+  </div>
+  <slot />
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-work]').forEach((root) => {
+    const items = [...root.querySelectorAll<HTMLElement>('[data-item]')];
+    const pvs = [...root.querySelectorAll<HTMLElement>('[data-pv]')];
+    const caps = [...root.querySelectorAll<HTMLElement>('[data-cap]')];
+    const set = (i: number) => {
+      items.forEach((el) => el.classList.toggle('is-active', Number(el.dataset.i) === i));
+      pvs.forEach((el) => el.classList.toggle('is-active', Number(el.dataset.pv) === i));
+      caps.forEach((el) => el.classList.toggle('is-active', Number(el.dataset.cap) === i));
+    };
+    items.forEach((el) => {
+      const i = Number(el.dataset.i);
+      el.addEventListener('pointerenter', () => set(i));
+      el.querySelector('a')?.addEventListener('focus', () => set(i));
+    });
+    const buttons = [...root.querySelectorAll<HTMLButtonElement>('[data-filter]')];
+    buttons.forEach((b) => b.addEventListener('click', () => {
+      const f = b.dataset.filter!;
+      buttons.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      let first = -1;
+      items.forEach((el) => {
+        const show = f === 'all' || (el.dataset.tags || '').split(' ').includes(f);
+        el.hidden = !show;
+        if (show && first < 0) first = Number(el.dataset.i);
+      });
+      if (first >= 0) set(first);
+    }));
+  });
+</script>
+
+<style>
+  .top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 48px; }
+  .ht { display: grid; gap: 20px; }
+  .lede { max-width: 44ch; }
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; }
+  .filters button { min-height: 44px; padding: 0 18px; border: 0; background: var(--surface-2); font-weight: 700; font-size: var(--t-small); cursor: pointer; transition: background-color var(--t-hover) ease, color var(--t-hover) ease, transform var(--t-press) var(--ease-out); }
+  .filters button:active { transform: scale(0.96); }
+  .filters button[aria-pressed='true'] { background: var(--ink); color: var(--bg); }
+  .layout { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gap); }
+  .names { grid-column: 1 / 9; list-style: none; }
+  .row { display: flex; align-items: baseline; gap: 20px; padding: 10px 0; text-decoration: none; color: var(--muted); transition: color var(--t-hover) ease; }
+  .name { font-size: var(--t-h2); font-weight: 800; letter-spacing: -0.045em; line-height: 1; }
+  .meta { display: none; font-size: var(--t-small); font-weight: 600; }
+  .is-active .row, .row:focus-visible { color: var(--ink); }
+  .is-active .name { text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 0.06em; text-underline-offset: 0.12em; }
+  .m-pic { display: none; }
+  .preview { grid-column: 9 / -1; position: sticky; top: 12vh; align-self: start; }
+  .frame { position: relative; aspect-ratio: 4 / 5; background: var(--surface-2); overflow: clip; }
+  .pv { position: absolute; inset: 0; opacity: 0; transition: opacity 220ms ease; }
+  .pv.is-active { opacity: 1; }
+  .pv img { transform: scale(1.04); transition: transform 900ms var(--ease-out); }
+  .pv.is-active img { transform: none; }
+  .captions { display: grid; margin-top: 16px; }
+  .cap-meta { display: block; margin-top: 6px; color: var(--muted); font-weight: 600; }
+  .cap { grid-area: 1 / 1; font-size: var(--t-small); line-height: 1.45; opacity: 0; transition: opacity 220ms ease; }
+  .cap.is-active { opacity: 1; }
+  @media (max-width: 860px) {
+    .names { grid-column: 1 / -1; display: grid; gap: 40px; }
+    .preview { display: none; }
+    .m-pic { display: block; aspect-ratio: 16 / 10; }
+    .m-pic--dup { display: none; }
+    .names { gap: 28px; }
+    .meta { display: block; }
+    .row { flex-direction: column; gap: 6px; color: var(--ink); padding-top: 14px; }
+    .name { font-size: clamp(32px, 9.5vw, 48px); }
+    .is-active .name { text-decoration: none; }
+  }
+</style>

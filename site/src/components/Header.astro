@@ -1,0 +1,65 @@
+---
+import Symbol from './Symbol.astro';
+import { nav } from '../data/site';
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+---
+<header class="site-header wrap">
+  <a class="brand" href="/" aria-label="Ka Technology, home">
+    <Symbol size={40} />
+  </a>
+  <nav class="primary" aria-label="Main">
+    <ul>
+      {nav.map((item) => (
+        <li><a href={item.href} aria-current={path.startsWith(item.href) ? 'page' : undefined}>{item.label}</a></li>
+      ))}
+    </ul>
+  </nav>
+  <div class="tools">
+    <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark theme">
+      <svg class="i-sun" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>
+      <svg class="i-moon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 14.6A8.5 8.5 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1Z"/></svg>
+    </button>
+    <a class="button talk" href="/contact">Let’s talk</a>
+    <button class="menu-button" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-button>Menu</button>
+  </div>
+  <div class="mobile-menu" id="mobile-menu" hidden>
+    <ul>
+      {nav.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+      <li><a href="/contact" class="accent">Let’s talk</a></li>
+    </ul>
+  </div>
+</header>
+
+<style>
+  .site-header { display: flex; align-items: center; gap: 32px; min-height: 84px; position: relative; z-index: 20; }
+  .brand { display: inline-flex; color: var(--ink); transition: color var(--t-hover) ease, transform var(--t-press) var(--ease-out); }
+  .brand:active { transform: scale(0.94); }
+  @media (hover: hover) and (pointer: fine) { .brand:hover { color: var(--accent); } }
+  .primary { margin-left: auto; }
+  .primary ul { display: flex; gap: clamp(18px, 2.2vw, 36px); list-style: none; }
+  .primary a { font-size: var(--t-small); font-weight: 600; text-decoration: none; padding: 8px 0; text-decoration-line: underline; text-decoration-color: transparent; text-decoration-thickness: 2px; text-underline-offset: 8px; transition: text-decoration-color var(--t-hover) ease; }
+  .primary a[aria-current='page'] { text-decoration-color: var(--accent); }
+  @media (hover: hover) and (pointer: fine) { .primary a:hover { text-decoration-color: var(--ink); } }
+  .tools { display: flex; align-items: center; gap: 12px; }
+  .theme-toggle { width: 48px; height: 48px; display: inline-grid; place-items: center; background: transparent; border: 0; cursor: pointer; color: var(--ink); transition: transform var(--t-press) var(--ease-out), background-color var(--t-hover) ease; }
+  .theme-toggle:active { transform: scale(0.9) rotate(-20deg); }
+  @media (hover: hover) and (pointer: fine) { .theme-toggle:hover { background: var(--surface); } }
+  .i-sun { display: none; }
+  :global(:root[data-theme='dark']) .i-sun { display: block; }
+  :global(:root[data-theme='dark']) .i-moon { display: none; }
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .i-sun { display: block; }
+    :global(:root:not([data-theme='light'])) .i-moon { display: none; }
+  }
+  .talk { min-height: 46px; padding: 0 20px; font-size: var(--t-small); }
+  .menu-button { display: none; min-height: 46px; padding: 0 16px; background: var(--surface-2); border: 0; font-weight: 700; cursor: pointer; }
+  .mobile-menu { position: absolute; top: 100%; left: 0; right: 0; background: var(--bg); padding: 8px var(--margin) 28px; box-shadow: 0 24px 40px -24px rgb(0 0 0 / 0.35); } /* taste-skill-ignore: open menu overlay */
+  .mobile-menu ul { list-style: none; display: grid; gap: 2px; }
+  .mobile-menu a { display: block; padding: 12px 0; font-size: var(--t-h2); font-weight: 800; letter-spacing: -0.03em; text-decoration: none; }
+  .mobile-menu .accent { color: var(--accent-text); }
+  @media (max-width: 960px) {
+    .primary, .talk { display: none; }
+    .tools { margin-left: auto; }
+    .menu-button { display: inline-flex; align-items: center; }
+  }
+</style>

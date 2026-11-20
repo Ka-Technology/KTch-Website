@@ -1,0 +1,95 @@
+---
+import { site } from '../data/site';
+import { credits } from '../data/credits';
+import { img } from '../data/site';
+interface Props { strip?: boolean }
+const { strip = true } = Astro.props;
+const tiles = [
+  { n: 'hawthorne-1912', alt: 'A 1912 postcard of the Hawthorne Bridge with its lift span raised.' },
+  { n: 'st-johns-1938', alt: 'The St. Johns Bridge lit up at night, 1938.' },
+  { n: 'third-street-1910', alt: 'Third Street, downtown Portland, 1910.' },
+  { n: 'downtown-portland', alt: 'Downtown Portland and the Willamette River today.' },
+];
+const year = new Date().getFullYear();
+const social = site.social.filter((s) => s.href);
+---
+{strip && (
+  <div class="strip" data-reveal>
+    {tiles.map((t) => <figure class="photo tile"><img src={img(t.n, 800)} width="800" height="800" alt={t.alt} loading="lazy" /></figure>)}
+  </div>
+)}
+<footer class="site-footer inverse">
+  <div class="wrap">
+    <div class="mark" data-reveal>
+      <img class="logo logo--red" src="/brand/ka-logo-complete.png" width="900" height="462" alt="Ka Technology" loading="lazy" />
+      <img class="logo logo--white" src="/brand/ka-logo-complete-white.png" width="900" height="462" alt="Ka Technology" loading="lazy" />
+      <p class="t-lead slogan">{site.slogan}</p>
+    </div>
+    <div class="grid12 row">
+      <ul class="places" data-reveal>
+        <li><a href={`mailto:${site.email}`}>{site.email}</a></li>
+        <li><a href={site.phoneHref}>{site.phone}</a></li>
+        <li><span>Based in {site.city}</span></li>
+      </ul>
+      <div class="cols" data-reveal>
+        <ul>
+          <li><a href="/services">Services</a></li>
+          <li><a href="/work">Work</a></li>
+          <li><a href="/products">Products</a></li>
+        </ul>
+        <ul>
+          <li><a href="/about">About</a></li>
+          <li><a href="/careers">Careers</a></li>
+          <li><a href="/contact">Contact</a></li>
+        </ul>
+        <ul>
+          <li><a href="/privacy">Privacy</a></li>
+          {social.map((s) => <li><a href={s.href} rel="me noopener" target="_blank">{s.label}</a></li>)}
+        </ul>
+      </div>
+    </div>
+    <div class="legal t-small">
+      <p>© {year} {site.legal}. All rights reserved.</p>
+      <a href="#top">Back to top</a>
+    </div>
+    <p class="credits t-small">
+      Photographs of Portland: {credits.map((c, i) => (
+        <>{i > 0 && '; '}<a href={c.page} rel="noopener">{c.title}</a>{c.creator ? `, ${c.creator}` : ''} ({c.licence})</>
+      ))}.
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer { padding-block: clamp(80px, 9vw, 140px) 40px; }
+  .mark { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 32px; }
+  .logo { width: clamp(220px, 30vw, 420px); }
+  .slogan { max-width: 22ch; font-weight: 600; }
+  .logo--white { display: none; }
+  /* the footer is inverse: on a dark page it is light, so the red wordmark shows; on a light page, the white one. */
+  :global(:root:not([data-theme='dark'])) .logo--red { display: none; }
+  :global(:root:not([data-theme='dark'])) .logo--white { display: block; }
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .logo--red { display: block; }
+    :global(:root:not([data-theme='light'])) .logo--white { display: none; }
+  }
+  .row { margin-top: 72px; row-gap: 48px; }
+  .places { grid-column: 1 / 7; list-style: none; display: grid; gap: 6px; }
+  .places a, .places span { font-size: var(--t-lead); font-weight: 700; letter-spacing: -0.03em; text-decoration: none; }
+  .places a { color: var(--accent-text); transition: color var(--t-hover) ease; }
+  @media (hover: hover) and (pointer: fine) { .places a:hover { color: var(--ink); } }
+  .cols { grid-column: 8 / -1; display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap); }
+  .cols ul { list-style: none; display: grid; gap: 10px; align-content: start; }
+  .cols a, .legal a { font-size: var(--t-small); text-decoration: underline; text-decoration-color: transparent; text-underline-offset: 4px; transition: text-decoration-color var(--t-hover) ease; }
+  @media (hover: hover) and (pointer: fine) { .cols a:hover, .legal a:hover { text-decoration-color: var(--accent); } }
+  .legal { margin-top: 96px; display: flex; justify-content: space-between; gap: 16px; }
+  .credits { margin-top: 20px; color: var(--muted); max-width: 90ch; }
+  .strip { display: grid; grid-template-columns: repeat(4, 1fr); }
+  .tile { aspect-ratio: 1; margin: 0; }
+  @media (max-width: 860px) { .strip { grid-template-columns: repeat(2, 1fr); } }
+  .credits a { color: inherit; }
+  @media (max-width: 860px) {
+    .places, .cols { grid-column: 1 / -1; }
+    .cols { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>

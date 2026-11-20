@@ -1,0 +1,30 @@
+---
+interface Props { title?: [string, string]; text?: string }
+const { title = ['Got a tedious process?', 'Let’s make it disappear.'], text = 'Tell us what’s slowing you down. We’ll get back to you within 1–2 business days.' } = Astro.props;
+const len = Math.max(...title.map((t) => t.length));
+---
+<section class="close inverse" aria-labelledby="close-title">
+  <div class="wrap inner">
+    <h2 id="close-title" class="t-display lines fit" style={`--len:${len}`} data-reveal>
+      <span class="line"><span>{title[0]}</span></span>
+      <span class="line"><span>{title[1]}</span></span>
+    </h2>
+    <div class="foot" data-reveal>
+      <p class="t-lead">{text}</p>
+      <a class="button" href="/contact">Let’s talk</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .close { min-height: min(86svh, 820px); display: flex; }
+  .inner { display: flex; flex-direction: column; justify-content: space-between; gap: clamp(64px, 12vh, 140px); padding-block: clamp(96px, 12vw, 180px) 64px; width: 100%; }
+  .fit { font-size: min(var(--t-display), calc((100vw - 2 * var(--margin)) / (var(--len) * 0.54))); }
+  .foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 28px; }
+  .foot p { max-width: 40ch; }
+  .foot .button { min-height: 58px; padding: 0 34px; font-size: var(--t-body); }
+  @media (max-width: 1100px) { .close { min-height: 0; } }
+  @media (max-width: 860px) {
+    .foot .button { width: 100%; }
+  }
+</style>

@@ -1,0 +1,29 @@
+---
+import Base from '../layouts/Base.astro';
+import { site } from '../data/site';
+---
+<Base title="Privacy" description="How Ka Technology handles the information you share through ka-tch.com.">
+  <article class="wrap grid12 pv">
+    <h1 class="t-display title lines"><span class="line"><span data-line>Privacy</span></span></h1>
+    <div class="prose body" data-reveal>
+      <p class="t-lead">This site collects as little as it can. Here is everything it does with your information.</p>
+      <h2>What we collect</h2>
+      <p>If you use the contact form, we receive the name, email, company and message you type in. The form is delivered to us by Formspree, a form-handling service, which stores submissions so they can be sent to <a class="link" href={`mailto:${site.email}`}>{site.email}</a>.</p>
+      <h2>How we use it</h2>
+      <p>Only to reply to you and to talk about the work you asked about. We don’t sell it, rent it or add you to a mailing list.</p>
+      <h2>Cookies and storage</h2>
+      <p>This site sets no advertising or tracking cookies. If you switch between light and dark mode, your choice is saved in your own browser so the site remembers it.</p>
+      <h2>Your choices</h2>
+      <p>Email <a class="link" href={`mailto:${site.email}`}>{site.email}</a> and we will tell you what we hold about you, correct it, or delete it.</p>
+      <p class="muted">Last updated November 2026.</p>
+    </div>
+  </article>
+</Base>
+
+<style>
+  .pv { padding-top: clamp(24px, 5vh, 64px); padding-bottom: var(--section); row-gap: 40px; }
+  .title { grid-column: 1 / 6; }
+  .body { grid-column: 6 / -1; max-width: 62ch; }
+  .body h2 { font-size: var(--t-lead); letter-spacing: -0.02em; margin-top: 1.6em; margin-bottom: 0.4em; }
+  @media (max-width: 860px) { .title, .body { grid-column: 1 / -1; } }
+</style>

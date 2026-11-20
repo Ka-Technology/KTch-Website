@@ -1,0 +1,11 @@
+---
+// Ka Logo 2.0 symbol, drawn as a stroke so it takes currentColor (white on dark, ink on light).
+interface Props { size?: number; class?: string; title?: string }
+const { size = 36, class: cls = '', title } = Astro.props;
+---
+<svg class={cls} width={size} height={size} viewBox="330 370 703 703" fill="none" stroke="currentColor"
+  stroke-width="36" stroke-linecap="round" stroke-linejoin="round" role={title ? 'img' : undefined}
+  aria-hidden={title ? undefined : 'true'} aria-label={title}>
+  <path class="ka-draw" pathLength="1" d="M430 705V397H1003V968H360" />
+  <path class="ka-draw" pathLength="1" style="animation-delay:260ms" d="M430 1043V825H573V545H860V825H700" />
+</svg>

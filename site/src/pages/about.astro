@@ -1,0 +1,95 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import CloseCTA from '../components/CloseCTA.astro';
+import { img, srcset } from '../data/site';
+const team = (await getCollection('team', (t) => t.data.current)).sort((a, b) => a.data.order - b.data.order);
+const initials = (n: string) => n.split(' ').map((w) => w[0]).join('').slice(0, 2);
+const values = [
+  { name: 'Meaningful choices.', text: 'Tech should give you options, not lock you in.' },
+  { name: 'Human first.', text: 'AI handles the tedious parts; people keep the meaningful ones.' },
+  { name: 'Partners, not vendors.', text: 'On bigger projects we sometimes take equity or revenue share, because we want to be invested in your growth.' },
+];
+---
+<Base og="about" title="About" description="Ka Technology started in May 2024 as four friends from Oregon State with one idea: small businesses deserve the same technology big companies have.">
+  <PageHead title="Our story" lede="Small businesses deserve the same technology big companies have, without the big-company price tag or jargon."
+    image="hawthorne-pan" imageAlt="A panorama of Portland’s Hawthorne Bridge spanning the Willamette River." imageH={441} />
+
+  <section class="wrap grid12 story" aria-label="How Ka Technology started">
+    <div class="side-pic">
+      <figure class="photo">
+        <img src={img('third-street-1910', 800)} width="800" height="1199" loading="lazy" alt="Third Street in downtown Portland in 1910, with streetcars and shop awnings." />
+      </figure>
+    </div>
+    <div class="prose text" data-reveal>
+      <p class="t-lead first">Ka Technology started in May 2024 as four friends from Oregon State’s computer science program with one idea: small businesses deserve the same technology big companies have, without the big-company price tag or jargon.</p>
+      <p>Our first products came from real frustrations. Santosh worked as a real-estate broker and watched his principal broker spend close to an hour every week typing out continuing-education certificates by hand. We built <a class="link" href="/products/realdoc">RealDoc</a> to do it in one click. A title company later used it across its Oregon branch.</p>
+      <p>Since then we’ve built AI document platforms, schedulers, gym software and websites for businesses across the Portland area. We still believe what we wrote on day one: AI is a tool, not a replacement. Its job is to give people more time, and more meaningful choices.</p>
+    </div>
+  </section>
+
+  <section class="values inverse" aria-labelledby="values-t">
+    <div class="wrap">
+      <h2 id="values-t" class="t-h2">What we believe</h2>
+      <ul class="vl" data-reveal>
+        {values.map((v) => <li><h3>{v.name}</h3><p class="t-lead">{v.text}</p></li>)}
+      </ul>
+    </div>
+  </section>
+
+  <section class="team wrap section" aria-labelledby="team-t">
+    <div class="th" data-reveal>
+      <h2 id="team-t" class="t-h2">The Dream Team</h2>
+      <p class="t-lead">Engineers, a former broker and a data scientist, building together since day one.</p>
+    </div>
+    <ul class="tg" data-reveal>
+      {team.map((m) => (
+        <li class="member">
+          {m.data.photo
+            ? <figure class="photo mp"><img src={m.data.photo} width="720" height="960" alt={`Portrait of ${m.data.name}`} loading="lazy" /></figure>
+            : <div class="mp mono" aria-hidden="true"><span>{initials(m.data.name)}</span></div>}
+          <h3>{m.data.name}</h3>
+          <p class="role">{m.data.title}</p>
+          <p class="bio">{m.data.bio}</p>
+          {m.data.linkedin && <a class="link" href={m.data.linkedin} rel="noopener">LinkedIn</a>}
+        </li>
+      ))}
+    </ul>
+    <p class="join">Want to build with us? <a class="link" href="/careers"><span class="arrow">See careers</span></a></p>
+  </section>
+  <CloseCTA />
+</Base>
+
+<style>
+  .story { row-gap: 40px; align-items: start; }
+  .side-pic { grid-column: 1 / 5; }
+  .side-pic .photo { aspect-ratio: 3 / 4; }
+  .text { grid-column: 6 / -1; max-width: 62ch; }
+  .first { font-weight: 600; margin-bottom: 0.4em; }
+  .values { margin-top: var(--section); padding-block: clamp(80px, 9vw, 140px); }
+  .vl { list-style: none; margin-top: 56px; display: grid; grid-template-columns: 5fr 4fr 5fr; gap: var(--gap); align-items: start; }
+  .vl li { display: grid; gap: 14px; }
+  .vl li:nth-child(2) { margin-top: 64px; }
+  .vl li:nth-child(3) { margin-top: 128px; }
+  .values { padding-bottom: clamp(64px, 6vw, 96px) !important; }
+  .vl h3 { font-size: var(--t-h2); letter-spacing: -0.04em; }
+  .vl h3::after { content: ""; display: block; width: 36px; height: 6px; background: var(--accent); margin-top: 18px; }
+  .th { display: grid; gap: 18px; max-width: 46ch; margin-bottom: 56px; }
+  .tg { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 56px var(--gap); }
+  .member { display: grid; gap: 8px; align-content: start; }
+  .mp { aspect-ratio: 3 / 4; margin-bottom: 12px; }
+  .mono { background: var(--surface); display: grid; place-items: end start; padding: 20px; }
+  .mono span { font-size: var(--t-display); font-weight: 850; letter-spacing: -0.06em; line-height: 0.8; color: var(--muted); }
+  .member h3 { font-size: var(--t-lead); letter-spacing: -0.02em; }
+  .role { font-weight: 600; color: var(--accent-text); font-size: var(--t-small); }
+  .bio { max-width: 34ch; }
+  .join { margin-top: 64px; font-weight: 600; }
+  @media (max-width: 860px) {
+    .side-pic, .text { grid-column: 1 / -1; }
+    .side-pic { order: 2; }
+    .vl { grid-template-columns: 1fr; }
+    .vl li:nth-child(n) { margin-top: 0; }
+    .tg { grid-template-columns: 1fr 1fr; gap: 40px 16px; }
+  }
+</style>

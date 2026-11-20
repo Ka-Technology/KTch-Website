@@ -1,0 +1,67 @@
+---
+import { srcset, img } from '../../data/site';
+---
+<section class="hero wrap" aria-labelledby="hero-title">
+  <h1 id="hero-title" class="t-display lines title">
+    <span class="line"><span data-line style="--i:0">Giving people the power</span></span>
+    <span class="line"><span data-line style="--i:1">of meaningful choices.</span></span>
+  </h1>
+
+  <div class="body grid12">
+    <div class="talk">
+      <p class="t-lead" data-load style="--d:420ms">
+        We’re a Portland team that builds AI tools, custom software and automations that take tedious
+        work off your plate, so you can spend your time on the work that matters.
+      </p>
+      <div class="actions" data-load style="--d:500ms">
+        <a class="button" href="/contact">Let’s talk</a>
+        <a class="button button--quiet" href="/work">See our work</a>
+      </div>
+    </div>
+
+    <div class="picture-col">
+      <figure class="photo picture" data-open>
+        <img src={img('hawthorne-1912')} srcset={srcset('hawthorne-1912')} sizes="(max-width: 860px) 100vw, 64vw"
+          width="1600" height="1019" fetchpriority="high"
+          alt="A 1912 postcard of Portland’s Hawthorne Bridge with its lift span raised as a riverboat steams through." />
+      </figure>
+      <a class="figure" href="/products/realdoc" data-load style="--d:700ms">
+        <span class="figure-num">1 click</span>
+        <span class="figure-text">replaces an hour a week of typing certificates by hand. That’s RealDoc.</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero { padding-top: clamp(24px, 4vh, 56px); }
+  .title { font-size: min(var(--t-display), calc((100vw - 2 * var(--margin)) / 11.9)); }
+  .body { margin-top: clamp(32px, 5vh, 64px); align-items: start; }
+  .talk { grid-column: 1 / 5; display: grid; gap: 32px; padding-top: 8px; }
+  .talk p { max-width: 26ch; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; }
+  .picture-col { grid-column: 5 / -1; position: relative; padding-top: 72px; }
+  .picture { aspect-ratio: 1600 / 1019; max-height: 64vh; width: 100%; background: #9a9a96; }
+  .figure {
+    position: absolute; left: 0; top: 72px; transform: translateY(-50%);
+    width: 300px; padding: 22px 24px; background: var(--accent); color: var(--on-accent);
+    display: grid; gap: 6px; text-decoration: none;
+    transition: transform var(--t-hover) var(--ease-out);
+  }
+  .figure-num { font-size: var(--t-h2); font-weight: 850; letter-spacing: -0.04em; line-height: 1; }
+  .figure-text { font-size: var(--t-small); line-height: 1.4; font-weight: 600; }
+  @media (hover: hover) and (pointer: fine) { .figure:hover { transform: translateY(calc(-50% - 4px)); } }
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.js) .figure[data-load] { transform: translateY(calc(-50% + 14px)); animation-name: figure-rise; }
+  }
+  @keyframes figure-rise { to { opacity: 1; transform: translateY(-50%); } }
+
+  @media (max-width: 860px) {
+    .talk, .picture-col { grid-column: 1 / -1; }
+    .talk .button { flex: 1 1 100%; }
+    .picture-col { margin-top: 40px; margin-inline: calc(var(--margin) * -1); padding-top: 72px; }
+    .picture { aspect-ratio: 4 / 3; max-height: none; }
+    .figure { left: var(--margin); width: 64%; padding: 16px 18px; }
+    
+  }
+</style>
