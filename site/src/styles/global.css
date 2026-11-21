@@ -190,7 +190,9 @@ ul, ol { margin: 0; padding: 0; }
   }
 }
 @media (prefers-reduced-motion: no-preference) {
-  .js .ka-draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: ka-draw 1100ms var(--ease-in-out) 100ms forwards; }
+  .js .ka-draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: ka-draw 1300ms linear 150ms forwards; }
+  /* both traces leave the plus together at the same speed: durations follow path length (349 : 228) */
+  .js .ka-trace-b { animation-duration: 850ms; }
 }
 @keyframes ka-draw { to { stroke-dashoffset: 0; } }
 @keyframes line-up { to { transform: none; } }

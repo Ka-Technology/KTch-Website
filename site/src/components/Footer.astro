@@ -1,5 +1,6 @@
 ---
 import { site, nav, img } from '../data/site';
+import Logo from './Logo.astro';
 interface Props { strip?: boolean }
 const { strip = true } = Astro.props;
 const tiles = [
@@ -21,8 +22,7 @@ const social = site.social.filter((s) => s.href);
     <div class="grid12 top">
       <div class="brand" data-reveal>
         <a href="/" class="logo-link" aria-label="Ka Technology, home">
-          <img class="logo logo--red" src="/brand/ka-logo-complete.png" width="900" height="462" alt="Ka Technology" loading="lazy" />
-          <img class="logo logo--white" src="/brand/ka-logo-complete-white.png" width="900" height="462" alt="Ka Technology" loading="lazy" />
+          <Logo height={40} draw={false} class="logo" />
         </a>
         <p class="slogan">{site.slogan}</p>
       </div>
@@ -68,16 +68,9 @@ const social = site.social.filter((s) => s.href);
   .brand { grid-column: 1 / 5; display: grid; gap: 16px; justify-items: start; }
   .logo-link { display: block; transition: transform var(--t-press) var(--ease-out); }
   .logo-link:active { transform: scale(0.98); }
-  .logo { width: clamp(150px, 13vw, 190px); }
+  .logo-link { color: var(--accent); }
+  .logo-link :global(.logo) { width: clamp(200px, 17vw, 250px); height: auto; }
   .slogan { font-size: var(--t-body); font-weight: 600; max-width: 24ch; line-height: 1.4; }
-  .logo--white { display: none; }
-  /* the footer is an inverse field: dark on a light page (white wordmark), light on a dark page (red wordmark) */
-  :global(:root:not([data-theme='dark'])) .logo--red { display: none; }
-  :global(:root:not([data-theme='dark'])) .logo--white { display: block; }
-  @media (prefers-color-scheme: dark) {
-    :global(:root:not([data-theme='light'])) .logo--red { display: block; }
-    :global(:root:not([data-theme='light'])) .logo--white { display: none; }
-  }
 
   .col { display: grid; gap: 14px; align-content: start; }
   .contact { grid-column: 6 / 9; }
