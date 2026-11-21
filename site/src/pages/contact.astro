@@ -12,8 +12,8 @@ const topics = ['AI', 'Software', 'Automation', 'Analytics', 'Website', 'Not sur
         <h1 id="c-title" class="t-display lines"><span class="line"><span data-line style="--i:0">Let’s talk.</span></span></h1>
         <p class="t-lead" data-load style="--d:300ms">Tell us what’s slowing you down. We’ll get back to you within 1–2 business days.</p>
         <ul class="direct" data-load style="--d:380ms">
-          <li><a href={`mailto:${site.email}`}>{site.email}</a></li>
-          <li><a href={site.phoneHref}>{site.phone}</a></li>
+          <li><a class="link" href={`mailto:${site.email}`}>{site.email}</a></li>
+          <li><a class="link" href={site.phoneHref}>{site.phone}</a></li>
           <li><span>Based in {site.city}</span></li>
         </ul>
         <figure class="photo pic">
@@ -93,9 +93,7 @@ const topics = ['AI', 'Software', 'Automation', 'Analytics', 'Website', 'Not sur
   .intro { grid-column: 1 / 6; display: grid; gap: 28px; }
   .intro .t-lead { max-width: 30ch; }
   .direct { list-style: none; display: grid; gap: 6px; }
-  .direct a, .direct span { font-size: var(--t-lead); font-weight: 700; letter-spacing: -0.02em; text-decoration: none; }
-  .direct a { color: var(--accent-text); }
-  @media (hover: hover) and (pointer: fine) { .direct a:hover { text-decoration: underline; text-underline-offset: 4px; } }
+  .direct li { font-size: var(--t-lead); font-weight: 700; letter-spacing: -0.02em; }
   .pic { aspect-ratio: 16 / 9; margin-top: 12px; }
   .form { grid-column: 7 / -1; display: grid; gap: 26px; background: var(--surface); padding: clamp(24px, 3.5vw, 48px); }
   .field { display: grid; gap: 8px; border: 0; margin: 0; padding: 0; min-width: 0; }
