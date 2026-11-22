@@ -47,7 +47,7 @@ const values = [
       {team.map((m) => (
         <li class="member">
           {m.data.photo
-            ? <figure class="photo mp"><img src={m.data.photo} width="720" height="960" alt={`Portrait of ${m.data.name}`} loading="lazy" /></figure>
+            ? <figure class="photo mp"><img src={m.data.photo} width="900" height="900" alt={`Portrait of ${m.data.name}`} loading="lazy" /></figure>
             : <div class="mp mono" aria-hidden="true"><span>{initials(m.data.name)}</span></div>}
           <h3>{m.data.name}</h3>
           <p class="role">{m.data.title}</p>
@@ -78,7 +78,9 @@ const values = [
   .th { display: grid; gap: 18px; max-width: 46ch; margin-bottom: 56px; }
   .tg { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 56px var(--gap); }
   .member { display: grid; gap: 8px; align-content: start; }
-  .mp { aspect-ratio: 3 / 4; margin-bottom: 12px; }
+  .mp { aspect-ratio: 1; margin-bottom: 12px; }
+  /* the headshots are designed brand pieces (colour, red ka outline): shown as made, not greyed */
+  .mp img { filter: none; }
   .mono { background: var(--surface); display: grid; place-items: end start; padding: 20px; }
   .mono span { font-size: var(--t-display); font-weight: 850; letter-spacing: -0.06em; line-height: 0.8; color: var(--muted); }
   .member h3 { font-size: var(--t-lead); letter-spacing: -0.02em; }

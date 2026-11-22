@@ -120,7 +120,7 @@ ul, ol { margin: 0; padding: 0; }
 }
 
 /* ------------------------------------------------------------------ type roles */
-.t-display { font-size: var(--t-display); line-height: 1.04; letter-spacing: -0.045em; font-weight: 850; }
+.t-display { font-size: var(--t-display); line-height: 1.14; letter-spacing: -0.045em; font-weight: 850; }
 .t-h2 { font-size: var(--t-h2); line-height: 0.98; letter-spacing: -0.04em; font-weight: 800; }
 .t-lead { font-size: var(--t-lead); line-height: 1.4; letter-spacing: -0.01em; }
 .t-small { font-size: var(--t-small); line-height: 1.45; }
