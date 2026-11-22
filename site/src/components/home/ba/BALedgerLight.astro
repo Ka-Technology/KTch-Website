@@ -1,0 +1,59 @@
+---
+// Option 2B, Ledger (lighter): reads across like the ledger, but only the result is a filled block.
+// The chore and the old cost are plain type on the page, so the eye lands on the three results.
+import { chores } from '../../../data/chores';
+---
+<section class="ledger wrap section" aria-labelledby="ledger2-t">
+  <div class="top grid12" data-reveal>
+    <h2 id="ledger2-t" class="t-h2 heading">Before and after</h2>
+    <p class="t-lead intro">AI is a tool, not a replacement. We use it, plus good software, to take the tedious part off your plate.</p>
+  </div>
+
+  <ol class="rows">
+    {chores.map((c) => (
+      <li class="row" data-reveal>
+        <div class="chore">
+          <h3>{c.tab}</h3>
+          <a class="link t-small" href={c.href}><span class="arrow">{c.short}</span></a>
+        </div>
+        <div class="before">
+          <p class="big"><span class="sr-only">Before: </span>{c.before.big}</p>
+          <p class="note">{c.before.note}</p>
+        </div>
+        <span class="to" aria-hidden="true">→</span>
+        <div class="after">
+          <p class="big"><span class="sr-only">After: </span>{c.after.big}</p>
+          <p class="note">{c.after.note}</p>
+        </div>
+      </li>
+    ))}
+  </ol>
+</section>
+
+<style>
+  .heading { grid-column: 1 / 6; }
+  .intro { grid-column: 7 / -1; max-width: 40ch; }
+  .rows { list-style: none; margin-top: clamp(48px, 7vh, 96px); display: grid; gap: clamp(40px, 5vw, 72px); }
+  .row { display: grid; grid-template-columns: 1fr 1.45fr auto 1.45fr; gap: var(--gap); align-items: center; }
+  .chore { display: grid; gap: 10px; justify-items: start; align-self: start; padding-top: 6px; }
+  .chore h3 { font-size: var(--t-lead); letter-spacing: -0.02em; line-height: 1.2; }
+  .before, .after { display: grid; gap: 14px; align-content: start; }
+  .after { background: var(--accent); color: var(--on-accent); padding: clamp(20px, 2.2vw, 32px); }
+  .big { font-size: clamp(40px, 4.6vw, 76px); font-weight: 850; letter-spacing: -0.05em; line-height: 0.9; white-space: nowrap; }
+  .before .big { color: var(--muted); }
+  .note { max-width: 34ch; }
+  .before .note { color: var(--muted); }
+  .to { font-size: clamp(32px, 3vw, 48px); font-weight: 800; color: var(--accent-text); }
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.js) .row .to { opacity: 0; transform: translateX(-12px); transition: opacity 500ms var(--ease-out) 300ms, transform 600ms var(--ease-out) 300ms; }
+    :global(.js) .row.is-in .to { opacity: 1; transform: none; }
+  }
+  @media (max-width: 860px) {
+    .heading, .intro { grid-column: 1 / -1; }
+    .intro { margin-top: 20px; }
+    .row { grid-template-columns: 1fr; gap: 16px; }
+    .to { transform: rotate(90deg); justify-self: start; }
+    :global(.js) .row.is-in .to { transform: rotate(90deg); }
+    .big { font-size: clamp(36px, 11vw, 56px); }
+  }
+</style>
