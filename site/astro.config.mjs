@@ -6,8 +6,8 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   site: 'https://ka-tch.com',
   trailingSlash: 'ignore',
-  // the work index now lives on the Services page
-  redirects: { '/work': '/services#work' },
+  // client work now lives inside each service on the Services page
+  redirects: { '/work': '/services' },
   integrations: [sitemap()],
   vite: { plugins: [tailwindcss()] },
 });

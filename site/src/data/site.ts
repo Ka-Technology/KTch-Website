@@ -24,14 +24,15 @@ export const nav = [
 ];
 
 export type Pillar = {
-  slug: 'ai' | 'software' | 'automation' | 'analytics';
+  slug: 'ai' | 'software' | 'web' | 'automation' | 'analytics';
   name: string;
   short: string;
   pitch: string;
   image: string;
   imageAlt: string;
   offerings: { name: string; text: string; example?: { label: string; href: string } }[];
-  caseStudy: { label: string; href: string; kind?: string };
+  caseStudy?: { label: string; href: string };      // the proof shown in the home table
+  partners?: { name: string; what: string }[];      // clients in this area without a case study
 };
 
 export const pillars: Pillar[] = [
@@ -46,7 +47,7 @@ export const pillars: Pillar[] = [
       { name: 'LLM integrations', text: 'AI that already knows your business, so you never have to catch ChatGPT up again.' },
       { name: 'Document AI', text: 'Turn piles of PDFs into structured, verified data.', example: { label: 'CIDA Analytics', href: '/work/cida-analytics' } },
       { name: 'Voice and text agents', text: 'AI that answers calls, follows up on missed calls, and books appointments.' },
-      { name: 'ML-based optimization', text: "Find the inefficiencies your team can't see.", example: { label: 'Shiftwize', href: '/products/shiftwize' } },
+      { name: 'ML-based optimization', text: "Find the inefficiencies your team can't see." },
     ],
     caseStudy: { label: 'CIDA Analytics', href: '/work/cida-analytics' },
   },
@@ -58,13 +59,28 @@ export const pillars: Pillar[] = [
     image: 'svc-software',
     imageAlt: 'Downtown Portland towers rising above autumn trees.',
     offerings: [
-      { name: 'Website design & development', text: 'Great UX and UI, beyond what a template can give you.' },
-      { name: 'Custom web apps & SaaS', text: 'Software shaped around how you already work.', example: { label: 'RealDoc', href: '/products/realdoc' } },
+      { name: 'Custom web apps & SaaS', text: 'Software shaped around how you already work.' },
       { name: 'Database design', text: 'Data that’s organized, so it scales with you.' },
       { name: 'API development', text: "Connect the tools that don't talk to each other." },
       { name: 'Tech debt', text: 'Modernize old code before it costs you more.' },
     ],
+    caseStudy: { label: 'CIDA Analytics', href: '/work/cida-analytics' },
+  },
+  {
+    slug: 'web',
+    name: 'Website Development',
+    short: 'Web',
+    pitch: 'A website that looks like your business today, not like a template.',
+    image: 'third-street-1910',
+    imageAlt: 'Third Street in downtown Portland in 1910, lined with shop fronts and awnings.',
+    offerings: [
+      { name: 'Website design & development', text: 'Great UX and UI, beyond what a template can give you.' },
+      { name: 'Redesigns', text: 'Bring an old site up to date, with a personal touch instead of stock photos.', example: { label: 'Scrubs & More', href: '/work/scrubs-and-more' } },
+      { name: 'Online shops & donations', text: 'Sell or take donations right from your own site.', example: { label: 'Hopewell Ranch', href: '/work/hopewell-ranch' } },
+      { name: 'Forms that reach you', text: 'Quote requests and job applications that land straight in your inbox.', example: { label: 'Milligan’s', href: '/work/milligans' } },
+    ],
     caseStudy: { label: 'Scrubs & More', href: '/work/scrubs-and-more' },
+    partners: [{ name: 'Kap & Company', what: 'Project partner' }],
   },
   {
     slug: 'automation',
@@ -92,7 +108,6 @@ export const pillars: Pillar[] = [
       { name: 'Predictive forecasting', text: "Staff and stock for what's coming." },
       { name: 'Data visualization', text: 'Dashboards your whole team understands.' },
     ],
-    caseStudy: { label: 'Shiftwize', href: '/products/shiftwize', kind: 'Product' },
   },
 ];
 
@@ -102,24 +117,6 @@ export const serviceLabel: Record<string, string> = {
   automation: 'Automation',
   analytics: 'Analytics',
   web: 'Web',
-};
-
-/* Clients. Old Republic appears in the past list only, never quoted. */
-export const clients = {
-  current: [
-    { name: 'CIDA Analytics', what: 'AI document platform' },
-    { name: 'Keller Williams Eugene-Springfield', what: 'RealDoc' }, // TODO: confirm still active
-  ],
-  past: [
-    { name: 'Old Republic Title, Oregon branch', what: 'RealDoc' },
-    { name: 'Cascade Title', what: 'RealDoc' },
-    { name: 'Scrubs & More', what: 'Website' },
-    { name: 'Real Accounting', what: 'IT and email migration' },
-    { name: 'APEX Performance', what: 'Automation' },
-    { name: 'Hopewell Ranch', what: 'Website' },
-    { name: "Milligan's Landscape & Lawn", what: 'Website' },
-    { name: 'Kap & Company LLC', what: 'Project partner' },
-  ],
 };
 
 /* Names for the home-page strip (no Old Republic, no unconfirmed partners). */

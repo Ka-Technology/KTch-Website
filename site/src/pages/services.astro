@@ -2,8 +2,12 @@
 import Base from '../layouts/Base.astro';
 import PageHead from '../components/PageHead.astro';
 import CloseCTA from '../components/CloseCTA.astro';
-import WorkIndex from '../components/WorkIndex.astro';
-import { pillars, clients, img, srcset } from '../data/site';
+import { getCollection } from 'astro:content';
+import { pillars, img, srcset } from '../data/site';
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+const workFor = (slug: string) => projects.filter((p) => p.data.services.includes(slug as never));
+// photos that only exist at 800px
+const small = ['svc-software', 'svc-automation'];
 ---
 <Base og="services" title="Services" description="AI applications, custom software, process automation and data analytics for small and growing businesses in Portland, Oregon and beyond.">
   <PageHead title="Consulting services" lede="When it comes to AI there’s a lot of buzz. We care about what actually helps your business." />
@@ -11,7 +15,6 @@ import { pillars, clients, img, srcset } from '../data/site';
   <nav class="jump wrap" aria-label="Services on this page">
     <ul>
       {pillars.map((p) => <li><a href={`#${p.slug}`}>{p.name}</a></li>)}
-      <li><a href="#work">Our work</a></li>
     </ul>
   </nav>
 
@@ -19,7 +22,7 @@ import { pillars, clients, img, srcset } from '../data/site';
     <section id={p.slug} class={`pillar ${i % 2 ? 'inverse' : ''}`} aria-labelledby={`${p.slug}-t`}>
       <div class="wrap grid12 inner">
         <figure class={`photo pic ${i % 2 ? 'pic--right' : ''}`}>
-          <img src={img(p.image, p.image === 'svc-software' || p.image === 'svc-automation' ? 800 : 1600)} srcset={p.image === 'svc-ai' || p.image === 'svc-analytics' ? srcset(p.image) : undefined}
+          <img src={img(p.image, small.includes(p.image) ? 800 : 1600)} srcset={small.includes(p.image) ? undefined : srcset(p.image)}
             sizes="(max-width: 860px) 100vw, 40vw" width="800" height="1100" alt={p.imageAlt} loading="lazy" />
         </figure>
         <div class={`text ${i % 2 ? 'text--left' : ''}`} data-reveal>
@@ -33,33 +36,21 @@ import { pillars, clients, img, srcset } from '../data/site';
               </li>
             ))}
           </ul>
-          <p class="case">{p.caseStudy.kind ?? 'Case study'}: <a class="link" href={p.caseStudy.href}><span class="arrow">{p.caseStudy.label}</span></a></p>
+          {(workFor(p.slug).length > 0 || p.partners) && (
+            <div class="clients">
+              <h3 class="ch">Clients</h3>
+              <ul>
+                {workFor(p.slug).map((w) => (
+                  <li><a href={`/work/${w.id}`}><span class="cn arrow">{w.data.client}</span><span class="cw">{w.data.title}</span></a></li>
+                ))}
+                {p.partners?.map((c) => <li><div><span class="cn">{c.name}</span><span class="cw">{c.what}</span></div></li>)}
+              </ul>
+            </div>
+          )}
         </div>
       </div>
     </section>
   ))}
-  <div class="work-wrap">
-    <WorkIndex heading="Our work" filter id="work" lede="Client projects, each one an example of the services above." />
-  </div>
-
-  <section id="clients" class="clients wrap section" aria-labelledby="clients-t">
-    <div class="grid12">
-      <div class="head" data-reveal>
-        <h2 id="clients-t" class="t-h2">Current & past clients</h2>
-        <p class="t-lead">Real estate, hospitality, fitness, professional services and nonprofits, mostly around Portland.</p>
-      </div>
-      <div class="lists">
-        <div>
-          <h3 class="lh">Current</h3>
-          <ul data-reveal>{clients.current.map((c) => <li><span class="n">{c.name}</span><span class="w">{c.what}</span></li>)}</ul>
-        </div>
-        <div>
-          <h3 class="lh">Past</h3>
-          <ul data-reveal>{clients.past.map((c) => <li><span class="n">{c.name}</span><span class="w">{c.what}</span></li>)}</ul>
-        </div>
-      </div>
-    </div>
-  </section>
   <CloseCTA title={['Not sure which', 'one you need?']} text="Most projects mix two or three of these. Tell us the problem and we’ll suggest the simplest fix." />
 </Base>
 
@@ -81,25 +72,20 @@ import { pillars, clients, img, srcset } from '../data/site';
   .offers li::before { content: ""; position: absolute; top: 0; left: 0; width: 28px; height: 6px; background: var(--accent); }
   .offers h3 { font-size: var(--t-lead); letter-spacing: -0.02em; line-height: 1.15; }
   .offers p { max-width: 40ch; }
-  .case { font-weight: 600; margin-top: 8px; }
-  .work-wrap { padding-top: var(--section); }
-  .work-wrap :global(#work) { scroll-margin-top: 32px; }
-  .clients { padding-top: var(--section) !important; }
-  .head { grid-column: 1 / 6; display: grid; gap: 20px; align-content: start; }
-  .lists { grid-column: 7 / -1; display: grid; gap: 48px; }
-  .lh { font-size: var(--t-lead); letter-spacing: -0.02em; margin-bottom: 12px; }
-  .lists ul { list-style: none; }
-  .lists li { display: flex; justify-content: space-between; gap: 24px; padding: 14px 16px; margin-inline: -16px; }
-  .lists li:nth-child(odd) { background: var(--surface); }
-  .n { font-weight: 700; }
-  .w { color: var(--muted); text-align: right; }
+  .clients { margin-top: 16px; display: grid; gap: 12px; }
+  .ch { font-size: var(--t-lead); letter-spacing: -0.02em; }
+  .clients ul { list-style: none; }
+  .clients li > * { display: flex; justify-content: space-between; align-items: baseline; gap: 24px; padding: 14px 16px; margin-inline: -16px; text-decoration: none; }
+  .clients li:nth-child(odd) > * { background: var(--surface); }
+  .cn { font-weight: 700; }
+  .cw { color: var(--muted); text-align: right; }
+  .clients a { transition: color var(--t-hover) ease; }
+  @media (hover: hover) and (pointer: fine) { .clients a:hover .cn { color: var(--accent-text); } }
   @media (max-width: 860px) {
     .pic, .pic--right, .text, .text--left { grid-column: 1 / -1; grid-row: auto; position: static; }
     .pic { aspect-ratio: 16 / 10; }
     .offers { grid-template-columns: 1fr; }
-    .head, .lists { grid-column: 1 / -1; }
-    .lists { margin-top: 40px; }
-    .lists li { flex-direction: column; gap: 2px; }
-    .w { text-align: left; }
+    .clients li > * { flex-direction: column; gap: 2px; }
+    .cw { text-align: left; }
   }
 </style>
