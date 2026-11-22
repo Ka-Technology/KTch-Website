@@ -5,7 +5,8 @@ interface Props { heading?: string; headingTag?: 'h1' | 'h2'; filter?: boolean; 
 const { heading = 'Our work', headingTag = 'h2', filter = false, limit, id = 'work-title', lede } = Astro.props;
 const all = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
 const projects = limit ? all.slice(0, limit) : all;
-const tags = ['ai', 'software', 'automation', 'web', 'analytics'];
+// only offer filters that match at least one project
+const tags = ['ai', 'software', 'automation', 'web', 'analytics'].filter((t) => all.some((p) => p.data.services.includes(t as never)));
 const H = headingTag;
 const yearOf = (y: string) => y.replace('–present', '–now');
 const seen = new Set<string>();

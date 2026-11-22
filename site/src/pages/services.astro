@@ -2,7 +2,8 @@
 import Base from '../layouts/Base.astro';
 import PageHead from '../components/PageHead.astro';
 import CloseCTA from '../components/CloseCTA.astro';
-import { pillars, img, srcset } from '../data/site';
+import WorkIndex from '../components/WorkIndex.astro';
+import { pillars, clients, img, srcset } from '../data/site';
 ---
 <Base og="services" title="Services" description="AI applications, custom software, process automation and data analytics for small and growing businesses in Portland, Oregon and beyond.">
   <PageHead title="Consulting services" lede="When it comes to AI there’s a lot of buzz. We care about what actually helps your business." />
@@ -10,6 +11,7 @@ import { pillars, img, srcset } from '../data/site';
   <nav class="jump wrap" aria-label="Services on this page">
     <ul>
       {pillars.map((p) => <li><a href={`#${p.slug}`}>{p.name}</a></li>)}
+      <li><a href="#work">Our work</a></li>
     </ul>
   </nav>
 
@@ -31,11 +33,33 @@ import { pillars, img, srcset } from '../data/site';
               </li>
             ))}
           </ul>
-          <p class="case">Case study: <a class="link" href={p.caseStudy.href}><span class="arrow">{p.caseStudy.label}</span></a></p>
+          <p class="case">{p.caseStudy.kind ?? 'Case study'}: <a class="link" href={p.caseStudy.href}><span class="arrow">{p.caseStudy.label}</span></a></p>
         </div>
       </div>
     </section>
   ))}
+  <div class="work-wrap">
+    <WorkIndex heading="Our work" filter id="work" lede="Client projects, each one an example of the services above." />
+  </div>
+
+  <section id="clients" class="clients wrap section" aria-labelledby="clients-t">
+    <div class="grid12">
+      <div class="head" data-reveal>
+        <h2 id="clients-t" class="t-h2">Current & past clients</h2>
+        <p class="t-lead">Real estate, hospitality, fitness, professional services and nonprofits, mostly around Portland.</p>
+      </div>
+      <div class="lists">
+        <div>
+          <h3 class="lh">Current</h3>
+          <ul data-reveal>{clients.current.map((c) => <li><span class="n">{c.name}</span><span class="w">{c.what}</span></li>)}</ul>
+        </div>
+        <div>
+          <h3 class="lh">Past</h3>
+          <ul data-reveal>{clients.past.map((c) => <li><span class="n">{c.name}</span><span class="w">{c.what}</span></li>)}</ul>
+        </div>
+      </div>
+    </div>
+  </section>
   <CloseCTA title={['Not sure which', 'one you need?']} text="Most projects mix two or three of these. Tell us the problem and we’ll suggest the simplest fix." />
 </Base>
 
@@ -58,9 +82,24 @@ import { pillars, img, srcset } from '../data/site';
   .offers h3 { font-size: var(--t-lead); letter-spacing: -0.02em; line-height: 1.15; }
   .offers p { max-width: 40ch; }
   .case { font-weight: 600; margin-top: 8px; }
+  .work-wrap { padding-top: var(--section); }
+  .work-wrap :global(#work) { scroll-margin-top: 32px; }
+  .clients { padding-top: var(--section) !important; }
+  .head { grid-column: 1 / 6; display: grid; gap: 20px; align-content: start; }
+  .lists { grid-column: 7 / -1; display: grid; gap: 48px; }
+  .lh { font-size: var(--t-lead); letter-spacing: -0.02em; margin-bottom: 12px; }
+  .lists ul { list-style: none; }
+  .lists li { display: flex; justify-content: space-between; gap: 24px; padding: 14px 16px; margin-inline: -16px; }
+  .lists li:nth-child(odd) { background: var(--surface); }
+  .n { font-weight: 700; }
+  .w { color: var(--muted); text-align: right; }
   @media (max-width: 860px) {
     .pic, .pic--right, .text, .text--left { grid-column: 1 / -1; grid-row: auto; position: static; }
     .pic { aspect-ratio: 16 / 10; }
     .offers { grid-template-columns: 1fr; }
+    .head, .lists { grid-column: 1 / -1; }
+    .lists { margin-top: 40px; }
+    .lists li { flex-direction: column; gap: 2px; }
+    .w { text-align: left; }
   }
 </style>

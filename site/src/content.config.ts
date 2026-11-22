@@ -12,7 +12,7 @@ const projects = defineCollection({
     location: z.string().optional(),
     year: z.string(),
     services: z.array(pillars),
-    status: z.enum(['Current', 'Completed', 'In development']),
+    status: z.enum(['Current', 'Completed']),
     summary: z.string(),
     challenge: z.string(),
     results: z.array(z.string()).default([]),
@@ -30,7 +30,7 @@ const products = defineCollection({
   schema: z.object({
     name: z.string(),
     tagline: z.string(),
-    status: z.enum(['Beta', 'Live', 'In use', 'Retired', 'Past project']),
+    status: z.enum(['Beta', 'Live', 'In use', 'In development', 'Retired', 'Past project']),
     url: z.string().optional(),
     year: z.string(),
     summary: z.string(),

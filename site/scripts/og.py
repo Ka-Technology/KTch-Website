@@ -39,5 +39,6 @@ for slug, t in [('services', 'Consulting services'), ('work', 'Our work'), ('pro
 for p in glob.glob('src/content/projects/*.md'):
     s = os.path.basename(p)[:-3]; card(f'work-{s}', f"{fm(p, 'client')}: {fm(p, 'title')}")
 for p in glob.glob('src/content/products/*.md'):
+    if fm(p, 'hidden') == 'true': continue  # hidden products get no preview image
     s = os.path.basename(p)[:-3]; card(f'product-{s}', f"{fm(p, 'name')}: {fm(p, 'tagline')}")
 print('ok')

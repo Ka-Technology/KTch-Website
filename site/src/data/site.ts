@@ -18,7 +18,6 @@ export const site = {
 
 export const nav = [
   { label: 'Services', href: '/services' },
-  { label: 'Work', href: '/work' },
   { label: 'Products', href: '/products' },
   { label: 'About', href: '/about' },
   { label: 'Careers', href: '/careers' },
@@ -32,7 +31,7 @@ export type Pillar = {
   image: string;
   imageAlt: string;
   offerings: { name: string; text: string; example?: { label: string; href: string } }[];
-  caseStudy: { label: string; href: string };
+  caseStudy: { label: string; href: string; kind?: string };
 };
 
 export const pillars: Pillar[] = [
@@ -47,7 +46,7 @@ export const pillars: Pillar[] = [
       { name: 'LLM integrations', text: 'AI that already knows your business, so you never have to catch ChatGPT up again.' },
       { name: 'Document AI', text: 'Turn piles of PDFs into structured, verified data.', example: { label: 'CIDA Analytics', href: '/work/cida-analytics' } },
       { name: 'Voice and text agents', text: 'AI that answers calls, follows up on missed calls, and books appointments.' },
-      { name: 'ML-based optimization', text: "Find the inefficiencies your team can't see.", example: { label: 'Shiftwize scheduler', href: '/work/shiftwize' } },
+      { name: 'ML-based optimization', text: "Find the inefficiencies your team can't see.", example: { label: 'Shiftwize', href: '/products/shiftwize' } },
     ],
     caseStudy: { label: 'CIDA Analytics', href: '/work/cida-analytics' },
   },
@@ -93,7 +92,7 @@ export const pillars: Pillar[] = [
       { name: 'Predictive forecasting', text: "Staff and stock for what's coming." },
       { name: 'Data visualization', text: 'Dashboards your whole team understands.' },
     ],
-    caseStudy: { label: 'Shiftwize', href: '/work/shiftwize' },
+    caseStudy: { label: 'Shiftwize', href: '/products/shiftwize', kind: 'Product' },
   },
 ];
 
