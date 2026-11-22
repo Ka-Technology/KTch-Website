@@ -120,7 +120,7 @@ ul, ol { margin: 0; padding: 0; }
 }
 
 /* ------------------------------------------------------------------ type roles */
-.t-display { font-size: var(--t-display); line-height: 0.92; letter-spacing: -0.045em; font-weight: 850; }
+.t-display { font-size: var(--t-display); line-height: 1.04; letter-spacing: -0.045em; font-weight: 850; }
 .t-h2 { font-size: var(--t-h2); line-height: 0.98; letter-spacing: -0.04em; font-weight: 800; }
 .t-lead { font-size: var(--t-lead); line-height: 1.4; letter-spacing: -0.01em; }
 .t-small { font-size: var(--t-small); line-height: 1.45; }
@@ -169,7 +169,8 @@ ul, ol { margin: 0; padding: 0; }
 /* ------------------------------------------------------------------ motion
    Hidden states apply only under html.js and no-preference, so content is
    always visible without script or with reduced motion. */
-.lines .line { display: block; overflow: hidden; padding-bottom: 0.1em; margin-bottom: -0.1em; }
+/* the mask reaches below the baseline so descenders (g, p, y) are never clipped */
+.lines .line { display: block; overflow: hidden; padding-bottom: 0.26em; margin-bottom: -0.26em; }
 .lines [data-line] { display: block; }
 @media (prefers-reduced-motion: no-preference) {
   .js .lines [data-line] { transform: translateY(108%); animation: line-up 900ms var(--ease-out) forwards; animation-delay: calc(var(--i, 0) * 110ms + 120ms); }

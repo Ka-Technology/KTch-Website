@@ -12,7 +12,7 @@ interface Props {
   strip?: boolean;         // Portland photo strip above the footer
 }
 const { title, description = site.description, og = 'default', strip = true } = Astro.props;
-const fullTitle = title ? `${title} · Ka Technology` : 'Ka Technology · AI & Software Consulting in Portland, Oregon';
+const fullTitle = title ? `${title} · Ka Technology` : 'Ka Technology';
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const ogImage = new URL(`/og/${og}.png`, Astro.site).href;
 const social = site.social.filter((s) => s.href).map((s) => s.href);
