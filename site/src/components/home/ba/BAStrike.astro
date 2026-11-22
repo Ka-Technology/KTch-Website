@@ -1,0 +1,58 @@
+---
+// Option 3, Strike-through: the old cost is crossed out in red as it scrolls in; the new one stands beside it.
+import { chores } from '../../../data/chores';
+---
+<section class="strike wrap section" aria-labelledby="strike-t">
+  <div class="top grid12" data-reveal>
+    <h2 id="strike-t" class="t-h2 heading">Before and after</h2>
+    <p class="t-lead intro">AI is a tool, not a replacement. We use it, plus good software, to take the tedious part off your plate.</p>
+  </div>
+
+  <ol class="list">
+    {chores.map((c) => (
+      <li class="item" data-reveal>
+        <h3 class="name"><a href={c.href}>{c.tab}<span class="sr-only">, {c.short}</span></a></h3>
+        <p class="line">
+          <span class="was"><span class="sr-only">Before: </span>{c.before.big}</span>
+          <span class="now"><span class="sr-only">After: </span>{c.after.big}</span>
+        </p>
+        <div class="notes">
+          <p><strong>Before.</strong> {c.before.note}</p>
+          <p><strong>After.</strong> {c.after.note}</p>
+        </div>
+      </li>
+    ))}
+  </ol>
+</section>
+
+<style>
+  .heading { grid-column: 1 / 6; }
+  .intro { grid-column: 7 / -1; max-width: 40ch; }
+  .list { list-style: none; margin-top: clamp(56px, 8vh, 104px); display: grid; gap: clamp(56px, 7vw, 104px); }
+  .item { display: grid; gap: 18px; }
+  .name { font-size: var(--t-lead); letter-spacing: -0.02em; }
+  .name a { text-decoration: underline; text-decoration-color: transparent; text-decoration-thickness: 2px; text-underline-offset: 6px; transition: text-decoration-color var(--t-hover) ease; }
+  @media (hover: hover) and (pointer: fine) { .name a:hover { text-decoration-color: var(--accent); } }
+  .line {
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 0.35em;
+    font-size: clamp(52px, 8.4vw, 150px); font-weight: 850; letter-spacing: -0.05em; line-height: 1;
+  }
+  .was { position: relative; color: var(--muted); }
+  .was::after {
+    content: ""; position: absolute; left: -0.04em; right: -0.04em; top: 52%; height: 0.09em;
+    background: var(--accent); transform-origin: left center;
+  }
+  .now { color: var(--ink); }
+  .notes { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); max-width: 980px; }
+  .notes strong { color: var(--accent-text); }
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.js) .item .was::after { transform: scaleX(0); transition: transform 700ms var(--ease-in-out) 450ms; }
+    :global(.js) .item.is-in .was::after { transform: scaleX(1); }
+  }
+  @media (max-width: 860px) {
+    .heading, .intro { grid-column: 1 / -1; }
+    .intro { margin-top: 20px; }
+    .line { flex-direction: column; align-items: flex-start; font-size: clamp(48px, 15vw, 96px); }
+    .notes { grid-template-columns: 1fr; }
+  }
+</style>

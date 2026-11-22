@@ -1,0 +1,89 @@
+---
+// Option 4, Switch: one Before/After switch flips all three chores at once.
+import { chores } from '../../../data/chores';
+---
+<section class="switch wrap section" aria-labelledby="switch-t" data-ba-switch>
+  <div class="top grid12" data-reveal>
+    <h2 id="switch-t" class="t-h2 heading">Before and after</h2>
+    <div class="intro">
+      <p class="t-lead">AI is a tool, not a replacement. We use it, plus good software, to take the tedious part off your plate.</p>
+      <div class="toggle" role="group" aria-label="Show the chores">
+        <button type="button" aria-pressed="true" data-state="before">Before</button>
+        <button type="button" aria-pressed="false" data-state="after">After us</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="cards" data-reveal aria-live="polite">
+    {chores.map((c) => (
+      <article class="card">
+        <h3>{c.tab}</h3>
+        <div class="face face--before">
+          <p class="big">{c.before.big}</p>
+          <p class="note">{c.before.note}</p>
+        </div>
+        <div class="face face--after">
+          <p class="big">{c.after.big}</p>
+          <p class="note">{c.after.note}</p>
+        </div>
+        <a class="link t-small who" href={c.href}><span class="arrow">{c.short}</span></a>
+      </article>
+    ))}
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-ba-switch]').forEach((root) => {
+    const btns = [...root.querySelectorAll<HTMLButtonElement>('.toggle button')];
+    root.classList.add('is-live');
+    btns.forEach((b) => b.addEventListener('click', () => {
+      btns.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      root.dataset.state = b.dataset.state;
+    }));
+    root.dataset.state = 'before';
+  });
+</script>
+
+<style>
+  .heading { grid-column: 1 / 6; }
+  .intro { grid-column: 7 / -1; display: grid; gap: 28px; align-content: start; }
+  .intro .t-lead { max-width: 40ch; }
+  .toggle { display: none; background: var(--surface-2); padding: 4px; justify-self: start; }
+  .is-live .toggle { display: inline-flex; }
+  .toggle button {
+    min-height: 52px; padding: 0 26px; border: 0; background: transparent; color: var(--ink);
+    font-weight: 700; cursor: pointer;
+    transition: background-color var(--t-hover) ease, color var(--t-hover) ease, transform var(--t-press) var(--ease-out);
+  }
+  .toggle button:active { transform: scale(0.96); }
+  .toggle button[aria-pressed='true'] { background: var(--ink); color: var(--bg); }
+  .toggle button[data-state='after'][aria-pressed='true'] { background: var(--accent); color: var(--on-accent); }
+
+  .cards { margin-top: clamp(48px, 7vh, 88px); display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap); }
+  .card {
+    display: grid; grid-template-rows: auto 1fr auto; gap: 24px; padding: clamp(22px, 2.4vw, 34px);
+    background: var(--surface); min-height: clamp(340px, 30vw, 440px);
+    transition: background-color 500ms var(--ease-in-out), color 500ms var(--ease-in-out);
+  }
+  .card h3 { font-size: var(--t-lead); letter-spacing: -0.02em; }
+  .face { display: grid; gap: 16px; align-content: end; grid-row: 2; grid-column: 1;
+    transition: opacity 400ms var(--ease-out), transform 500ms var(--ease-out); }
+  .big { font-size: clamp(44px, 4.4vw, 80px); font-weight: 850; letter-spacing: -0.05em; line-height: 0.9; white-space: nowrap; }
+  .note { max-width: 32ch; }
+  .who { justify-self: start; }
+  /* without script both faces show, stacked */
+  .switch:not(.is-live) .face--after { grid-row: 3; }
+  .is-live .face--after { opacity: 0; transform: translateY(16px); pointer-events: none; }
+  [data-state='after'] .card { background: var(--ink); color: var(--bg); }
+  [data-state='after'] .card .big { color: var(--accent); }
+  [data-state='after'] .face--before { opacity: 0; transform: translateY(-16px); pointer-events: none; }
+  [data-state='after'] .face--after { opacity: 1; transform: none; pointer-events: auto; }
+  [data-state='after'] .card:nth-child(2) { transition-delay: 70ms; }
+  [data-state='after'] .card:nth-child(3) { transition-delay: 140ms; }
+  @media (max-width: 860px) {
+    .heading, .intro { grid-column: 1 / -1; }
+    .intro { margin-top: 20px; }
+    .cards { grid-template-columns: 1fr; }
+    .card { min-height: 280px; }
+  }
+</style>

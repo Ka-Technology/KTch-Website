@@ -1,0 +1,12 @@
+---
+// TEMPORARY: marks each before/after option on the home page while one is chosen. Delete with the losers.
+interface Props { n: number; name: string }
+const { n, name } = Astro.props;
+---
+<div class="wrap opt"><p><span>Option {n}</span> {name}</p></div>
+
+<style>
+  .opt { padding-top: 48px; }
+  .opt p { display: inline-flex; gap: 10px; align-items: center; background: var(--accent); color: var(--on-accent); font-weight: 700; padding: 8px 14px; font-size: var(--t-small); }
+  .opt span { font-weight: 850; }
+</style>

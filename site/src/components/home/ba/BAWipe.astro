@@ -1,0 +1,97 @@
+---
+// Option 5, Wipe: drag the divider and "after" wipes over "before" on all three rows.
+import { chores } from '../../../data/chores';
+---
+<section class="wipe wrap section" aria-labelledby="wipe-t" data-ba-wipe>
+  <div class="top grid12" data-reveal>
+    <h2 id="wipe-t" class="t-h2 heading">Before and after</h2>
+    <p class="t-lead intro">AI is a tool, not a replacement. Drag the line to take the tedious part off the plate.</p>
+  </div>
+
+  <div class="stage" style="--pos: 50%">
+    {chores.map((c) => (
+      <div class="row">
+        <div class="layer layer--before">
+          <h3>{c.tab}</h3>
+          <p class="big"><span class="sr-only">Before: </span>{c.before.big}</p>
+          <p class="note">{c.before.note}</p>
+        </div>
+        <div class="layer layer--after">
+          <p class="big"><span class="sr-only">After: </span>{c.after.big}</p>
+          <p class="note">{c.after.note}</p>
+          <a class="who" href={c.href}><span class="arrow">{c.short}</span></a>
+        </div>
+      </div>
+    ))}
+    <div class="handle" aria-hidden="true"><span>⟷</span></div>
+    <input class="range" type="range" min="4" max="96" value="50" aria-label="Before and after divider" />
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-ba-wipe]').forEach((root) => {
+    const stage = root.querySelector<HTMLElement>('.stage');
+    const range = root.querySelector<HTMLInputElement>('.range');
+    if (!stage || !range) return;
+    root.classList.add('is-live');
+    const set = () => stage.style.setProperty('--pos', `${range.value}%`);
+    range.addEventListener('input', set);
+    // a one-time nudge when it scrolls in, so people see it moves
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      let t0 = 0;
+      const step = (t: number) => {
+        t0 ||= t; const k = Math.min((t - t0) / 1400, 1);
+        range.value = String(Math.round(50 + Math.sin(k * Math.PI) * 22)); set();
+        if (k < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }, { threshold: 0.5 });
+    io.observe(stage);
+  });
+</script>
+
+<style>
+  .heading { grid-column: 1 / 6; }
+  .intro { grid-column: 7 / -1; max-width: 40ch; }
+  .stage { position: relative; margin-top: clamp(48px, 7vh, 88px); display: grid; gap: 6px; user-select: none; }
+  .row { position: relative; display: grid; min-height: clamp(200px, 18vw, 260px); }
+  .layer { grid-area: 1 / 1; padding: clamp(20px, 2.4vw, 34px); display: grid; gap: 10px; align-content: center; }
+  .layer--before { background: var(--surface); }
+  .layer--before h3 { font-size: var(--t-body); font-weight: 700; letter-spacing: 0; color: var(--muted); }
+  .layer--after { background: var(--accent); color: var(--on-accent); justify-items: end; text-align: right; }
+  .is-live .layer--after { clip-path: inset(0 0 0 var(--pos)); }
+  .big { font-size: clamp(44px, 5.6vw, 96px); font-weight: 850; letter-spacing: -0.05em; line-height: 0.9; white-space: nowrap; }
+  .layer--before .big { color: var(--muted); }
+  .note { max-width: 30ch; }
+  .who { font-weight: 700; font-size: var(--t-small); color: inherit; }
+  .handle {
+    display: none; position: absolute; top: 0; bottom: 0; left: var(--pos); width: 6px; margin-left: -3px;
+    background: var(--ink); pointer-events: none;
+  }
+  .handle span {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 52px; height: 52px; display: grid; place-items: center;
+    background: var(--ink); color: var(--bg); font-weight: 800; font-size: 20px;
+  }
+  .is-live .handle { display: block; }
+  .range { display: none; }
+  .is-live .range {
+    display: block; position: absolute; inset: 0; width: 100%; height: 100%; margin: 0;
+    opacity: 0; cursor: ew-resize; appearance: none; -webkit-appearance: none;
+  }
+  .range:focus-visible + .handle, .is-live .range:focus-visible { outline: none; }
+  .stage:has(.range:focus-visible) .handle span { outline: 3px solid var(--accent); outline-offset: 3px; }
+  /* without script: before and after stack as two plain blocks */
+  .wipe:not(.is-live) .row { grid-template-columns: 1fr 1fr; }
+  .wipe:not(.is-live) .layer--after { grid-area: 1 / 2; }
+  @media (max-width: 860px) {
+    .heading, .intro { grid-column: 1 / -1; }
+    .intro { margin-top: 20px; }
+    .note { display: none; }
+    .row { min-height: 150px; }
+    .big { font-size: clamp(30px, 9vw, 52px); }
+  }
+</style>
