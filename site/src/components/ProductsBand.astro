@@ -14,8 +14,8 @@ const products = (await getCollection('products', (p) => !p.data.hidden)).sort((
       {products.map((p) => (
         <li class="item">
           {p.data.cover_image && <figure class="photo pic"><img src={img(p.data.cover_image, 800)} width="800" height="1000" alt={p.data.cover_alt} loading="lazy" /></figure>}
-          <p class="status"><span class="dot"></span>{p.data.status}</p>
           <h3 class="name"><a href={`/products/${p.id}`}>{p.data.name}</a></h3>
+          <p class="status"><span class="dot"></span>{p.data.status}</p>
           <p class="tag">{p.data.tagline}</p>
           <span class="more arrow" aria-hidden="true">More</span>
         </li>
