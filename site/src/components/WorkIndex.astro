@@ -76,8 +76,12 @@ const firstUse = projects.map((p) => { if (!p.image) return true; const f = !see
     };
     items.forEach((el) => {
       const i = Number(el.dataset.i);
-      el.addEventListener('pointerenter', () => set(i));
-      el.querySelector('a')?.addEventListener('focus', () => set(i));
+      // the photo follows the last name pointed at; the description is open only while pointing or focused
+      const open = (on: boolean) => el.classList.toggle('is-open', on);
+      el.addEventListener('pointerenter', () => { set(i); open(true); });
+      el.addEventListener('pointerleave', () => open(false));
+      el.querySelector('a')?.addEventListener('focus', () => { set(i); open(true); });
+      el.querySelector('a')?.addEventListener('blur', () => open(false));
     });
     const buttons = [...root.querySelectorAll<HTMLButtonElement>('[data-filter]')];
     buttons.forEach((b) => b.addEventListener('click', () => {
@@ -121,8 +125,8 @@ const firstUse = projects.map((p) => { if (!p.image) return true; const f = !see
   .drop { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 320ms var(--ease-out); }
   .drop > div { overflow: hidden; }
   .drop p { max-width: 52ch; padding: 2px 0 18px; font-size: var(--t-body); line-height: 1.45; opacity: 0; transition: opacity 200ms ease; }
-  .is-active .drop { grid-template-rows: 1fr; }
-  .is-active .drop p { opacity: 1; transition-delay: 80ms; }
+  .is-open .drop { grid-template-rows: 1fr; }
+  .is-open .drop p { opacity: 1; transition-delay: 80ms; }
   /* products have no photograph: a type panel in Ka red stands in */
   .card { background: var(--accent); color: var(--on-accent); display: grid; align-content: space-between; padding: clamp(20px, 2.4vw, 32px); }
   .card-name { font-size: clamp(40px, 4.4vw, 72px); font-weight: 850; letter-spacing: -0.05em; line-height: 0.95; overflow-wrap: anywhere; }
