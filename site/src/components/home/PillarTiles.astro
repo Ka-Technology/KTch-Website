@@ -31,36 +31,37 @@ import PillarDialogs from './PillarDialogs.astro';
   /* two rows that share what is left of the screen after the heading */
   .tiles {
     display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
-    grid-auto-rows: clamp(260px, calc((100svh - 240px) / 2), 420px);
+    grid-auto-rows: clamp(300px, calc((100svh - 240px) / 2), 460px);
   }
-  .tile { position: relative; min-width: 0; overflow: clip; }
-  .pic { position: absolute; inset: 0; }
+  /* photo on top, then a text band of one fixed height, the same on every tile */
+  .tile { position: relative; min-width: 0; overflow: clip; display: grid; grid-template-rows: minmax(0, 1fr) var(--band); --band: 120px; }
+  .pic { min-height: 0; }
   .pic img { transition: transform 900ms var(--ease-out); }
   .card {
-    position: absolute; left: 0; bottom: 0; max-width: min(86%, 460px);
-    background: var(--ink); color: var(--bg); padding: 16px 22px 18px;
-    display: grid; gap: 6px 20px; grid-template-columns: 1fr auto; align-items: baseline;
+    background: var(--ink); color: var(--bg); padding: 16px 22px;
+    display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto 1fr; gap: 6px 20px; align-items: baseline; align-content: start;
   }
-  h3 { grid-column: 1 / -1; font-size: clamp(22px, 2vw, 34px); font-weight: 850; letter-spacing: -0.04em; line-height: 1.05; }
-  .hit { all: unset; cursor: pointer; display: inline-flex; gap: 14px; align-items: baseline; }
+  h3 { font-size: clamp(19px, 1.9vw, 30px); font-weight: 850; letter-spacing: -0.04em; line-height: 1.05; }
+  .hit { all: unset; cursor: pointer; }
   /* the whole tile opens the pop-up */
   .hit::after { content: ""; position: absolute; inset: 0; z-index: 1; }
   .hit:focus-visible { outline: none; }
   .tile:has(.hit:focus-visible) { outline: 3px solid var(--accent); outline-offset: 4px; }
-  .plus { color: var(--accent); display: inline-block; transition: transform var(--t-hover) var(--ease-out); }
-  .pitch { font-size: var(--t-small); line-height: 1.4; color: var(--bg); opacity: 0.82; }
-  .proof { position: relative; z-index: 2; color: var(--bg); font-weight: 700; font-size: var(--t-small); white-space: nowrap; }
+  .plus { color: var(--accent); display: inline-block; margin-left: 0.4em; transition: transform var(--t-hover) var(--ease-out); }
+  .pitch { grid-column: 1 / -1; font-size: var(--t-small); line-height: 1.4; color: var(--bg); opacity: 0.82; max-width: 62ch; }
+  .proof { grid-column: 2; grid-row: 1; justify-self: end; position: relative; z-index: 2; color: var(--bg); font-weight: 700; font-size: var(--t-small); white-space: nowrap; }
   @media (hover: hover) and (pointer: fine) {
     .tile:hover .pic img { transform: scale(1.03); }
     .tile:hover .plus { transform: rotate(90deg); }
     .proof:hover { color: var(--accent); }
   }
-  @media (max-width: 1100px) { .card { grid-template-columns: 1fr; } }
   @media (max-width: 860px) {
     .head h2, .head p { grid-column: 1 / -1; }
     .tiles { grid-template-columns: 1fr; grid-auto-rows: auto; gap: 16px; }
-    .tile { display: grid; }
-    .pic { position: relative; aspect-ratio: 16 / 9; }
-    .card { position: relative; max-width: none; }
+    .tile { grid-template-rows: auto auto; }
+    h3 { font-size: clamp(22px, 6vw, 28px); }
+    .pic { aspect-ratio: 16 / 9; }
+    .card { grid-template-columns: 1fr; grid-template-rows: auto; }
+    .proof { grid-column: 1; grid-row: 3; justify-self: start; margin-top: 6px; }
   }
 </style>
