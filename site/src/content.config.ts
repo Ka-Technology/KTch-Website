@@ -30,7 +30,7 @@ const products = defineCollection({
   schema: z.object({
     name: z.string(),
     tagline: z.string(),
-    status: z.enum(['Beta', 'Live', 'In use', 'In development', 'Retired', 'Past project']),
+    status: z.enum(['Beta', 'Live', 'In development', 'Retired', 'Past project']),
     url: z.string().optional(),
     year: z.string(),
     summary: z.string(),

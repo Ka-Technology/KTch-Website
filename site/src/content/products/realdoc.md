@@ -1,7 +1,7 @@
 ---
 name: RealDoc
 tagline: Continuing-education certificates, generated with a button’s click.
-status: In use
+status: Live
 url: https://realdoc.app
 year: "2024"
 summary: Attendance sheets and signed CE certificates for real-estate instructors, in one click instead of an hour a week.
