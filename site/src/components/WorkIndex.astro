@@ -49,6 +49,7 @@ const firstUse = projects.map((p) => { if (!p.image) return true; const f = !see
             <span class="name">{p.name}</span>
             <span class="meta">{p.meta}</span>
           </a>
+          <div class="drop"><div><p><strong>{p.title}.</strong> {p.summary} <span class="cap-meta">{p.meta}</span></p></div></div>
         </li>
       ))}
     </ol>
@@ -60,13 +61,6 @@ const firstUse = projects.map((p) => { if (!p.image) return true; const f = !see
             : <div class={`pv card ${i === 0 ? 'is-active' : ''}`} data-pv={i}><span class="card-name">{p.name}</span><span class="card-tag">{p.tagline}</span></div>
         ))}
       </div>
-      <div class="captions">
-        {projects.map((p, i) => (
-          <p class={`cap ${i === 0 ? 'is-active' : ''}`} data-cap={i}>
-            <strong>{p.title}.</strong> {p.summary} <span class="cap-meta">{p.meta}</span>
-          </p>
-        ))}
-      </div>
     </div>
   </div>
   <slot />
@@ -76,11 +70,9 @@ const firstUse = projects.map((p) => { if (!p.image) return true; const f = !see
   document.querySelectorAll<HTMLElement>('[data-work]').forEach((root) => {
     const items = [...root.querySelectorAll<HTMLElement>('[data-item]')];
     const pvs = [...root.querySelectorAll<HTMLElement>('[data-pv]')];
-    const caps = [...root.querySelectorAll<HTMLElement>('[data-cap]')];
     const set = (i: number) => {
       items.forEach((el) => el.classList.toggle('is-active', Number(el.dataset.i) === i));
       pvs.forEach((el) => el.classList.toggle('is-active', Number(el.dataset.pv) === i));
-      caps.forEach((el) => el.classList.toggle('is-active', Number(el.dataset.cap) === i));
     };
     items.forEach((el) => {
       const i = Number(el.dataset.i);
@@ -103,6 +95,7 @@ const firstUse = projects.map((p) => { if (!p.image) return true; const f = !see
 </script>
 
 <style>
+  .work { padding-bottom: clamp(88px, 10vw, 160px); }
   .top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 48px; }
   .ht { display: grid; gap: 20px; }
   .lede { max-width: 44ch; }
@@ -124,14 +117,17 @@ const firstUse = projects.map((p) => { if (!p.image) return true; const f = !see
   .pv.is-active { opacity: 1; visibility: visible; transition: opacity 220ms ease; }
   .pv img { transform: scale(1.04); transition: transform 900ms var(--ease-out); }
   .pv.is-active img { transform: none; }
-  .captions { display: grid; margin-top: 16px; }
+  /* the active name's description drops open under it */
+  .drop { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 320ms var(--ease-out); }
+  .drop > div { overflow: hidden; }
+  .drop p { max-width: 52ch; padding: 2px 0 18px; font-size: var(--t-body); line-height: 1.45; opacity: 0; transition: opacity 200ms ease; }
+  .is-active .drop { grid-template-rows: 1fr; }
+  .is-active .drop p { opacity: 1; transition-delay: 80ms; }
   /* products have no photograph: a type panel in Ka red stands in */
   .card { background: var(--accent); color: var(--on-accent); display: grid; align-content: space-between; padding: clamp(20px, 2.4vw, 32px); }
   .card-name { font-size: clamp(40px, 4.4vw, 72px); font-weight: 850; letter-spacing: -0.05em; line-height: 0.95; overflow-wrap: anywhere; }
   .card-tag { font-size: var(--t-lead); font-weight: 700; letter-spacing: -0.015em; line-height: 1.25; max-width: 18ch; }
   .cap-meta { display: block; margin-top: 6px; color: var(--muted); font-weight: 600; }
-  .cap { grid-area: 1 / 1; font-size: var(--t-small); line-height: 1.45; opacity: 0; transition: opacity 220ms ease; }
-  .cap.is-active { opacity: 1; }
   @media (max-width: 860px) {
     .names { grid-column: 1 / -1; display: grid; gap: 40px; }
     .preview { display: none; }
@@ -140,7 +136,9 @@ const firstUse = projects.map((p) => { if (!p.image) return true; const f = !see
     .names .card-name { display: none; }  /* the name sits right below on phones */
     .names .m-pic--dup { display: none; }
     .names { gap: 28px; }
-    .meta { display: block; }
+    .meta { display: none; }
+    .drop { grid-template-rows: 1fr; }
+    .drop p { opacity: 1; padding: 8px 0 0; }
     .row { flex-direction: column; gap: 6px; color: var(--ink); padding-top: 14px; }
     .name { font-size: clamp(32px, 9.5vw, 48px); }
     .is-active .name { text-decoration: none; }

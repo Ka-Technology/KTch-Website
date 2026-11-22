@@ -13,6 +13,6 @@ export const chores = [
   {
     id: 'hoa', tab: 'HOA reports', who: 'CIDA Analytics', short: 'CIDA Analytics', href: '/work/cida-analytics',
     before: { big: '800 pages', note: 'HOA document dumps read by hand, sometimes 100+ files for one report.' },
-    after: { big: '202 fields', note: 'Drafted by AI, then checked by staff next to the source page.' },
+    after: { big: '1 flow', note: 'AI doing the heavy parsing, so staff can focus on auditing HOAs.' },
   },
 ];

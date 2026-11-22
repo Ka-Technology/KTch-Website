@@ -5,7 +5,7 @@
 import { pillars, img } from '../../data/site';
 import PillarDialogs from './PillarDialogs.astro';
 ---
-<section class="wrap section" aria-labelledby="wwd-t">
+<section class="wwd wrap section" aria-labelledby="wwd-t">
   <div class="head grid12" data-reveal>
     <h2 id="wwd-t" class="t-h2">What we do</h2>
     <p class="t-lead">Four kinds of work, one goal: fewer tedious hours. Open any one for the details.</p>
@@ -81,6 +81,8 @@ import PillarDialogs from './PillarDialogs.astro';
 </script>
 
 <style>
+  /* How we work follows straight on; a full section gap here read as a hole */
+  .wwd { padding-bottom: clamp(56px, 6vw, 96px); }
   .head { margin-bottom: clamp(24px, 3.5vh, 44px); row-gap: 16px; align-items: end; }
   .head h2 { grid-column: 1 / 6; }
   .head p { grid-column: 7 / -1; max-width: 42ch; }

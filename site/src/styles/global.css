@@ -111,7 +111,7 @@ ul, ol { margin: 0; padding: 0; }
 .wrap { padding-inline: var(--margin); max-width: 1680px; margin-inline: auto; }
 .grid12 { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gap); }
 .section { padding-block: var(--section); }
-.section + .section { padding-top: 0; }
+.section + .section, .section + script + .section { padding-top: 0; }
 .on-axis { grid-column: 6 / -1; }          /* the column line at ~42% */
 .side { grid-column: 1 / 5; }
 @media (max-width: 860px) {
