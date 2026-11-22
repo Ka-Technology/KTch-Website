@@ -1,0 +1,40 @@
+---
+// How option C, Statements: each step is one huge word on its own line, the explanation beside it.
+const steps = [
+  { name: 'Listen.', text: 'We start with your problem, not our favorite tech.' },
+  { name: 'Build.', text: 'Small team, fast iterations, regular demos.' },
+  { name: 'Stick around.', text: 'We maintain and improve what we ship.' },
+];
+---
+<section class="hs inverse" aria-labelledby="hs-t">
+  <div class="wrap">
+    <div class="grid12 top" data-reveal>
+      <h2 id="hs-t" class="t-h2 heading">How we work</h2>
+      <p class="t-lead para">Your messy, scattered process goes in. One clear tool comes out, and we keep it running.</p>
+    </div>
+    <ol class="steps">
+      {steps.map((s, i) => (
+        <li class="grid12" data-reveal>
+          <h3 class="word"><span class="n" aria-hidden="true">{i + 1}</span>{s.name}</h3>
+          <p class="t-lead txt">{s.text}</p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .hs { padding-block: var(--section); }
+  .heading { grid-column: 1 / 6; }
+  .para { grid-column: 7 / -1; max-width: 40ch; }
+  .steps { list-style: none; margin-top: clamp(56px, 7vw, 104px); display: grid; gap: clamp(28px, 3.5vw, 48px); }
+  .steps li { align-items: baseline; }
+  .word { grid-column: 1 / 9; font-size: clamp(48px, 7.2vw, 132px); white-space: nowrap; letter-spacing: -0.055em; line-height: 0.95; display: flex; align-items: baseline; gap: 0.25em; }
+  .n { font-size: 0.28em; color: var(--accent-text); letter-spacing: 0; min-width: 1.2em; }
+  .txt { grid-column: 9 / -1; max-width: 26ch; }
+  @media (max-width: 860px) {
+    .heading, .para, .word, .txt { grid-column: 1 / -1; }
+    .para { margin-top: 20px; }
+    .txt { margin-top: 10px; }
+  }
+</style>

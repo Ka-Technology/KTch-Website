@@ -41,6 +41,8 @@ const products = defineCollection({
     cta_label: z.string().optional(),
     cta_url: z.string().optional(),
     logo: z.string().optional(),
+    cover_image: z.string().optional(),   // a picture of the product's world (public/images/<name>-800/1600.webp)
+    cover_alt: z.string().optional(),
     order: z.number().default(99),
     hidden: z.boolean().default(false),
   }),

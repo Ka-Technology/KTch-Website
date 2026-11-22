@@ -1,0 +1,58 @@
+---
+// Products option C, Catalogue rows: one full-width row per product, read across like a price list.
+import { getCollection } from 'astro:content';
+import { img } from '../../../data/site';
+const products = (await getCollection('products', (p) => !p.data.hidden)).sort((a, b) => a.data.order - b.data.order);
+---
+<section class="pr inverse" aria-labelledby="pr-t">
+  <div class="wrap">
+    <div class="grid12 top" data-reveal>
+      <h2 id="pr-t" class="t-h2 heading">Our software</h2>
+      <p class="t-lead intro">Besides client work, we build our own products. Some started as a client’s problem that turned out to be everyone’s problem.</p>
+    </div>
+    <ul class="rows">
+      {products.map((p) => (
+        <li class="row" data-reveal>
+          {p.data.cover_image && <figure class="photo pic"><img src={img(p.data.cover_image, 800)} width="800" height="600" alt={p.data.cover_alt} loading="lazy" /></figure>}
+          <h3 class="name"><a href={`/products/${p.id}`}>{p.data.name}</a></h3>
+          <div class="body">
+            <p class="tag">{p.data.tagline}</p>
+            <p class="sum">{p.data.summary}</p>
+          </div>
+          <p class="status"><span class="dot"></span>{p.data.status}<span class="go arrow" aria-hidden="true"></span></p>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .pr { padding-block: var(--section); }
+  .heading { grid-column: 1 / 6; }
+  .intro { grid-column: 7 / -1; max-width: 42ch; }
+  .rows { list-style: none; margin-top: clamp(48px, 6vw, 80px); display: grid; gap: 6px; }
+  .row {
+    position: relative; display: grid; grid-template-columns: 180px 1.1fr 2fr auto; gap: var(--gap); align-items: center;
+    padding: 14px; background: var(--surface); transition: background-color var(--t-hover) ease;
+  }
+  .pic { aspect-ratio: 4 / 3; }
+  .name { font-size: var(--t-h2); letter-spacing: -0.045em; }
+  .name a { text-decoration: none; }
+  .name a::after { content: ""; position: absolute; inset: 0; }
+  .body { display: grid; gap: 6px; }
+  .tag { font-size: var(--t-lead); font-weight: 700; letter-spacing: -0.015em; }
+  .sum { color: var(--muted); max-width: 52ch; }
+  .status { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: var(--t-small); padding-right: 12px; white-space: nowrap; }
+  .dot { width: 10px; height: 10px; background: var(--accent); border-radius: 50%; }
+  .go { margin-left: 8px; }
+  @media (hover: hover) and (pointer: fine) {
+    .row:hover { background: var(--surface-2); }
+    .row:hover .name { color: var(--accent); }
+  }
+  @media (max-width: 860px) {
+    .heading, .intro { grid-column: 1 / -1; }
+    .intro { margin-top: 20px; }
+    .row { grid-template-columns: 110px 1fr; align-items: start; }
+    .body, .status { grid-column: 1 / -1; }
+  }
+</style>

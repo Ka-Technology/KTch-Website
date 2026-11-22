@@ -15,8 +15,8 @@ results:
   - Launched in August 2025 with a more personal, human brand online.
 tech: [Web design, Responsive build]
 quote_id: blake
-cover_image: svc-software
-cover_alt: Downtown Portland towers rising above autumn trees.
+cover_image: fw-scrubs
+cover_alt: Two nurses in white uniforms tending a patient in a hospital bed, 1940s.
 featured: true
 order: 3
 ---

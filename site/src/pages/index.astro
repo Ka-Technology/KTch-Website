@@ -6,6 +6,14 @@ import BALedger from '../components/home/ba/BALedger.astro';
 import PillarTable from '../components/home/PillarTable.astro';
 import WorkIndex from '../components/WorkIndex.astro';
 import ProductsBand from '../components/ProductsBand.astro';
+// TEMPORARY layout options for review: keep one of each set, delete the rest with OptionLabel
+import OptionLabel from '../components/home/opt/OptionLabel.astro';
+import ProductsGrid from '../components/home/opt/ProductsGrid.astro';
+import ProductsRows from '../components/home/opt/ProductsRows.astro';
+import ProductsPicker from '../components/home/opt/ProductsPicker.astro';
+import HowNumbers from '../components/home/opt/HowNumbers.astro';
+import HowStatements from '../components/home/opt/HowStatements.astro';
+import HowTrack from '../components/home/opt/HowTrack.astro';
 import HowWeWork from '../components/HowWeWork.astro';
 import PortlandMosaic from '../components/PortlandMosaic.astro';
 import Testimonials from '../components/Testimonials.astro';
@@ -18,18 +26,25 @@ import CloseCTA from '../components/CloseCTA.astro';
   <WorkIndex heading="Featured work" picks={[
     'projects/cida-analytics', 'products/realdoc', 'products/kept', 'products/doigetgas',
     'projects/apex-performance', 'projects/scrubs-and-more', 'projects/hopewell-ranch',
-  ]}>
-    <p class="all"><a class="button button--ink" href="/services">See all services</a></p>
-  </WorkIndex>
+  ]} />
   <PillarTable />
+  <OptionLabel n="Products A" name="Lead product + cards (current)" />
   <ProductsBand />
+  <OptionLabel n="Products B" name="Equal shelf" />
+  <ProductsGrid />
+  <OptionLabel n="Products C" name="Catalogue rows" />
+  <ProductsRows />
+  <OptionLabel n="Products D" name="Picker" />
+  <ProductsPicker />
+  <OptionLabel n="How A" name="Squares diagram (current)" />
   <HowWeWork />
+  <OptionLabel n="How B" name="Big numbers" />
+  <HowNumbers />
+  <OptionLabel n="How C" name="Statements" />
+  <HowStatements />
+  <OptionLabel n="How D" name="Track" />
+  <HowTrack />
   <PortlandMosaic />
   <Testimonials />
   <CloseCTA />
 </Base>
-
-<style>
-  .all { margin-top: 48px; }
-  .gap { height: var(--section); }
-</style>

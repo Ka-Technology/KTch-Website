@@ -14,6 +14,7 @@ const projectEntries: Entry[] = (await getCollection('projects')).sort((a, b) =>
 const productEntries: Entry[] = (await getCollection('products', (p) => !p.data.hidden)).map((p) => ({
   id: `products/${p.id}`, href: `/products/${p.id}`, name: p.data.name, title: 'Our product', summary: p.data.summary,
   meta: `Product · ${p.data.status}, ${p.data.year}`, tags: ['product'], tagline: p.data.tagline,
+  image: p.data.cover_image, alt: p.data.cover_alt,
 }));
 const byId = new Map([...projectEntries, ...productEntries].map((e) => [e.id, e]));
 const all = picks ? picks.map((k) => byId.get(k)).filter((e): e is Entry => Boolean(e)) : projectEntries;

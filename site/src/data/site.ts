@@ -68,7 +68,7 @@ export const pillars: Pillar[] = [
       { name: 'API development', text: "Connect the tools that don't talk to each other." },
       { name: 'Tech debt', text: 'Modernize old code before it costs you more.' },
     ],
-    caseStudy: { label: 'CIDA Analytics', href: '/work/cida-analytics' },
+    caseStudy: { label: 'APEX Performance', href: '/work/apex-performance' },
   },
   {
     slug: 'web',

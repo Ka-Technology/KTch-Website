@@ -18,5 +18,7 @@ features:
 tech: [Web app, AWS]
 cta_label: Visit RealDoc
 cta_url: https://realdoc.app
+cover_image: fw-realdoc
+cover_alt: A 1940s office, with a man at his desk and a woman typing at a typewriter.
 order: 3
 ---

@@ -1,0 +1,49 @@
+---
+// Products option B, Equal shelf: every product gets the same column, picture, name, line and status.
+import { getCollection } from 'astro:content';
+import { img } from '../../../data/site';
+const products = (await getCollection('products', (p) => !p.data.hidden)).sort((a, b) => a.data.order - b.data.order);
+---
+<section class="pg inverse" aria-labelledby="pg-t">
+  <div class="wrap">
+    <div class="grid12 top" data-reveal>
+      <h2 id="pg-t" class="t-h2 heading">Our software</h2>
+      <p class="t-lead intro">Besides client work, we build our own products. Some started as a client’s problem that turned out to be everyone’s problem.</p>
+    </div>
+    <ul class="shelf" data-reveal>
+      {products.map((p) => (
+        <li class="item">
+          {p.data.cover_image && <figure class="photo pic"><img src={img(p.data.cover_image, 800)} width="800" height="1000" alt={p.data.cover_alt} loading="lazy" /></figure>}
+          <p class="status"><span class="dot"></span>{p.data.status}</p>
+          <h3 class="name"><a href={`/products/${p.id}`}>{p.data.name}</a></h3>
+          <p class="tag">{p.data.tagline}</p>
+          <span class="more arrow" aria-hidden="true">More</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .pg { padding-block: var(--section); }
+  .heading { grid-column: 1 / 6; }
+  .intro { grid-column: 7 / -1; max-width: 42ch; }
+  .shelf { list-style: none; margin-top: clamp(48px, 6vw, 80px); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gap); }
+  .item { position: relative; display: grid; gap: 12px; align-content: start; }
+  .pic { aspect-ratio: 4 / 5; margin-bottom: 8px; }
+  .pic img { transition: transform 700ms var(--ease-out); }
+  .name { font-size: clamp(30px, 2.6vw, 44px); letter-spacing: -0.045em; }
+  .name a { text-decoration: none; }
+  .name a::after { content: ""; position: absolute; inset: 0; }
+  .tag { font-weight: 600; max-width: 26ch; }
+  .status { display: inline-flex; align-items: center; gap: 8px; font-size: var(--t-small); font-weight: 700; color: var(--muted); }
+  .dot { width: 10px; height: 10px; background: var(--accent); border-radius: 50%; }
+  .more { font-weight: 700; font-size: var(--t-small); }
+  @media (hover: hover) and (pointer: fine) {
+    .item:hover .pic img { transform: scale(1.04); }
+    .item:hover .name { color: var(--accent); }
+  }
+  @media (max-width: 1100px) { .shelf { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 56px; } }
+  @media (max-width: 860px) { .heading, .intro { grid-column: 1 / -1; } .intro { margin-top: 20px; } }
+  @media (max-width: 520px) { .shelf { grid-template-columns: 1fr; } .pic { aspect-ratio: 16 / 10; } }
+</style>

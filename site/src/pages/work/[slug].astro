@@ -13,7 +13,7 @@ const d = project.data;
 const { Content } = await render(project);
 const testimonials = await getCollection('testimonials');
 const quote = d.quote_id ? testimonials.find((t) => t.data.id === d.quote_id && t.data.quote.trim())?.data : undefined;
-const big = d.cover_image === 'svc-ai' || d.cover_image === 'svc-analytics';
+const big = !['svc-software', 'svc-automation'].includes(d.cover_image);
 ---
 <Base title={`${d.client}: ${d.title}`} description={d.summary} og={`work-${project.id}`}>
   <article>

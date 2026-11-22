@@ -14,8 +14,8 @@ results:
   - The ranch team, Jodi and Amanda, signed off happily on the final version.
 tech: [Web design, Online shop, Donations]
 quote_id: hopewell
-cover_image: svc-software
-cover_alt: Downtown Portland towers rising above autumn trees.
+cover_image: fw-hopewell
+cover_alt: Horses, black and white, running across an open ranch field.
 order: 6
 ---
 
