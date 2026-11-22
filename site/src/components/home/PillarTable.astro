@@ -1,5 +1,6 @@
 ---
-import { pillars, img } from '../../data/site';
+import { pillars } from '../../data/site';
+import PillarDialogs from './PillarDialogs.astro';
 ---
 <section class="pillars wrap section" aria-labelledby="pillars-title">
   <div class="head" data-reveal>
@@ -28,42 +29,9 @@ import { pillars, img } from '../../data/site';
     ))}
   </div>
 
-  {pillars.map((p) => (
-    <dialog id={`dlg-${p.slug}`} class="dlg" aria-labelledby={`dlg-${p.slug}-t`}>
-      <div class="dlg-inner">
-        <figure class="photo dlg-pic">
-          <img src={img(p.image, 800)} width="800" height="1000" alt={p.imageAlt} loading="lazy" />
-        </figure>
-        <div class="dlg-body">
-          <h3 id={`dlg-${p.slug}-t`} class="t-h2 dlg-title">{p.name}</h3>
-          <p class="t-lead">{p.pitch}</p>
-          <ul class="offers">
-            {p.offerings.map((o) => (
-              <li>
-                <strong>{o.name}.</strong> {o.text}
-                {o.example && <> Example: <a class="link" href={o.example.href}>{o.example.label}</a>.</>}
-              </li>
-            ))}
-          </ul>
-          <div class="dlg-actions">
-            <a class="button" href={`/services#${p.slug}`}>See {p.short} services</a>
-            <button type="button" class="button button--quiet" data-close-dialog>Close</button>
-          </div>
-        </div>
-      </div>
-    </dialog>
-  ))}
+  <PillarDialogs />
 </section>
 
-<script>
-  document.querySelectorAll<HTMLButtonElement>('[data-open-dialog]').forEach((b) => {
-    const d = document.getElementById(b.dataset.openDialog!) as HTMLDialogElement | null;
-    if (!d) return;
-    b.addEventListener('click', () => d.showModal());
-    d.querySelector('[data-close-dialog]')?.addEventListener('click', () => d.close());
-    d.addEventListener('click', (e) => { if (e.target === d) d.close(); });
-  });
-</script>
 
 <style>
   .head { display: grid; gap: 20px; margin-bottom: 48px; }
@@ -92,23 +60,6 @@ import { pillars, img } from '../../data/site';
   .proof a { color: var(--bg); font-weight: 700; font-size: var(--t-body); text-decoration: none; }
   @media (hover: hover) and (pointer: fine) { .proof a:hover { color: var(--accent); } }
 
-  .dlg { margin: auto; inset: 0; border: 0; padding: 0; width: min(1080px, calc(100vw - 2 * var(--margin))); max-height: calc(100svh - 48px); background: var(--bg); color: var(--ink); box-shadow: 0 30px 80px rgb(0 0 0 / 0.4); } /* taste-skill-ignore: dialog is a real overlay */
-  .dlg::backdrop { background: rgb(11 11 12 / 0.72); }
-  .dlg-inner { display: grid; grid-template-columns: 5fr 7fr; }
-  .dlg-pic { min-height: 100%; }
-  .dlg-pic img { height: 100%; }
-  .dlg-body { padding: clamp(24px, 3.5vw, 48px); display: grid; gap: 22px; align-content: start; }
-  .dlg-title { font-size: clamp(30px, 3vw, 44px); }
-  .offers { list-style: none; display: grid; gap: 14px; font-size: var(--t-body); }
-  .offers li { padding-left: 1.2em; position: relative; }
-  .offers li::before { content: ""; position: absolute; left: 0; top: 0.6em; width: 0.45em; height: 0.45em; background: var(--accent); }
-  .dlg-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 6px; }
-  @media (prefers-reduced-motion: no-preference) {
-    .dlg[open] { animation: dlg-in 360ms var(--ease-out); }
-    .dlg[open]::backdrop { animation: fade 300ms ease; }
-  }
-  @keyframes dlg-in { from { opacity: 0; transform: translateY(24px) scale(0.98); } }
-  @keyframes fade { from { opacity: 0; } }
 
   @media (max-width: 860px) {
     .table { grid-template-columns: minmax(0, 1fr); }
@@ -118,7 +69,5 @@ import { pillars, img } from '../../data/site';
     .tr > .pitch { padding-bottom: 8px !important; }
     .tr > .build { color: var(--muted); padding-bottom: 14px !important; }
     .tr > .fc { padding: 14px 16px !important; }
-    .dlg-inner { grid-template-columns: 1fr; }
-    .dlg-pic { max-height: 200px; }
   }
 </style>

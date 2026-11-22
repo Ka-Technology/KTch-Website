@@ -13,8 +13,8 @@ results:
   - The site launched in August 2024.
 tech: [Wix, Forms]
 quote_id: jake
-cover_image: svc-software
-cover_alt: Downtown Portland towers rising above autumn trees.
+cover_image: fw-milligans
+cover_alt: A groundskeeper walking behind a mower across a wide lawn.
 order: 7
 ---
 

@@ -43,8 +43,8 @@ export const pillars: Pillar[] = [
     name: 'AI & Process Automation',
     short: 'AI & automation',
     pitch: 'Practical AI and automation that solve real problems, not a chatbot for the sake of it.',
-    image: 'svc-ai',
-    imageAlt: 'A developer working at two monitors full of code in a dark room.',
+    image: 'wwd-ai',
+    imageAlt: 'The control panel of a robotic arm on a factory line.',
     offerings: [
       { name: 'LLM integrations', text: 'AI that already knows your business, so you never have to catch ChatGPT up again.' },
       { name: 'Document AI', text: 'Turn piles of PDFs into structured, verified data.', example: { label: 'CIDA Analytics', href: '/work/cida-analytics' } },
@@ -75,8 +75,8 @@ export const pillars: Pillar[] = [
     name: 'Website Development',
     short: 'web',
     pitch: 'A website that looks like your business today, not like a template.',
-    image: 'third-street-1910',
-    imageAlt: 'Third Street in downtown Portland in 1910, lined with shop fronts and awnings.',
+    image: 'wwd-web',
+    imageAlt: 'A woman at a café table with a laptop, mid-conversation.',
     offerings: [
       { name: 'Website design & development', text: 'Great UX and UI, beyond what a template can give you.' },
       { name: 'Redesigns', text: 'Bring an old site up to date, with a personal touch instead of stock photos.', example: { label: 'Scrubs & More', href: '/work/scrubs-and-more' } },

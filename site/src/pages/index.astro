@@ -3,7 +3,12 @@ import Base from '../layouts/Base.astro';
 import Hero from '../components/home/Hero.astro';
 import ClientStrip from '../components/home/ClientStrip.astro';
 import BALedger from '../components/home/ba/BALedger.astro';
-import PillarTable from '../components/home/PillarTable.astro';
+import PillarDialogs from '../components/home/PillarDialogs.astro';
+import OptionLabel from '../components/home/opt/OptionLabel.astro';
+import WwdSpreads from '../components/home/opt/WwdSpreads.astro';
+import WwdTiles from '../components/home/opt/WwdTiles.astro';
+import WwdPanels from '../components/home/opt/WwdPanels.astro';
+import WwdRows from '../components/home/opt/WwdRows.astro';
 import WorkIndex from '../components/WorkIndex.astro';
 import ProductsBand from '../components/ProductsBand.astro';
 import HowWeWork from '../components/HowWeWork.astro';
@@ -15,11 +20,19 @@ import CloseCTA from '../components/CloseCTA.astro';
   <Hero />
   <ClientStrip />
   <BALedger />
-  <PillarTable />
+  <OptionLabel n="A" name="Spreads" />
+  <WwdSpreads />
+  <OptionLabel n="B" name="Photo tiles" />
+  <WwdTiles />
+  <OptionLabel n="C" name="Opening panels" />
+  <WwdPanels />
+  <OptionLabel n="D" name="Rows with photos" />
+  <WwdRows />
+  <PillarDialogs />
   <HowWeWork />
   <WorkIndex heading="Client work" picks={[
     'projects/cida-analytics', 'projects/apex-performance',
-    'projects/real-accounting', 'projects/scrubs-and-more', 'projects/hopewell-ranch',
+    'projects/real-accounting', 'projects/scrubs-and-more', 'projects/hopewell-ranch', 'projects/milligans',
   ]} />
   <ProductsBand />
   <PortlandMosaic />
