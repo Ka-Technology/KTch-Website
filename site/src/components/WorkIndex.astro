@@ -69,6 +69,7 @@ const firstUse = projects.map((p) => { if (!p.image) return true; const f = !see
 <script>
   document.querySelectorAll<HTMLElement>('[data-work]').forEach((root) => {
     const items = [...root.querySelectorAll<HTMLElement>('[data-item]')];
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const pvs = [...root.querySelectorAll<HTMLElement>('[data-pv]')];
     const set = (i: number) => {
       items.forEach((el) => el.classList.toggle('is-active', Number(el.dataset.i) === i));
@@ -77,7 +78,19 @@ const firstUse = projects.map((p) => { if (!p.image) return true; const f = !see
     items.forEach((el) => {
       const i = Number(el.dataset.i);
       // the photo follows the last name pointed at; the description is open only while pointing or focused
-      const open = (on: boolean) => el.classList.toggle('is-open', on);
+      const open = (on: boolean) => {
+        if (el.classList.contains('is-open') === on) return;
+        // FLIP: note where every name is, change the layout in one step, then slide each name from where it was
+        // to where it now is with a transform, which the GPU animates without re-laying out the list
+        const before = items.map((li) => li.getBoundingClientRect().top);
+        items.forEach((li) => li.getAnimations().forEach((a) => a.cancel()));
+        el.classList.toggle('is-open', on);
+        if (reduce) return;
+        items.forEach((li, k) => {
+          const d = before[k] - li.getBoundingClientRect().top;
+          if (Math.abs(d) > 0.5) li.animate([{ transform: `translateY(${d}px)` }, { transform: 'none' }], { duration: 340, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
+        });
+      };
       // only the name itself opens it: leaving the name closes it, even onto the description
       const head = el.querySelector<HTMLElement>('a.row');
       // hover intent: the photo follows at once, but the description waits until the pointer settles,
@@ -126,13 +139,13 @@ const firstUse = projects.map((p) => { if (!p.image) return true; const f = !see
   .pv.is-active { opacity: 1; visibility: visible; transition: opacity 220ms ease; }
   .pv img { transform: scale(1.04); transition: transform 900ms var(--ease-out); }
   .pv.is-active img { transform: none; }
-  /* closing: the text fades first, then the space folds; opening: the space unfolds, then the text fades in */
-  .drop { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 260ms var(--ease-out) 60ms; }
-  .drop > div { overflow: hidden; }
-  .drop p { max-width: 52ch; padding: 2px 0 18px; font-size: var(--t-body); line-height: 1.45; opacity: 0; transform: translateY(-6px); transition: opacity 120ms ease, transform 120ms ease; }
-  .is-open .drop { grid-template-rows: 1fr; transition: grid-template-rows 320ms var(--ease-out); }
-  .is-open .drop p { opacity: 1; transform: none; transition: opacity 240ms ease 120ms, transform 320ms var(--ease-out) 120ms; }
-  @media (prefers-reduced-motion: reduce) { .drop, .drop p, .is-open .drop, .is-open .drop p { transition: none; } }
+  /* the description takes its space in one step (the names below glide via FLIP in the script); its text fades in */
+  .drop { display: none; }
+  .drop p { max-width: 52ch; padding: 2px 0 18px; font-size: var(--t-body); line-height: 1.45; }
+  .is-open .drop { display: block; }
+  .is-open .drop p { animation: drop-in 300ms var(--ease-out) 60ms both; }
+  @keyframes drop-in { from { opacity: 0; transform: translateY(-8px); } }
+  @media (prefers-reduced-motion: reduce) { .is-open .drop p { animation: none; } }
   /* products have no photograph: a type panel in Ka red stands in */
   .card { background: var(--accent); color: var(--on-accent); display: grid; align-content: space-between; padding: clamp(20px, 2.4vw, 32px); }
   .card-name { font-size: clamp(40px, 4.4vw, 72px); font-weight: 850; letter-spacing: -0.05em; line-height: 0.95; overflow-wrap: anywhere; }
@@ -147,8 +160,8 @@ const firstUse = projects.map((p) => { if (!p.image) return true; const f = !see
     .names .m-pic--dup { display: none; }
     .names { gap: 28px; }
     .meta { display: none; }
-    .drop { grid-template-rows: 1fr; }
-    .drop p { opacity: 1; transform: none; padding: 8px 0 0; }
+    .drop { display: block; }
+    .drop p { padding: 8px 0 0; animation: none !important; }
     .row { flex-direction: column; gap: 6px; color: var(--ink); padding-top: 14px; }
     .name { font-size: clamp(32px, 9.5vw, 48px); }
     .is-active .name { text-decoration: none; }
