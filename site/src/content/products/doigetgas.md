@@ -16,6 +16,6 @@ tech: [Forecasting, Web]
 cta_label: Check today’s forecast
 cta_url: https://doigetgas.com
 cover_image: fw-doigetgas
-cover_alt: A gas station on a Portland street corner, 1976.
+cover_alt: A hand reaching for a fuel nozzle at a gas pump.
 order: 2
 ---

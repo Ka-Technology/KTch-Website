@@ -19,6 +19,6 @@ features:
   - Peak-hour coverage met across test weeks.
 tech: [Python, Linear and constraint optimization, Spreadsheet-upload web UI]
 cover_image: fw-shiftwize
-cover_alt: The counter and stools of an old diner, with the kitchen pass behind.
+cover_alt: A server taking an order from a customer in a café.
 order: 4
 ---

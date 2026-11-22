@@ -16,7 +16,7 @@ results:
 tech: [Web design, Responsive build]
 quote_id: blake
 cover_image: fw-scrubs
-cover_alt: A healthcare worker standing in scrubs, a stethoscope around the neck.
+cover_alt: A smiling clinic team in uniforms at a hospital reception.
 featured: true
 order: 3
 ---

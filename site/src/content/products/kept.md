@@ -17,6 +17,6 @@ tech: [iOS, Stripe, Solana (Anchor), Every.org]
 cta_label: Watch the demo
 cta_url: https://www.youtube.com/watch?v=hhJmwtj5dYg
 cover_image: fw-kept
-cover_alt: A runner in glasses rounding an indoor track, 1950s.
+cover_alt: Two people jogging side by side across a footbridge.
 order: 1
 ---
