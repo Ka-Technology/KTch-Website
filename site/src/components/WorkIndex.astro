@@ -78,10 +78,12 @@ const firstUse = projects.map((p) => { if (!p.image) return true; const f = !see
       const i = Number(el.dataset.i);
       // the photo follows the last name pointed at; the description is open only while pointing or focused
       const open = (on: boolean) => el.classList.toggle('is-open', on);
-      el.addEventListener('pointerenter', () => { set(i); open(true); });
-      el.addEventListener('pointerleave', () => open(false));
-      el.querySelector('a')?.addEventListener('focus', () => { set(i); open(true); });
-      el.querySelector('a')?.addEventListener('blur', () => open(false));
+      // only the name itself opens it: leaving the name closes it, even onto the description
+      const head = el.querySelector<HTMLElement>('a.row');
+      head?.addEventListener('pointerenter', () => { set(i); open(true); });
+      head?.addEventListener('pointerleave', () => open(false));
+      head?.addEventListener('focus', () => { set(i); open(true); });
+      head?.addEventListener('blur', () => open(false));
     });
     const buttons = [...root.querySelectorAll<HTMLButtonElement>('[data-filter]')];
     buttons.forEach((b) => b.addEventListener('click', () => {
