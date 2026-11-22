@@ -14,7 +14,7 @@ results:
   - A manual print-and-scan routine replaced with one step.
 tech: [Python, PDF generation]
 cover_image: fw-apex
-cover_alt: A man walking on a treadmill in a testing lab, wired to monitors, 1974.
+cover_alt: A man running on a treadmill in a gym.
 order: 5
 ---
 

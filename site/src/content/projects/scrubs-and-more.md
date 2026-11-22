@@ -16,7 +16,7 @@ results:
 tech: [Web design, Responsive build]
 quote_id: blake
 cover_image: fw-scrubs
-cover_alt: Two nurses in white uniforms tending a patient in a hospital bed, 1940s.
+cover_alt: A healthcare worker standing in scrubs, a stethoscope around the neck.
 featured: true
 order: 3
 ---
