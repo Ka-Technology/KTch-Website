@@ -44,8 +44,8 @@ const steps = [
     :global(.js) [data-track].is-in .fill { transform: scaleX(1); }
     :global(.js) [data-track] .steps li { opacity: 0; transform: translateY(16px); transition: opacity 600ms var(--ease-out), transform 700ms var(--ease-out); transition-delay: calc(var(--k) * 450ms + 150ms); }
     :global(.js) [data-track].is-in .steps li { opacity: 1; transform: none; }
-    :global(.js) [data-track] .stop { transform: scale(0); transition: transform 400ms var(--ease-out); transition-delay: calc(var(--k) * 450ms + 100ms); }
-    :global(.js) [data-track].is-in .stop { transform: none; }
+    :global(.js) [data-track] .stop { opacity: 0; transform: scale(0.6); transition: opacity 300ms var(--ease-out), transform 400ms var(--ease-out); transition-delay: calc(var(--k) * 450ms + 100ms); }
+    :global(.js) [data-track].is-in .stop { opacity: 1; transform: none; }
   }
   @media (max-width: 860px) {
     .heading, .para { grid-column: 1 / -1; }
