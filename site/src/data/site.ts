@@ -42,9 +42,9 @@ export const pillars: Pillar[] = [
     tags: ['ai', 'automation'],
     name: 'AI & Process Automation',
     short: 'AI & automation',
-    pitch: 'Practical AI and automation that solve real problems, not a chatbot for the sake of it.',
+    pitch: 'Practical AI and automation, not a chatbot for the sake of it.',
     image: 'wwd-ai',
-    imageAlt: 'A close-up of chips and components on a computer circuit board.',
+    imageAlt: 'A smiling barista behind a café counter, holding a travel mug.',
     offerings: [
       { name: 'LLM integrations', text: 'AI that already knows your business, so you never have to catch ChatGPT up again.' },
       { name: 'Document AI', text: 'Turn piles of PDFs into structured, verified data.', example: { label: 'CIDA Analytics', href: '/work/cida-analytics' } },
