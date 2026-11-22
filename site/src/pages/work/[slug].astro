@@ -20,7 +20,15 @@ const big = d.cover_image === 'svc-ai' || d.cover_image === 'svc-analytics';
     <header class="wrap hd">
       <h1 class="t-display lines"><span class="line"><span data-line style="--i:0">{d.client}</span></span></h1>
       <div class="grid12 sub">
-        <p class="t-lead summary" data-load style="--d:300ms">{d.summary}</p>
+        <div class="lede" data-load style="--d:300ms">
+          <p class="t-lead summary">{d.summary}</p>
+          {d.tech.length > 0 && (
+            <div class="tech-wrap">
+              <h2 class="tech-h">Tech used</h2>
+              <ul class="tech">{d.tech.map((t) => <li>{t}</li>)}</ul>
+            </div>
+          )}
+        </div>
         <dl class="facts" data-load style="--d:380ms">
           <div><dt>Project</dt><dd>{d.title}</dd></div>
           <div><dt>Services</dt><dd>{d.services.map((s) => serviceLabel[s]).join(', ')}</dd></div>
@@ -54,13 +62,6 @@ const big = d.cover_image === 'svc-ai' || d.cover_image === 'svc-analytics';
       </section>
     )}
 
-    {d.tech.length > 0 && (
-      <section class="wrap grid12 block" aria-labelledby="tech">
-        <h2 id="tech" class="t-h2 bh">Tech used</h2>
-        <ul class="tech body" data-reveal>{d.tech.map((t) => <li>{t}</li>)}</ul>
-      </section>
-    )}
-
     {quote && (
       <section class="wrap grid12 block" aria-label="What the client said">
         <figure class="q body">
@@ -81,7 +82,10 @@ const big = d.cover_image === 'svc-ai' || d.cover_image === 'svc-analytics';
 <style>
   .hd { padding-top: clamp(24px, 5vh, 64px); }
   .sub { margin-top: 36px; row-gap: 32px; }
-  .summary { grid-column: 1 / 7; max-width: 36ch; font-weight: 600; }
+  .lede { grid-column: 1 / 7; display: grid; gap: 28px; align-content: start; }
+  .summary { max-width: 36ch; font-weight: 600; }
+  .tech-wrap { display: grid; gap: 10px; }
+  .tech-h { font-size: var(--t-small); font-weight: 600; letter-spacing: 0; line-height: 1.45; color: var(--muted); }
   .facts { grid-column: 8 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 18px var(--gap); margin: 0; }
   .facts dt { font-size: var(--t-small); color: var(--muted); font-weight: 600; }
   .facts dd { margin: 2px 0 0; font-weight: 700; }
@@ -104,7 +108,7 @@ const big = d.cover_image === 'svc-ai' || d.cover_image === 'svc-analytics';
   .nn { font-size: var(--t-h2); font-weight: 800; letter-spacing: -0.04em; line-height: 1; transition: color var(--t-hover) ease; }
   @media (hover: hover) and (pointer: fine) { .nextp a:hover .nn { color: var(--accent-text); } }
   @media (max-width: 860px) {
-    .summary, .facts, .bh, .body, .rl { grid-column: 1 / -1; }
+    .lede, .facts, .bh, .body, .rl { grid-column: 1 / -1; }
     .cover { aspect-ratio: 4 / 3; }
   }
 </style>

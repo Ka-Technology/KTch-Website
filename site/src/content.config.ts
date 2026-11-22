@@ -12,7 +12,7 @@ const projects = defineCollection({
     location: z.string().optional(),
     year: z.string(),
     services: z.array(pillars),
-    status: z.enum(['Current', 'Completed']),
+    status: z.enum(['Current', 'Completed', 'In development']),
     summary: z.string(),
     challenge: z.string(),
     results: z.array(z.string()).default([]),

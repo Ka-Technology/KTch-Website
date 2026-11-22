@@ -47,7 +47,7 @@ export const pillars: Pillar[] = [
       { name: 'LLM integrations', text: 'AI that already knows your business, so you never have to catch ChatGPT up again.' },
       { name: 'Document AI', text: 'Turn piles of PDFs into structured, verified data.', example: { label: 'CIDA Analytics', href: '/work/cida-analytics' } },
       { name: 'Voice and text agents', text: 'AI that answers calls, follows up on missed calls, and books appointments.' },
-      { name: 'ML-based optimization', text: "Find the inefficiencies your team can't see.", example: { label: 'Face Plant scheduler', href: '/work/face-plant' } },
+      { name: 'ML-based optimization', text: "Find the inefficiencies your team can't see.", example: { label: 'Shiftwize scheduler', href: '/work/shiftwize' } },
     ],
     caseStudy: { label: 'CIDA Analytics', href: '/work/cida-analytics' },
   },
@@ -93,7 +93,7 @@ export const pillars: Pillar[] = [
       { name: 'Predictive forecasting', text: "Staff and stock for what's coming." },
       { name: 'Data visualization', text: 'Dashboards your whole team understands.' },
     ],
-    caseStudy: { label: 'Face Plant', href: '/work/face-plant' },
+    caseStudy: { label: 'Shiftwize', href: '/work/shiftwize' },
   },
 ];
 
@@ -114,11 +114,9 @@ export const clients = {
   past: [
     { name: 'Old Republic Title, Oregon branch', what: 'RealDoc' },
     { name: 'Cascade Title', what: 'RealDoc' },
-    { name: 'Face Plant', what: 'Scheduling and analytics' },
     { name: 'Scrubs & More', what: 'Website' },
     { name: 'Real Accounting', what: 'IT and email migration' },
     { name: 'APEX Performance', what: 'Automation' },
-    { name: '4 Elements MMA', what: 'MyElement' },
     { name: 'Hopewell Ranch', what: 'Website' },
     { name: "Milligan's Landscape & Lawn", what: 'Website' },
     { name: 'Kap & Company LLC', what: 'Project partner' },
@@ -129,12 +127,10 @@ export const clients = {
 export const stripNames = [
   'CIDA Analytics',
   'Keller Williams Eugene-Springfield',
-  'Face Plant',
   'Scrubs & More',
   'Cascade Title',
   'Real Accounting',
   'APEX Performance',
-  '4 Elements MMA',
   'Hopewell Ranch',
   "Milligan's Landscape & Lawn",
   'Kap & Company',
