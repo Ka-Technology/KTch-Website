@@ -1,6 +1,6 @@
 ---
 // Before and after, as a ledger: every chore at once, read across: the chore, what it cost, what it costs now.
-// The grey is the table itself (frame and gutters); the cells are cut out of it in the page colour,
+// The grey shows only in the gutters between cells (no outer frame); the cells are in the page colour,
 // except the result column, which is filled.
 import { chores } from '../../../data/chores';
 ---
@@ -38,9 +38,9 @@ import { chores } from '../../../data/chores';
 <style>
   .heading { grid-column: 1 / 6; }
   .intro { grid-column: 7 / -1; max-width: 40ch; }
-  .table { margin-top: clamp(48px, 7vh, 88px); display: grid; gap: 6px; padding: 6px; background: var(--surface); }
+  .table { margin-top: clamp(48px, 7vh, 88px); display: grid; gap: 6px; background: var(--surface); }
   .row { display: grid; grid-template-columns: 1.1fr 1.5fr 1.5fr; gap: 6px; }
-  .head span { font-size: var(--t-small); font-weight: 700; color: var(--ink); padding: 8px clamp(18px, 2vw, 28px) 4px; }
+  .head span { font-size: var(--t-small); font-weight: 700; color: var(--muted); padding: 0 clamp(20px, 2.2vw, 32px) 12px; background: var(--bg); }
   .cell { padding: clamp(20px, 2.2vw, 32px); display: grid; gap: 14px; align-content: start; }
   .chore { background: var(--bg); align-content: space-between; }
   .chore h3 { font-size: var(--t-lead); letter-spacing: -0.02em; line-height: 1.2; }
