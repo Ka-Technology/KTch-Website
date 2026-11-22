@@ -2,10 +2,7 @@
 import Base from '../layouts/Base.astro';
 import Hero from '../components/home/Hero.astro';
 import ClientStrip from '../components/home/ClientStrip.astro';
-// TEMPORARY: two ledger versions for review; keep one and delete the other with OptionLabel
-import OptionLabel from '../components/home/ba/OptionLabel.astro';
 import BALedger from '../components/home/ba/BALedger.astro';
-import BALedgerLight from '../components/home/ba/BALedgerLight.astro';
 import PillarTable from '../components/home/PillarTable.astro';
 import WorkIndex from '../components/WorkIndex.astro';
 import ProductsBand from '../components/ProductsBand.astro';
@@ -17,10 +14,7 @@ import CloseCTA from '../components/CloseCTA.astro';
 <Base strip={false}>
   <Hero />
   <ClientStrip />
-  <OptionLabel n={2} name="Ledger (as before)" />
   <BALedger />
-  <OptionLabel n={2} name="Ledger, lighter (B)" />
-  <BALedgerLight />
   <WorkIndex heading="Featured work">
     <p class="all"><a class="button button--ink" href="/work">See all work</a></p>
   </WorkIndex>
