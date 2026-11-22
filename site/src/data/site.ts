@@ -24,9 +24,10 @@ export const nav = [
 ];
 
 export type Pillar = {
-  slug: 'ai' | 'software' | 'web' | 'automation' | 'analytics';
+  slug: 'ai' | 'software' | 'web' | 'analytics';
+  tags?: string[];                                  // project service tags this section collects (default: its slug)
   name: string;
-  short: string;
+  short: string;                                    // used mid-sentence: 'See {short} services'
   pitch: string;
   image: string;
   imageAlt: string;
@@ -38,15 +39,18 @@ export type Pillar = {
 export const pillars: Pillar[] = [
   {
     slug: 'ai',
-    name: 'AI Applications & Integrations',
-    short: 'AI',
-    pitch: 'Practical AI that solves real problems, not a chatbot for the sake of it.',
+    tags: ['ai', 'automation'],
+    name: 'AI & Process Automation',
+    short: 'AI & automation',
+    pitch: 'Practical AI and automation that solve real problems, not a chatbot for the sake of it.',
     image: 'svc-ai',
     imageAlt: 'A developer working at two monitors full of code in a dark room.',
     offerings: [
       { name: 'LLM integrations', text: 'AI that already knows your business, so you never have to catch ChatGPT up again.' },
       { name: 'Document AI', text: 'Turn piles of PDFs into structured, verified data.', example: { label: 'CIDA Analytics', href: '/work/cida-analytics' } },
-      { name: 'Voice and text agents', text: 'AI that answers calls, follows up on missed calls, and books appointments.' },
+      { name: 'AI agents & customer outreach', text: 'AI that answers calls, follows up on missed calls and books appointments, so your clients feel looked after.' },
+      { name: 'Workflow automation', text: 'The repetitive steps, done for you.', example: { label: 'APEX test reports', href: '/work/apex-performance' } },
+      { name: 'Integrations & centralization', text: 'Data over here, software over there. We put it in one place.' },
       { name: 'ML-based optimization', text: "Find the inefficiencies your team can't see." },
     ],
     caseStudy: { label: 'CIDA Analytics', href: '/work/cida-analytics' },
@@ -54,7 +58,7 @@ export const pillars: Pillar[] = [
   {
     slug: 'software',
     name: 'Software Applications',
-    short: 'Software',
+    short: 'software',
     pitch: "One size doesn't fit all. We build the tools your business actually needs.",
     image: 'svc-software',
     imageAlt: 'Downtown Portland towers rising above autumn trees.',
@@ -69,7 +73,7 @@ export const pillars: Pillar[] = [
   {
     slug: 'web',
     name: 'Website Development',
-    short: 'Web',
+    short: 'web',
     pitch: 'A website that looks like your business today, not like a template.',
     image: 'third-street-1910',
     imageAlt: 'Third Street in downtown Portland in 1910, lined with shop fronts and awnings.',
@@ -83,23 +87,9 @@ export const pillars: Pillar[] = [
     partners: [{ name: 'Kap & Company', what: 'Project partner' }],
   },
   {
-    slug: 'automation',
-    name: 'Process Automation',
-    short: 'Automation',
-    pitch: 'Run your business without running your business.',
-    image: 'svc-automation',
-    imageAlt: 'Two people working on laptops at a shared wooden table.',
-    offerings: [
-      { name: 'Automated customer outreach', text: 'Make sure your clients feel looked after, automatically.' },
-      { name: 'Integrations & centralization', text: 'Data over here, software over there. We put it in one place.' },
-      { name: 'Workflow automation', text: 'The repetitive steps, done for you.', example: { label: 'APEX test reports', href: '/work/apex-performance' } },
-    ],
-    caseStudy: { label: 'APEX Performance', href: '/work/apex-performance' },
-  },
-  {
     slug: 'analytics',
     name: 'Data Analytics',
-    short: 'Analytics',
+    short: 'analytics',
     pitch: 'Find out what your customers care about.',
     image: 'svc-analytics',
     imageAlt: 'Three people around a table reviewing charts pinned to a whiteboard.',
@@ -108,8 +98,13 @@ export const pillars: Pillar[] = [
       { name: 'Predictive forecasting', text: "Staff and stock for what's coming." },
       { name: 'Data visualization', text: 'Dashboards your whole team understands.' },
     ],
+    // shown only as the proof in the home-page table; Services lists no case study for analytics
+    caseStudy: { label: 'Shiftwize', href: '/products/shiftwize' },
   },
 ];
+
+/** The Services section a project service tag belongs to. */
+export const pillarOf = (tag: string) => pillars.find((p) => (p.tags ?? [p.slug]).includes(tag)) ?? pillars[0];
 
 export const serviceLabel: Record<string, string> = {
   ai: 'AI',

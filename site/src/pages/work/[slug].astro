@@ -2,7 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import CloseCTA from '../../components/CloseCTA.astro';
-import { serviceLabel, img, srcset } from '../../data/site';
+import { serviceLabel, pillarOf, img, srcset } from '../../data/site';
 
 export async function getStaticPaths() {
   const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
@@ -73,7 +73,7 @@ const big = d.cover_image === 'svc-ai' || d.cover_image === 'svc-analytics';
 
     <nav class="wrap nextp" aria-label="Next case study">
       <a href={`/work/${next.id}`}><span class="nl">Next case study</span><span class="nn arrow">{next.data.client}</span></a>
-      <p class="allw"><a class="link" href={`/services#${d.services[0]}`}>Back to {serviceLabel[d.services[0]]} services</a></p>
+      <p class="allw"><a class="link" href={`/services#${pillarOf(d.services[0]).slug}`}>Back to {pillarOf(d.services[0]).short} services</a></p>
     </nav>
   </article>
   <CloseCTA title={['Have a similar', 'problem?']} />

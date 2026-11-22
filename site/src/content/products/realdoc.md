@@ -1,6 +1,6 @@
 ---
 name: RealDoc
-tagline: Continuing-education certificates, generated with a button's click.
+tagline: Continuing-education certificates, generated with a button’s click.
 status: In use
 url: https://realdoc.app
 year: "2024"
@@ -10,7 +10,7 @@ problem: >-
   every week typing continuing-education certificates by hand.
 how_it_works:
   - A QR code at class creates the attendance sheet automatically.
-  - One click generates every attendee's certificate, signed and zipped.
+  - One click generates every attendee’s certificate, signed and zipped.
   - Oregon and Arizona templates are built in.
 features:
   - Used by Keller Williams Eugene-Springfield.

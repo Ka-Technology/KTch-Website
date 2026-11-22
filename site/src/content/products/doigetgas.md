@@ -13,7 +13,7 @@ how_it_works:
 features:
   - Free to use, and supported by donations.
 tech: [Forecasting, Web]
-cta_label: Check today's forecast
+cta_label: Check today’s forecast
 cta_url: https://doigetgas.com
 order: 2
 ---

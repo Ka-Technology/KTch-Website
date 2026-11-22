@@ -4,10 +4,10 @@ import { pillars, img } from '../../data/site';
 <section class="pillars wrap section" aria-labelledby="pillars-title">
   <div class="head" data-reveal>
     <h2 id="pillars-title" class="t-h2">What we do</h2>
-    <p class="t-lead measure">Five kinds of work, one goal: fewer tedious hours. Open any row for the details.</p>
+    <p class="t-lead measure">Four kinds of work, one goal: fewer tedious hours. Open any row for the details.</p>
   </div>
 
-  <div class="table" role="table" aria-label="Our five services">
+  <div class="table" role="table" aria-label="Our four services">
     <div class="feature-bg" aria-hidden="true" style={`--rows:${pillars.length + 1}`}></div>
     <div class="tr th" role="row" style="--r:1">
       <span role="columnheader">Service</span>
@@ -46,7 +46,7 @@ import { pillars, img } from '../../data/site';
             ))}
           </ul>
           <div class="dlg-actions">
-            <a class="button" href={`/services#${p.slug}`}>See {p.short.toLowerCase()} services</a>
+            <a class="button" href={`/services#${p.slug}`}>See {p.short} services</a>
             <button type="button" class="button button--quiet" data-close-dialog>Close</button>
           </div>
         </div>
@@ -92,7 +92,7 @@ import { pillars, img } from '../../data/site';
   .proof a { color: var(--bg); font-weight: 700; font-size: var(--t-body); text-decoration: none; }
   @media (hover: hover) and (pointer: fine) { .proof a:hover { color: var(--accent); } }
 
-  .dlg { border: 0; padding: 0; width: min(1080px, calc(100vw - 2 * var(--margin))); max-height: calc(100svh - 48px); background: var(--bg); color: var(--ink); box-shadow: 0 30px 80px rgb(0 0 0 / 0.4); } /* taste-skill-ignore: dialog is a real overlay */
+  .dlg { margin: auto; inset: 0; border: 0; padding: 0; width: min(1080px, calc(100vw - 2 * var(--margin))); max-height: calc(100svh - 48px); background: var(--bg); color: var(--ink); box-shadow: 0 30px 80px rgb(0 0 0 / 0.4); } /* taste-skill-ignore: dialog is a real overlay */
   .dlg::backdrop { background: rgb(11 11 12 / 0.72); }
   .dlg-inner { display: grid; grid-template-columns: 5fr 7fr; }
   .dlg-pic { min-height: 100%; }

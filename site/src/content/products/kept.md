@@ -12,7 +12,7 @@ how_it_works:
   - Finish, and your stake comes back. Miss, and it goes to your charity. Either way, it does good.
 features:
   - Pay by card or Apple Pay, or with stablecoins on Solana, where the stake waits in an escrow program that can only send it back to you or to your charity.
-  - Kept never keeps the stake. There's a small, upfront service fee.
+  - Kept never keeps the stake. There’s a small, upfront service fee.
 tech: [iOS, Stripe, Solana (Anchor), Every.org]
 cta_label: Watch the demo
 cta_url: https://www.youtube.com/watch?v=hhJmwtj5dYg

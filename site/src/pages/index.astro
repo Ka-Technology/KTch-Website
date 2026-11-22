@@ -15,7 +15,10 @@ import CloseCTA from '../components/CloseCTA.astro';
   <Hero />
   <ClientStrip />
   <BALedger />
-  <WorkIndex heading="Featured work">
+  <WorkIndex heading="Featured work" picks={[
+    'projects/cida-analytics', 'products/realdoc', 'products/kept', 'products/doigetgas',
+    'projects/apex-performance', 'projects/scrubs-and-more', 'projects/hopewell-ranch',
+  ]}>
     <p class="all"><a class="button button--ink" href="/services">See all services</a></p>
   </WorkIndex>
   <PillarTable />

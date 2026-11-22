@@ -1,16 +1,28 @@
 ---
 import { getCollection } from 'astro:content';
 import { serviceLabel, img } from '../data/site';
-interface Props { heading?: string; headingTag?: 'h1' | 'h2'; filter?: boolean; limit?: number; id?: string; lede?: string }
-const { heading = 'Our work', headingTag = 'h2', filter = false, limit, id = 'work-title', lede } = Astro.props;
-const all = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+// `picks` lists entries in order as 'projects/<id>' or 'products/<id>'; without it, every project shows.
+interface Props { heading?: string; headingTag?: 'h1' | 'h2'; filter?: boolean; limit?: number; id?: string; lede?: string; picks?: string[] }
+const { heading = 'Our work', headingTag = 'h2', filter = false, limit, id = 'work-title', lede, picks } = Astro.props;
+type Entry = { id: string; href: string; name: string; title: string; summary: string; meta: string; tags: string[]; image?: string; alt?: string; tagline?: string };
+const yearOf = (y: string) => y.replace('–present', '–now');
+const projectEntries: Entry[] = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order).map((p) => ({
+  id: `projects/${p.id}`, href: `/work/${p.id}`, name: p.data.client, title: p.data.title, summary: p.data.summary,
+  meta: `${p.data.services.map((s) => serviceLabel[s]).join(' · ')}, ${yearOf(p.data.year)}`, tags: p.data.services,
+  image: p.data.cover_image, alt: p.data.cover_alt,
+}));
+const productEntries: Entry[] = (await getCollection('products', (p) => !p.data.hidden)).map((p) => ({
+  id: `products/${p.id}`, href: `/products/${p.id}`, name: p.data.name, title: 'Our product', summary: p.data.summary,
+  meta: `Product · ${p.data.status}, ${p.data.year}`, tags: ['product'], tagline: p.data.tagline,
+}));
+const byId = new Map([...projectEntries, ...productEntries].map((e) => [e.id, e]));
+const all = picks ? picks.map((k) => byId.get(k)).filter((e): e is Entry => Boolean(e)) : projectEntries;
 const projects = limit ? all.slice(0, limit) : all;
 // only offer filters that match at least one project
-const tags = ['ai', 'software', 'automation', 'web', 'analytics'].filter((t) => all.some((p) => p.data.services.includes(t as never)));
+const tags = ['ai', 'software', 'automation', 'web', 'analytics'].filter((t) => all.some((p) => p.tags.includes(t)));
 const H = headingTag;
-const yearOf = (y: string) => y.replace('–present', '–now');
 const seen = new Set<string>();
-const firstUse = projects.map((p) => { const f = !seen.has(p.data.cover_image); seen.add(p.data.cover_image); return f; });
+const firstUse = projects.map((p) => { if (!p.image) return true; const f = !seen.has(p.image); seen.add(p.image); return f; });
 ---
 <section class="work wrap" aria-labelledby={id} data-work>
   <div class="top">
@@ -28,13 +40,13 @@ const firstUse = projects.map((p) => { const f = !seen.has(p.data.cover_image); 
   <div class="layout">
     <ol class="names">
       {projects.map((p, i) => (
-        <li data-item data-tags={p.data.services.join(' ')} class={i === 0 ? 'is-active' : ''} data-i={i}>
-          <figure class={`photo m-pic ${firstUse[i] ? '' : 'm-pic--dup'}`}>
-            <img src={img(p.data.cover_image, 800)} width="800" height="500" alt={p.data.cover_alt} loading="lazy" />
-          </figure>
-          <a href={`/work/${p.id}`} class="row">
-            <span class="name">{p.data.client}</span>
-            <span class="meta">{p.data.services.map((s) => serviceLabel[s]).join(' · ')}, {yearOf(p.data.year)}</span>
+        <li data-item data-tags={p.tags.join(' ')} class={i === 0 ? 'is-active' : ''} data-i={i}>
+          {p.image
+            ? <figure class={`photo m-pic ${firstUse[i] ? '' : 'm-pic--dup'}`}><img src={img(p.image, 800)} width="800" height="500" alt={p.alt} loading="lazy" /></figure>
+            : <div class="m-pic card" aria-hidden="true"><span class="card-name">{p.name}</span><span class="card-tag">{p.tagline}</span></div>}
+          <a href={p.href} class="row">
+            <span class="name">{p.name}</span>
+            <span class="meta">{p.meta}</span>
           </a>
         </li>
       ))}
@@ -42,15 +54,15 @@ const firstUse = projects.map((p) => { const f = !seen.has(p.data.cover_image); 
     <div class="preview" aria-hidden="true">
       <div class="frame">
         {projects.map((p, i) => (
-          <figure class={`photo pv ${i === 0 ? 'is-active' : ''}`} data-pv={i}>
-            <img src={img(p.data.cover_image, 800)} width="800" height="1000" alt="" loading="lazy" />
-          </figure>
+          p.image
+            ? <figure class={`photo pv ${i === 0 ? 'is-active' : ''}`} data-pv={i}><img src={img(p.image, 800)} width="800" height="1000" alt="" loading="lazy" /></figure>
+            : <div class={`pv card ${i === 0 ? 'is-active' : ''}`} data-pv={i}><span class="card-name">{p.name}</span><span class="card-tag">{p.tagline}</span></div>
         ))}
       </div>
       <div class="captions">
         {projects.map((p, i) => (
           <p class={`cap ${i === 0 ? 'is-active' : ''}`} data-cap={i}>
-            <strong>{p.data.title}.</strong> {p.data.summary} <span class="cap-meta">{p.data.services.map((s) => serviceLabel[s]).join(' · ')}, {yearOf(p.data.year)}</span>
+            <strong>{p.title}.</strong> {p.summary} <span class="cap-meta">{p.meta}</span>
           </p>
         ))}
       </div>
@@ -104,22 +116,28 @@ const firstUse = projects.map((p) => { const f = !seen.has(p.data.cover_image); 
   .meta { display: none; font-size: var(--t-small); font-weight: 600; }
   .is-active .row, .row:focus-visible { color: var(--ink); }
   .is-active .name { text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 0.06em; text-underline-offset: 0.12em; }
-  .m-pic { display: none; }
+  .names .m-pic { display: none; }
   .preview { grid-column: 9 / -1; position: sticky; top: 12vh; align-self: start; }
   .frame { position: relative; aspect-ratio: 4 / 5; background: var(--surface-2); overflow: clip; }
-  .pv { position: absolute; inset: 0; opacity: 0; transition: opacity 220ms ease; }
-  .pv.is-active { opacity: 1; }
+  .pv { position: absolute; inset: 0; opacity: 0; visibility: hidden; transition: opacity 220ms ease, visibility 0s linear 220ms; }
+  .pv.is-active { opacity: 1; visibility: visible; transition: opacity 220ms ease; }
   .pv img { transform: scale(1.04); transition: transform 900ms var(--ease-out); }
   .pv.is-active img { transform: none; }
   .captions { display: grid; margin-top: 16px; }
+  /* products have no photograph: a type panel in Ka red stands in */
+  .card { background: var(--accent); color: var(--on-accent); display: grid; align-content: space-between; padding: clamp(20px, 2.4vw, 32px); }
+  .card-name { font-size: clamp(40px, 4.4vw, 72px); font-weight: 850; letter-spacing: -0.05em; line-height: 0.95; overflow-wrap: anywhere; }
+  .card-tag { font-size: var(--t-lead); font-weight: 700; letter-spacing: -0.015em; line-height: 1.25; max-width: 18ch; }
   .cap-meta { display: block; margin-top: 6px; color: var(--muted); font-weight: 600; }
   .cap { grid-area: 1 / 1; font-size: var(--t-small); line-height: 1.45; opacity: 0; transition: opacity 220ms ease; }
   .cap.is-active { opacity: 1; }
   @media (max-width: 860px) {
     .names { grid-column: 1 / -1; display: grid; gap: 40px; }
     .preview { display: none; }
-    .m-pic { display: block; aspect-ratio: 16 / 10; }
-    .m-pic--dup { display: none; }
+    .names .m-pic { display: block; aspect-ratio: 16 / 10; }
+    .names .m-pic.card { display: grid; }
+    .names .card-name { display: none; }  /* the name sits right below on phones */
+    .names .m-pic--dup { display: none; }
     .names { gap: 28px; }
     .meta { display: block; }
     .row { flex-direction: column; gap: 6px; color: var(--ink); padding-top: 14px; }

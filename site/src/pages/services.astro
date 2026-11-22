@@ -5,7 +5,7 @@ import CloseCTA from '../components/CloseCTA.astro';
 import { getCollection } from 'astro:content';
 import { pillars, img, srcset } from '../data/site';
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
-const workFor = (slug: string) => projects.filter((p) => p.data.services.includes(slug as never));
+const workFor = (tags: string[]) => projects.filter((p) => p.data.services.some((s) => tags.includes(s)));
 // photos that only exist at 800px
 const small = ['svc-software', 'svc-automation'];
 ---
@@ -36,11 +36,11 @@ const small = ['svc-software', 'svc-automation'];
               </li>
             ))}
           </ul>
-          {(workFor(p.slug).length > 0 || p.partners) && (
+          {(workFor(p.tags ?? [p.slug]).length > 0 || p.partners) && (
             <div class="clients">
               <h3 class="ch">Clients</h3>
               <ul>
-                {workFor(p.slug).map((w) => (
+                {workFor(p.tags ?? [p.slug]).map((w) => (
                   <li><a href={`/work/${w.id}`}><span class="cn arrow">{w.data.client}</span><span class="cw">{w.data.title}</span></a></li>
                 ))}
                 {p.partners?.map((c) => <li><div><span class="cn">{c.name}</span><span class="cw">{c.what}</span></div></li>)}
