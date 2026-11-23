@@ -21,7 +21,7 @@ const len = Math.max(...title.map((t) => t.length));
   .inner { display: flex; flex-direction: column; justify-content: space-between; gap: clamp(32px, 4vw, 56px); padding-block: clamp(80px, 9vw, 140px) clamp(56px, 6vw, 88px); width: 100%; }
   .fit { font-size: min(var(--t-display), calc((100vw - 2 * var(--margin)) / (var(--len) * 0.54))); }
   .foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 28px; }
-  .foot p { max-width: 40ch; color: var(--accent); font-weight: 600; }
+  .foot p { max-width: 40ch; color: var(--ink); font-weight: 600; }
   .foot .button { min-height: 58px; padding: 0 34px; font-size: var(--t-body); }
   @media (max-width: 860px) {
     .foot .button { width: 100%; }

@@ -11,12 +11,34 @@ const tiles = [
 const year = new Date().getFullYear();
 // "Ka" in thirteen scripts, as a rail that marks where the footer begins (shapes from the KTch Letters set)
 const letters = [['english', 1.393], ['hindi', 1.346], ['kannada', 0.714], ['tamil', 1.449], ['telugu', 0.807], ['malayalam', 1.859], ['bengali', 1.412], ['gujarati', 0.829], ['punjabi', 1.085], ['odia', 0.98], ['urdu', 1.202], ['meitei', 1.174], ['ol-chiki', 1.458]] as const;
-const rail = Array.from({ length: 12 }, () => letters).flat();
+// every glyph gets about the same ink area, so wide and narrow scripts look the same size
+const nudge: Record<string, number> = { english: 1.2, 'ol-chiki': 1.12 };  // lighter shapes read small at the same area
+const sized = letters.map(([n, r]) => { const h = Math.min(1.2, Math.max(0.85, Math.sqrt(1.15 / r))) * (nudge[n] ?? 1); return { n, h: +h.toFixed(3), w: +(h * r).toFixed(3) }; });
+const rail = Array.from({ length: 12 }, () => sized).flat();
 const social = site.social.filter((s) => s.href);
 ---
-<div class="rail" aria-hidden="true">
-  {rail.map(([n, r]) => <span class="ka" style={`--m:url(/brand/letters/${n}.svg);--r:${r}`}></span>)}
+<div class="rail" data-rail aria-hidden="true">
+  {rail.map((g) => <span class="ka" style={`--m:url(/brand/letters/${g.n}.svg);--h:${g.h}em;--w:${g.w}em`}></span>)}
 </div>
+<script>
+  // fit whole letters between the page margins: drop the ones that would be cut off, then spread the rest evenly
+  const rail = document.querySelector<HTMLElement>('[data-rail]');
+  if (rail) {
+    const kids = [...rail.children] as HTMLElement[];
+    const fit = () => {
+      rail.classList.remove('is-fit');
+      kids.forEach((k) => (k.hidden = false));
+      const cs = getComputedStyle(rail);
+      const avail = rail.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      const gap = parseFloat(cs.columnGap) || 0;
+      let used = 0;
+      kids.forEach((k) => { const w = k.getBoundingClientRect().width; if (used + w > avail + 0.5) k.hidden = true; else used += w + gap; });
+      rail.classList.add('is-fit');
+    };
+    fit();
+    new ResizeObserver(fit).observe(rail);
+  }
+</script>
 {strip && (
   <div class="strip" data-reveal>
     {tiles.map((t) => <figure class="photo tile"><img src={img(t.n, 800)} width="800" height="500" alt={t.alt} loading="lazy" /></figure>)}
@@ -67,8 +89,10 @@ const social = site.social.filter((s) => s.href);
 
 <style>
   /* the rail: red on a light page, white on a dark one; as tall as the footer's body text */
-  .rail { --rail: var(--accent); display: flex; align-items: center; gap: 0.9em; overflow: clip; white-space: nowrap; font-size: var(--t-body); padding: 0.9em var(--margin); }
-  .ka { flex: none; height: 1em; width: calc(1em * var(--r)); background: var(--rail); -webkit-mask: var(--m) center / contain no-repeat; mask: var(--m) center / contain no-repeat; }
+  .rail { --rail: var(--accent); display: flex; align-items: center; gap: 0.8em; overflow: clip; white-space: nowrap; font-size: var(--t-body); padding: 0.9em var(--margin); height: 3.2em; }
+  .rail.is-fit { justify-content: space-between; }
+  .ka[hidden] { display: none; }
+  .ka { flex: none; height: var(--h); width: var(--w); background: var(--rail); -webkit-mask: var(--m) center / contain no-repeat; mask: var(--m) center / contain no-repeat; }
   :global(:root[data-theme='dark']) .rail { --rail: var(--ink); }
   @media (prefers-color-scheme: dark) { :global(:root:not([data-theme='light'])) .rail { --rail: var(--ink); } }
   .strip { display: grid; grid-template-columns: repeat(4, 1fr); }

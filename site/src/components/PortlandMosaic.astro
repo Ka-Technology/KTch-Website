@@ -22,7 +22,7 @@ import { img, srcset } from '../data/site';
       <p>Our first client project shipped three months later.</p>
     </div>
     <figure class="photo tile t-d">
-      <img src={img('first-street-stereo')} srcset={srcset('first-street-stereo')} sizes="(max-width: 860px) 100vw, 25vw" width="1600" height="827" loading="lazy" alt="A 19th-century stereograph of First Street, Portland, seen from the Occidental Hotel." />
+      <img src={img('vista-bridge')} srcset={srcset('vista-bridge')} sizes="(max-width: 860px) 100vw, 25vw" width="1600" height="900" loading="lazy" alt="Vista Bridge in Portland's West Hills, with downtown and Mount Hood behind it." />
     </figure>
   </div>
 </section>
@@ -35,9 +35,9 @@ import { img, srcset } from '../data/site';
   .t-text .t-lead { max-width: 34ch; }
   .t-a { grid-column: 3 / 5; grid-row: 1; }
   .t-b { grid-column: 3; grid-row: 2 / 4; }
-  .t-fig { grid-column: 4; grid-row: 2; background: var(--accent); padding: 28px; display: grid; align-content: center; gap: 8px; font-size: var(--t-body); font-weight: 600; }
-  .t-fig p:not(.fig) { color: var(--bg); }
-  .fig { color: var(--ink); font-size: var(--t-h2); font-weight: 850; letter-spacing: -0.045em; line-height: 1; }
+  .t-fig { grid-column: 4; grid-row: 2; background: var(--bg); padding: 28px; display: grid; align-content: center; gap: 8px; font-size: var(--t-body); font-weight: 600; }
+  .t-fig p:not(.fig) { color: var(--ink); }
+  .fig { color: var(--accent); font-size: var(--t-h2); font-weight: 850; letter-spacing: -0.045em; line-height: 1; }
   .t-c { grid-column: 1 / 3; grid-row: 3; }
   .t-d { grid-column: 4; grid-row: 3; }
   @media (max-width: 860px) {
