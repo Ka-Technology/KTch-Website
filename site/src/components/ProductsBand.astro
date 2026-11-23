@@ -25,8 +25,8 @@ const products = (await getCollection('products', (p) => !p.data.hidden)).sort((
 </section>
 
 <style>
-  .pg { padding-bottom: var(--section); }
-  .heading { color: var(--accent); }
+  /* a light grey field in light mode, a dark grey one in dark mode */
+  .pg { background: var(--surface); padding-block: var(--section); }
   .heading { grid-column: 1 / 6; }
   .intro { grid-column: 7 / -1; max-width: 42ch; }
   .shelf { list-style: none; margin-top: clamp(48px, 6vw, 80px); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gap); }

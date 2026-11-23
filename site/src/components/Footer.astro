@@ -16,7 +16,7 @@ const social = site.social.filter((s) => s.href);
     {tiles.map((t) => <figure class="photo tile"><img src={img(t.n, 800)} width="800" height="500" alt={t.alt} loading="lazy" /></figure>)}
   </div>
 )}
-<footer class="site-footer inverse">
+<footer class="site-footer">
   <div class="wrap">
     <div class="grid12 top">
       <div class="brand" data-reveal>
@@ -71,12 +71,12 @@ const social = site.social.filter((s) => s.href);
   .logo { width: clamp(150px, 13vw, 190px); }
   .slogan { font-size: var(--t-body); font-weight: 600; max-width: 24ch; line-height: 1.4; }
   .logo--white { display: none; }
-  /* the footer is an inverse field: dark on a light page (white wordmark), light on a dark page (red wordmark) */
-  :global(:root:not([data-theme='dark'])) .logo--red { display: none; }
-  :global(:root:not([data-theme='dark'])) .logo--white { display: block; }
+  /* the footer is in the page colour: red wordmark on a light page, white wordmark on a dark page */
+  :global(:root[data-theme='dark']) .logo--red { display: none; }
+  :global(:root[data-theme='dark']) .logo--white { display: block; }
   @media (prefers-color-scheme: dark) {
-    :global(:root:not([data-theme='light'])) .logo--red { display: block; }
-    :global(:root:not([data-theme='light'])) .logo--white { display: none; }
+    :global(:root:not([data-theme='light'])) .logo--red { display: none; }
+    :global(:root:not([data-theme='light'])) .logo--white { display: block; }
   }
 
   .col { display: grid; gap: 14px; align-content: start; }
