@@ -5,7 +5,7 @@ const { strip = true } = Astro.props;
 const tiles = [
   { n: 'hawthorne-1912', alt: 'A 1912 postcard of the Hawthorne Bridge with its lift span raised.' },
   { n: 'st-johns-1938', alt: 'The St. Johns Bridge lit up at night, 1938.' },
-  { n: 'third-street-1910', alt: 'Third Street, downtown Portland, 1910.' },
+  { n: 'union-station', alt: 'The clock tower of Portland’s Union Station.' },
   { n: 'downtown-portland', alt: 'Downtown Portland and the Willamette River today.' },
 ];
 const year = new Date().getFullYear();
@@ -98,7 +98,7 @@ const social = site.social.filter((s) => s.href);
   .strip { display: grid; grid-template-columns: repeat(4, 1fr); }
   .tile { aspect-ratio: 16 / 10; margin: 0; }
 
-  .site-footer { padding-block: clamp(56px, 6vw, 88px) 28px; font-size: var(--t-small); }
+  .site-footer { padding-block: clamp(36px, 4vw, 56px) 28px; font-size: var(--t-small); }
   .top { row-gap: 40px; align-items: start; }
   .brand { grid-column: 1 / 5; display: grid; gap: 16px; justify-items: start; }
   .logo-link { display: block; transition: transform var(--t-press) var(--ease-out); }

@@ -18,9 +18,9 @@ const len = Math.max(...title.map((t) => t.length));
 
 <style>
   .close { display: flex; }
-  .inner { display: flex; flex-direction: column; justify-content: space-between; gap: clamp(32px, 4vw, 56px); padding-block: clamp(80px, 9vw, 140px) clamp(56px, 6vw, 88px); width: 100%; }
+  .inner { display: flex; flex-direction: column; justify-content: space-between; gap: clamp(32px, 4vw, 56px); padding-block: clamp(80px, 9vw, 140px) clamp(80px, 8vw, 128px); width: 100%; }
   .fit { font-size: min(var(--t-display), calc((100vw - 2 * var(--margin)) / (var(--len) * 0.54))); }
-  .foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 28px; }
+  .foot { display: flex; flex-wrap: wrap; align-items: center; gap: 24px 48px; }
   .foot p { max-width: 40ch; color: var(--ink); font-weight: 600; }
   .foot .button { min-height: 58px; padding: 0 34px; font-size: var(--t-body); }
   @media (max-width: 860px) {
