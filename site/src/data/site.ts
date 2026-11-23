@@ -11,8 +11,9 @@ export const site = {
     'Ka Technology builds AI tools, custom software and automations for small and growing businesses. Based in Portland, Oregon.',
   // TODO: add real profile URLs. Empty entries are not rendered.
   social: [
-    { label: 'LinkedIn', href: '' },
+    // the footer's Socials column appears once these have their URLs
     { label: 'Instagram', href: '' },
+    { label: 'LinkedIn', href: '' },
   ],
 };
 

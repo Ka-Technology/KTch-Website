@@ -17,6 +17,7 @@ const sized = letters.map(([n, r]) => { const h = Math.min(1.2, Math.max(0.85, M
 const rail = Array.from({ length: 12 }, () => sized).flat();
 const social = site.social.filter((s) => s.href);
 ---
+{!strip && (<Fragment>
 <div class="rail" data-rail aria-hidden="true">
   {rail.map((g) => <span class="ka" style={`--m:url(/brand/letters/${g.n}.svg);--h:${g.h}em;--w:${g.w}em`}></span>)}
 </div>
@@ -39,6 +40,7 @@ const social = site.social.filter((s) => s.href);
     new ResizeObserver(fit).observe(rail);
   }
 </script>
+</Fragment>)}
 {strip && (
   <div class="strip" data-reveal>
     {tiles.map((t) => <figure class="photo tile"><img src={img(t.n, 800)} width="800" height="500" alt={t.alt} loading="lazy" /></figure>)}
@@ -50,7 +52,7 @@ const social = site.social.filter((s) => s.href);
       <div class="brand" data-reveal>
         <a href="/" class="logo-link" aria-label="Ka Technology, home">
           <img class="logo logo--red" src="/brand/ka-logo-complete.png" width="900" height="462" alt="Ka Technology" loading="lazy" />
-          <img class="logo logo--white" src="/brand/ka-logo-complete-white.png" width="900" height="462" alt="Ka Technology" loading="lazy" />
+          <img class="logo logo--white" src="/brand/ka-logo-complete-dark.png" width="900" height="462" alt="Ka Technology" loading="lazy" />
         </a>
         <p class="slogan">{site.slogan}</p>
       </div>
@@ -75,9 +77,15 @@ const social = site.social.filter((s) => s.href);
           <li><a href="/contact">Let’s talk</a></li>
           <li><a href="/privacy">Privacy</a></li>
           <li><a href="/credits">Photo credits</a></li>
-          {social.map((s) => <li><a href={s.href} rel="me noopener" target="_blank">{s.label}</a></li>)}
         </ul>
       </nav>
+
+      {social.length > 0 && (
+        <nav class="col socials" aria-labelledby="f-socials" data-reveal>
+          <h2 id="f-socials">Socials</h2>
+          <ul>{social.map((s) => <li><a href={s.href} target="_blank" rel="me noopener">{s.label}</a></li>)}</ul>
+        </nav>
+      )}
     </div>
 
     <div class="legal">
@@ -100,7 +108,7 @@ const social = site.social.filter((s) => s.href);
 
   .site-footer { padding-block: clamp(36px, 4vw, 56px) 28px; font-size: var(--t-small); }
   .top { row-gap: 40px; align-items: start; }
-  .brand { grid-column: 1 / 5; display: grid; gap: 16px; justify-items: start; }
+  .brand { grid-column: 1 / 4; display: grid; gap: 16px; justify-items: start; }
   .logo-link { display: block; transition: transform var(--t-press) var(--ease-out); }
   .logo-link:active { transform: scale(0.98); }
   .logo { width: clamp(150px, 13vw, 190px); }
@@ -115,9 +123,10 @@ const social = site.social.filter((s) => s.href);
   }
 
   .col { display: grid; gap: 14px; align-content: start; }
-  .contact { grid-column: 6 / 9; }
-  .explore { grid-column: 9 / 11; }
-  .more { grid-column: 11 / -1; }
+  .contact { grid-column: 5 / 8; }
+  .explore { grid-column: 8 / 10; }
+  .more { grid-column: 10 / 12; }
+  .socials { grid-column: 12 / -1; }
   .col h2 { font-size: var(--t-small); font-weight: 700; letter-spacing: 0; color: var(--muted); }
   .col ul { list-style: none; display: grid; gap: 8px; }
   .col li { font-size: var(--t-body); }
@@ -140,5 +149,6 @@ const social = site.social.filter((s) => s.href);
     .contact { grid-column: 1 / -1; }
     .explore { grid-column: 1; }
     .more { grid-column: 2; }
+    .socials { grid-column: 1; }
   }
 </style>
