@@ -9,8 +9,14 @@ const tiles = [
   { n: 'downtown-portland', alt: 'Downtown Portland and the Willamette River today.' },
 ];
 const year = new Date().getFullYear();
+// "Ka" in thirteen scripts, as a rail that marks where the footer begins (shapes from the KTch Letters set)
+const letters = [['english', 1.393], ['hindi', 1.346], ['kannada', 0.714], ['tamil', 1.449], ['telugu', 0.807], ['malayalam', 1.859], ['bengali', 1.412], ['gujarati', 0.829], ['punjabi', 1.085], ['odia', 0.98], ['urdu', 1.202], ['meitei', 1.174], ['ol-chiki', 1.458]] as const;
+const rail = Array.from({ length: 12 }, () => letters).flat();
 const social = site.social.filter((s) => s.href);
 ---
+<div class="rail" aria-hidden="true">
+  {rail.map(([n, r]) => <span class="ka" style={`--m:url(/brand/letters/${n}.svg);--r:${r}`}></span>)}
+</div>
 {strip && (
   <div class="strip" data-reveal>
     {tiles.map((t) => <figure class="photo tile"><img src={img(t.n, 800)} width="800" height="500" alt={t.alt} loading="lazy" /></figure>)}
@@ -60,6 +66,11 @@ const social = site.social.filter((s) => s.href);
 </footer>
 
 <style>
+  /* the rail: red on a light page, white on a dark one; as tall as the footer's body text */
+  .rail { --rail: var(--accent); display: flex; align-items: center; gap: 0.9em; overflow: clip; white-space: nowrap; font-size: var(--t-body); padding: 0.9em var(--margin); }
+  .ka { flex: none; height: 1em; width: calc(1em * var(--r)); background: var(--rail); -webkit-mask: var(--m) center / contain no-repeat; mask: var(--m) center / contain no-repeat; }
+  :global(:root[data-theme='dark']) .rail { --rail: var(--ink); }
+  @media (prefers-color-scheme: dark) { :global(:root:not([data-theme='light'])) .rail { --rail: var(--ink); } }
   .strip { display: grid; grid-template-columns: repeat(4, 1fr); }
   .tile { aspect-ratio: 16 / 10; margin: 0; }
 
