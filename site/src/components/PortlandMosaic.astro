@@ -3,7 +3,7 @@ import { img, srcset } from '../data/site';
 ---
 <section class="pdx" aria-labelledby="pdx-title">
   <div class="mosaic">
-    <div class="tile t-text inverse" data-reveal>
+    <div class="tile t-text" data-reveal>
       <h2 id="pdx-title" class="t-h2">Made in Portland</h2>
       <p class="t-lead">Four friends from Oregon State’s computer science program started Ka Technology in May 2024 with one idea: small businesses deserve the same technology big companies have, without the price tag or the jargon.</p>
       <a class="button" href="/about">Read our story</a>
@@ -31,6 +31,8 @@ import { img, srcset } from '../data/site';
   .mosaic { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: clamp(220px, 22vw, 360px); }
   .tile { margin: 0; }
   .t-text { grid-column: 1 / 3; grid-row: 1 / 3; padding: clamp(28px, 4vw, 64px); display: grid; gap: 28px; align-content: end; justify-items: start; }
+  .t-text { background: var(--surface); }
+  .t-text h2 { color: var(--accent); }
   .t-text .t-lead { max-width: 34ch; }
   .t-a { grid-column: 3 / 5; grid-row: 1; }
   .t-b { grid-column: 3; grid-row: 2 / 4; }
@@ -39,7 +41,7 @@ import { img, srcset } from '../data/site';
   .t-c { grid-column: 1 / 3; grid-row: 3; }
   .t-d { grid-column: 4; grid-row: 3; }
   @media (max-width: 860px) {
-    .mosaic { grid-template-columns: 1fr 1fr; grid-auto-rows: 46vw; }
+    .mosaic { grid-template-columns: 1fr 1fr; grid-template-rows: auto; grid-auto-rows: 46vw; }
     .t-text { grid-column: 1 / -1; grid-row: auto; padding: 40px var(--margin); }
     .t-a { grid-column: 1 / -1; grid-row: auto; }
     .t-b { grid-column: 1; grid-row: span 2; }

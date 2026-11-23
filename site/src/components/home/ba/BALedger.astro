@@ -38,7 +38,7 @@ import { chores } from '../../../data/chores';
 <style>
   .heading { grid-column: 1 / 6; }
   .intro { grid-column: 7 / -1; max-width: 40ch; }
-  .table { margin-top: clamp(48px, 7vh, 88px); display: grid; gap: 6px; background: var(--surface); }
+  .table { margin-top: clamp(36px, 7vh, 88px); display: grid; gap: 6px; background: var(--surface); }
   .row { display: grid; grid-template-columns: 1.1fr 1.5fr 1.5fr; gap: 6px; }
   .head span { font-size: var(--t-small); font-weight: 700; color: var(--muted); padding: 0 clamp(20px, 2.2vw, 32px) 12px; background: var(--bg); }
   .cell { padding: clamp(20px, 2.2vw, 32px); display: grid; gap: 14px; align-content: start; }
@@ -47,7 +47,7 @@ import { chores } from '../../../data/chores';
   .chore a { grid-row: 3; align-self: end; justify-self: start; }
   .chore h3 { font-size: var(--t-lead); letter-spacing: -0.02em; line-height: 1.2; }
   .before { background: var(--bg); }
-  .after { background: var(--ink); color: var(--bg); }
+  .after { background: var(--surface-2); }
   .big { font-size: clamp(40px, 4.6vw, 76px); font-weight: 850; letter-spacing: -0.05em; line-height: 0.9; white-space: nowrap; }
   .before .big { color: var(--muted); }
   .after .big { color: var(--accent); }
@@ -57,7 +57,8 @@ import { chores } from '../../../data/chores';
     .intro { margin-top: 20px; }
     .head { display: none; }
     .row { grid-template-columns: 1fr 1fr; }
-    .chore { grid-column: 1 / -1; }
+    .chore { grid-column: 1 / -1; grid-template-rows: auto; gap: 8px; }
+    .chore h3, .chore a { grid-row: auto; }
     .big { font-size: clamp(32px, 9vw, 48px); }
   }
   @media (max-width: 520px) { .row { grid-template-columns: 1fr; } }

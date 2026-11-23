@@ -96,7 +96,7 @@ import PillarDialogs from './PillarDialogs.astro';
   .pic { min-height: 0; }
   .pic video { display: block; width: 100%; height: 100%; object-fit: cover; filter: var(--photo-filter); }
   .card {
-    background: var(--ink); color: var(--bg); padding: 16px 22px;
+    background: var(--surface); color: var(--ink); padding: 16px 22px;
     display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto 1fr; gap: 6px 20px; align-items: baseline; align-content: start;
   }
   h3 { font-size: clamp(19px, 1.9vw, 30px); font-weight: 850; letter-spacing: -0.04em; line-height: 1.05; }
@@ -106,8 +106,8 @@ import PillarDialogs from './PillarDialogs.astro';
   .hit:focus-visible { outline: none; }
   .tile:has(.hit:focus-visible) { outline: 3px solid var(--accent); outline-offset: 4px; }
   .plus { color: var(--accent); display: inline-block; margin-left: 0.4em; transition: transform var(--t-hover) var(--ease-out); }
-  .pitch { grid-column: 1 / -1; font-size: var(--t-small); line-height: 1.4; color: var(--bg); opacity: 0.82; max-width: 62ch; }
-  .proof { grid-column: 2; grid-row: 1; justify-self: end; position: relative; z-index: 2; color: var(--bg); font-weight: 700; font-size: var(--t-small); white-space: nowrap; }
+  .pitch { grid-column: 1 / -1; font-size: var(--t-small); line-height: 1.4; color: var(--muted); max-width: 62ch; }
+  .proof { grid-column: 2; grid-row: 1; justify-self: end; position: relative; z-index: 2; color: var(--ink); font-weight: 700; font-size: var(--t-small); white-space: nowrap; }
   @media (hover: hover) and (pointer: fine) {
     .tile:hover .plus { transform: rotate(90deg); }
     .proof:hover { color: var(--accent); }

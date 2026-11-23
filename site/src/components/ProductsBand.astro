@@ -4,7 +4,7 @@ import { getCollection } from 'astro:content';
 import { img } from '../data/site';
 const products = (await getCollection('products', (p) => !p.data.hidden)).sort((a, b) => a.data.order - b.data.order);
 ---
-<section class="pg inverse" aria-labelledby="pg-t">
+<section class="pg" aria-labelledby="pg-t">
   <div class="wrap">
     <div class="grid12 top" data-reveal>
       <h2 id="pg-t" class="t-h2 heading">Our software</h2>
@@ -25,7 +25,8 @@ const products = (await getCollection('products', (p) => !p.data.hidden)).sort((
 </section>
 
 <style>
-  .pg { padding-block: var(--section); }
+  .pg { padding-bottom: var(--section); }
+  .heading { color: var(--accent); }
   .heading { grid-column: 1 / 6; }
   .intro { grid-column: 7 / -1; max-width: 42ch; }
   .shelf { list-style: none; margin-top: clamp(48px, 6vw, 80px); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gap); }
