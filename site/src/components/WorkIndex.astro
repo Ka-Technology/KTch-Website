@@ -22,8 +22,6 @@ const projects = limit ? all.slice(0, limit) : all;
 // only offer filters that match at least one project
 const tags = ['ai', 'software', 'automation', 'web', 'analytics'].filter((t) => all.some((p) => p.tags.includes(t)));
 const H = headingTag;
-const seen = new Set<string>();
-const firstUse = projects.map((p) => { if (!p.image) return true; const f = !seen.has(p.image); seen.add(p.image); return f; });
 ---
 <section class="work wrap" aria-labelledby={id} data-work>
   <div class="top">
@@ -42,14 +40,14 @@ const firstUse = projects.map((p) => { if (!p.image) return true; const f = !see
     <ol class="names">
       {projects.map((p, i) => (
         <li data-item data-tags={p.tags.join(' ')} class={i === 0 ? 'is-active' : ''} data-i={i}>
-          {p.image
-            ? <figure class={`photo m-pic ${firstUse[i] ? '' : 'm-pic--dup'}`}><img src={img(p.image, 800)} width="800" height="500" alt={p.alt} loading="lazy" /></figure>
-            : <div class="m-pic card" aria-hidden="true"><span class="card-name">{p.name}</span><span class="card-tag">{p.tagline}</span></div>}
-          <a href={p.href} class="row">
+          <a href={p.href} class="row" aria-controls={`${id}-d${i}`}>
             <span class="name">{p.name}</span>
-            <span class="meta">{p.meta}</span>
+            <span class="plus" aria-hidden="true"></span>
           </a>
-          <p class="drop"><strong>{p.title}.</strong> {p.summary} <span class="cap-meta">{p.meta}</span></p>
+          <div class="drop" id={`${id}-d${i}`}><div class="drop-in">
+            <p><strong>{p.title}.</strong> {p.summary} <span class="cap-meta">{p.meta}</span></p>
+            <a class="more arrow" href={p.href} tabindex="-1">See the project</a>
+          </div></div>
         </li>
       ))}
     </ol>
@@ -80,6 +78,7 @@ const firstUse = projects.map((p) => { if (!p.image) return true; const f = !see
 <script>
   document.querySelectorAll<HTMLElement>('[data-work]').forEach((root) => {
     const items = [...root.querySelectorAll<HTMLElement>('[data-item]')];
+    const phone = matchMedia('(max-width: 860px)');
     const pvs = [...root.querySelectorAll<HTMLElement>('[data-pv], [data-desc]')];
     // the photo and the description below the names follow the last name pointed at or focused
     const set = (i: number) => {
@@ -91,6 +90,21 @@ const firstUse = projects.map((p) => { if (!p.image) return true; const f = !see
       const head = el.querySelector<HTMLElement>('a.row');
       head?.addEventListener('pointerenter', () => set(i));
       head?.addEventListener('focus', () => set(i));
+      // phones: the list starts collapsed; tapping a name opens its description (and closes the others)
+      // and switches the photo below; a second tap closes it, and "See the project" goes to the case study
+      head?.addEventListener('click', (e) => {
+        if (!phone.matches) return;
+        e.preventDefault();
+        const on = !el.classList.contains('is-open');
+        items.forEach((li) => {
+          const o = on && li === el;
+          li.classList.toggle('is-open', o);
+          li.querySelector('a.row')?.setAttribute('aria-expanded', String(o));
+          li.querySelector('.more')?.setAttribute('tabindex', o ? '0' : '-1');
+        });
+        set(i);
+      });
+      if (phone.matches) head?.setAttribute('aria-expanded', 'false');
     });
     const buttons = [...root.querySelectorAll<HTMLButtonElement>('[data-filter]')];
     buttons.forEach((b) => b.addEventListener('click', () => {
@@ -145,19 +159,27 @@ const firstUse = projects.map((p) => { if (!p.image) return true; const f = !see
   .card-name { font-size: clamp(40px, 4.4vw, 72px); font-weight: 850; letter-spacing: -0.05em; line-height: 0.95; overflow-wrap: anywhere; }
   .card-tag { font-size: var(--t-lead); font-weight: 700; letter-spacing: -0.015em; line-height: 1.25; max-width: 18ch; }
   .cap-meta { display: block; margin-top: 6px; color: var(--muted); font-weight: 600; }
+  .plus, .more { display: none; }
   @media (max-width: 860px) {
-    .names { grid-column: 1 / -1; display: grid; gap: 40px; }
-    .preview { display: none; }
-    .names .m-pic { display: block; aspect-ratio: 16 / 10; }
-    .names .m-pic.card { display: grid; }
-    .names .card-name { display: none; }  /* the name sits right below on phones */
-    .names .m-pic--dup { display: none; }
-    .names { gap: 28px; }
-    .meta { display: none; }
+    /* phones: a collapsed list of names; tapping one opens its description, and the photo below follows */
+    .names { grid-column: 1 / -1; grid-row: 1; }
+    .preview { grid-column: 1 / -1; grid-row: 2; position: static; margin-top: 24px; }
+    .frame { aspect-ratio: 16 / 10; }
     .desc { display: none; }
-    .drop { position: static; width: auto; height: auto; overflow: visible; clip-path: none; white-space: normal; padding-top: 8px; max-width: 52ch; line-height: 1.45; }
-    .row { flex-direction: column; gap: 6px; color: var(--ink); padding-top: 14px; }
-    .name { font-size: clamp(32px, 9.5vw, 48px); }
+    .row { align-items: center; justify-content: space-between; gap: 16px; padding: 10px 0; min-height: 52px; color: var(--ink); }
+    .name { font-size: clamp(24px, 7vw, 34px); }
     .is-active .name { text-decoration: none; }
+    .is-open .name { color: var(--accent); }
+    .plus { display: block; position: relative; flex: none; width: 16px; height: 16px; transition: transform 280ms var(--ease-out); }
+    .plus::before, .plus::after { content: ''; position: absolute; inset: 7px 0; background: currentColor; }
+    .plus::after { transform: rotate(90deg); }
+    .is-open .plus { transform: rotate(45deg); }
+    .drop { position: static; width: auto; height: auto; overflow: visible; clip-path: none; white-space: normal;
+      display: grid; grid-template-rows: 0fr; transition: grid-template-rows 280ms var(--ease-out); }
+    .is-open .drop { grid-template-rows: 1fr; }
+    .drop-in { min-height: 0; overflow: hidden; }
+    .drop p { max-width: 52ch; line-height: 1.45; }
+    .more { display: inline-flex; min-height: 44px; align-items: center; margin: 4px 0 12px; font-weight: 700; color: var(--ink); }
   }
+  @media (max-width: 860px) and (prefers-reduced-motion: reduce) { .drop, .plus { transition: none; } }
 </style>
