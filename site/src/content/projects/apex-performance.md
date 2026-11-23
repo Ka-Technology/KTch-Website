@@ -14,7 +14,7 @@ results:
   - A manual print-and-scan routine replaced with one step.
 tech: [Python, PDF generation]
 cover_image: fw-apex
-cover_alt: An athlete in a gym checking his smartwatch.
+cover_alt: An empty, modern gym floor lined with weight machines.
 order: 5
 ---
 

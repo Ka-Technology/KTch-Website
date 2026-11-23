@@ -16,7 +16,7 @@ results:
 tech: [Web design, Responsive build]
 quote_id: blake
 cover_image: fw-scrubs
-cover_alt: A smiling clinic team in uniforms at a hospital reception.
+cover_alt: Racks of patterned scrub tops in a uniform shop.
 featured: true
 order: 3
 ---
