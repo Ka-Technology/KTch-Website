@@ -9,7 +9,6 @@ export const site = {
   slogan: 'Giving people the power of meaningful choices.',
   description:
     'Ka Technology builds AI tools, custom software and automations for small and growing businesses. Based in Portland, Oregon.',
-  // TODO: add real profile URLs. Empty entries are not rendered.
   social: [
     { label: 'Instagram', href: 'https://www.instagram.com/ka_tchnlgy/' },
     { label: 'LinkedIn', href: 'https://www.linkedin.com/company/ka-tch/' },
