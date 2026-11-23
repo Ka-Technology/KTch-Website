@@ -6,7 +6,7 @@ location: Beaverton, OR
 year: "2025–present"
 services: [ai, software]
 status: Current
-summary: An AI platform that reads HOA document dumps and drafts the 202 fields of every CIDA Report™.
+summary: An AI platform that does the heavy parsing of HOA document dumps, so staff can focus on auditing HOAs.
 challenge: >-
   CIDA Analytics makes the CIDA Report™, which rates HOA health for Realtors, mortgage underwriters
   and home buyers. Each report meant digging through HOA document dumps by hand (budgets, reserve
