@@ -18,12 +18,14 @@ const { title, lede, image, imageAlt = '', imageW = 1600, imageH = 1000 } = Astr
 
 <style>
   .ph { padding-top: clamp(24px, 5vh, 72px); padding-bottom: clamp(64px, 9vw, 128px); }
-  .top { row-gap: 28px; align-items: end; }
+  /* the description starts level with the top of the title, whatever the length of either */
+  .top { row-gap: 28px; align-items: start; }
   .title { grid-column: 1 / 7; }
-  .lede { grid-column: 7 / -1; max-width: 40ch; }
+  .lede { grid-column: 7 / -1; max-width: 40ch; padding-top: 0.6em; }
   .band { margin-top: clamp(40px, 6vw, 80px); aspect-ratio: 16 / 6; }
   @media (max-width: 860px) {
     .title, .lede { grid-column: 1 / -1; }
+    .lede { padding-top: 0; }
     .band { aspect-ratio: 4 / 3; margin-inline: calc(var(--margin) * -1); }
   }
 </style>
