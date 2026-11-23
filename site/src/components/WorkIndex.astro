@@ -133,7 +133,7 @@ const firstUse = projects.map((p) => { if (!p.image) return true; const f = !see
   /* each name's own description is read with it, but shown only on phones; on desktop the panel below shows it */
   .drop { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   .names { grid-row: 1; }
-  .desc { grid-column: 1 / 8; grid-row: 2; align-self: end; display: grid; margin-top: 40px; padding-top: 24px; border-top: 2px solid var(--accent); }
+  .desc { grid-column: 1 / 8; grid-row: 2; align-self: end; display: grid; margin-top: clamp(40px, 5vw, 64px); }
   .d { grid-area: 1 / 1; display: grid; gap: 10px; align-content: start; opacity: 0; visibility: hidden; transition: opacity 200ms ease, visibility 0s linear 200ms; }
   .d.is-active { opacity: 1; visibility: visible; transition: opacity 200ms ease 60ms; }
   .d-title { font-size: clamp(22px, 1.9vw, 30px); font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; }
