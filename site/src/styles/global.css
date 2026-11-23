@@ -13,13 +13,13 @@
   --ink: #0b0b0c;
   --muted: #47474b;
   --accent: #ff3131;          /* Ka red: fills, big type, details */
-  --accent-text: #c4161c;     /* red that passes AA as small text on --bg */
+  --accent-text: var(--accent);   /* one red only: Ka red. No darker or lighter text red anywhere */
   --on-accent: #0b0b0c;
   --inv-bg: #0b0b0c;
   --inv-surface: #18181a;
   --inv-ink: #fafaf9;
   --inv-muted: #b4b4b8;
-  --inv-accent-text: #ff4d4d;
+  --inv-accent-text: var(--accent);
   --photo-filter: grayscale(1) contrast(1.05);
   --sq-a: #cfcfcb;
   --sq-b: #b9b9b4;
@@ -52,12 +52,12 @@
     --surface-2: #1d1d20;
     --ink: #f4f4f3;
     --muted: #ababaf;
-    --accent-text: #ff5252;
+    --accent-text: var(--accent);
     --inv-bg: #f4f4f3;
     --inv-surface: #e6e6e3;
     --inv-ink: #0b0b0c;
     --inv-muted: #4a4a4e;
-    --inv-accent-text: #c4161c;
+    --inv-accent-text: var(--accent);
     --sq-a: #2c2c30;
     --sq-b: #3d3d42;
     color-scheme: dark;
@@ -69,12 +69,12 @@
   --surface-2: #1d1d20;
   --ink: #f4f4f3;
   --muted: #ababaf;
-  --accent-text: #ff5252;
+  --accent-text: var(--accent);
   --inv-bg: #f4f4f3;
   --inv-surface: #e6e6e3;
   --inv-ink: #0b0b0c;
   --inv-muted: #4a4a4e;
-  --inv-accent-text: #c4161c;
+  --inv-accent-text: var(--accent);
   --sq-a: #2c2c30;
   --sq-b: #3d3d42;
   color-scheme: dark;
