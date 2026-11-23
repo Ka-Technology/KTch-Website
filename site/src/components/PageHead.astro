@@ -6,7 +6,9 @@ const { title, lede, image, imageAlt = '', imageW = 1600, imageH = 1000 } = Astr
 <header class="ph wrap">
   <div class="grid12 top">
     <h1 class="t-display title lines"><span class="line"><span data-line style="--i:0">{title}</span></span></h1>
-    {lede && <p class="t-lead lede" data-load style="--d:300ms">{lede}</p>}
+    {Astro.slots.has('lede')
+      ? <p class="t-lead lede" data-load style="--d:300ms"><slot name="lede" /></p>
+      : lede && <p class="t-lead lede" data-load style="--d:300ms">{lede}</p>}
     <slot />
   </div>
   {image && (
@@ -21,7 +23,9 @@ const { title, lede, image, imageAlt = '', imageW = 1600, imageH = 1000 } = Astr
   /* the description starts level with the top of the title, whatever the length of either */
   .top { row-gap: 28px; align-items: start; }
   .title { grid-column: 1 / 7; }
-  .lede { grid-column: 7 / -1; max-width: 40ch; padding-top: 0.6em; }
+  /* the description's capitals line up with the top of the title's lowercase letters (Noto Sans: x-height
+     top sits 0.409em into a t-display line; a capital's top sits 0.367em into a t-lead line) */
+  .lede { grid-column: 7 / -1; max-width: 40ch; padding-top: calc(var(--t-display) * 0.409 - 0.367em); }
   .band { margin-top: clamp(40px, 6vw, 80px); aspect-ratio: 16 / 6; }
   @media (max-width: 860px) {
     .title, .lede { grid-column: 1 / -1; }

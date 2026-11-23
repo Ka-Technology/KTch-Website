@@ -10,13 +10,11 @@ const workFor = (tags: string[]) => projects.filter((p) => p.data.services.some(
 const small = ['svc-software', 'svc-automation'];
 ---
 <Base og="services" title="Services" description="AI applications, custom software, process automation and data analytics for small and growing businesses in Portland, Oregon and beyond.">
-  <PageHead title="Consulting" lede="When it comes to AI there’s a lot of buzz. We care about what actually helps your business." />
-
-  <nav class="jump wrap" aria-label="Services on this page">
-    <ul>
-      {pillars.map((p) => <li><a href={`#${p.slug}`}>{p.name}</a></li>)}
-    </ul>
-  </nav>
+  <PageHead title="Consulting">
+    <Fragment slot="lede">We do four things:{' '}
+      {pillars.map((p, i) => <><a class="link" href={`#${p.slug}`}>{p.name}</a>{i < pillars.length - 2 ? ', ' : i === pillars.length - 2 ? ' and ' : '.'}</>)}
+    </Fragment>
+  </PageHead>
 
   {pillars.map((p, i) => (
     <section id={p.slug} class={`pillar ${i % 2 ? 'inverse' : ''}`} aria-labelledby={`${p.slug}-t`}>
@@ -55,10 +53,6 @@ const small = ['svc-software', 'svc-automation'];
 </Base>
 
 <style>
-  .jump { padding-bottom: clamp(56px, 7vw, 96px); }
-  .jump ul { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
-  .jump a { display: inline-flex; align-items: center; min-height: 48px; padding: 0 18px; background: var(--surface-2); font-weight: 700; text-decoration: none; transition: background-color var(--t-hover) ease, color var(--t-hover) ease; }
-  @media (hover: hover) and (pointer: fine) { .jump a:hover { background: var(--ink); color: var(--bg); } }
   .pillar { padding-block: var(--section); scroll-margin-top: 0; }
   .pillar:not(.inverse) + .pillar:not(.inverse) { padding-top: 0; }
   .inner { row-gap: 48px; align-items: start; }
