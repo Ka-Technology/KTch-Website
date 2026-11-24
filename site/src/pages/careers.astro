@@ -5,9 +5,9 @@ import PageHead from '../components/PageHead.astro';
 import { site, img } from '../data/site';
 const jobs = await getCollection('jobs', (j) => j.data.open);
 const ways = [
-  { name: 'Real client work, day one.', text: 'You ship software that real businesses use, not practice projects.' },
-  { name: 'Profit sharing.', text: 'Developers share in the profit of the projects they work on.' },
-  { name: 'Flexible hours.', text: 'Part-time-friendly involvement that fits around school or another job.' },
+  { name: 'Real client work, day one.', text: 'You ship software that real businesses use, not practice projects.', pic: 'work-team', alt: 'A team leaning over a laptop and printed plans, working something out together.' },
+  { name: 'Profit sharing.', text: 'Developers share in the profit of the projects they work on.', pic: 'work-share', alt: 'A team laughing and sharing pizza together in the office.' },
+  { name: 'Flexible hours.', text: 'Part-time-friendly involvement that fits around school or another job.', pic: 'work-hours', alt: 'A woman working on her laptop from the sofa at home.' },
 ];
 const process = [
   { name: 'A short case study', text: 'A small, real-world problem to show how you think and build with AI.', pic: 'hire-case', alt: 'Two people working side by side at a café table, one writing in a notebook, one on a laptop.' },
@@ -24,7 +24,11 @@ const mail = (subject: string) => `mailto:${site.email}?subject=${encodeURICompo
     <h2 id="how-t" class="t-h2">How we work</h2>
     <ol class="nums" data-reveal>
       {ways.map((w, i) => (
-        <li><span class="n" aria-hidden="true">{i + 1}</span><div><h3>{w.name}</h3><p>{w.text}</p></div></li>
+        <li>
+          <span class="n" aria-hidden="true">{i + 1}</span>
+          <div class="wt"><h3>{w.name}</h3><p>{w.text}</p></div>
+          <figure class="photo wp"><img src={img(w.pic, 1600)} srcset={`${img(w.pic, 800)} 800w, ${img(w.pic, 1600)} 1600w`} sizes="(max-width: 860px) 100vw, 60vw" width="1280" height="427" alt={w.alt} loading="lazy" /></figure>
+        </li>
       ))}
     </ol>
   </section>
@@ -78,11 +82,18 @@ const mail = (subject: string) => `mailto:${site.email}?subject=${encodeURICompo
   .proc { padding-bottom: var(--section); }
 
   /* How we work · big numerals */
-  .nums { list-style: none; margin-top: clamp(36px, 4vw, 64px); display: grid; gap: clamp(28px, 3vw, 44px); }
-  .nums li { display: grid; grid-template-columns: clamp(72px, 9vw, 150px) minmax(0, 1fr); gap: var(--gap); align-items: baseline; }
-  .n { font-size: clamp(64px, 8vw, 140px); font-weight: 850; letter-spacing: -0.06em; line-height: 0.8; color: var(--accent); }
-  .nums h3 { font-size: clamp(26px, 2.6vw, 42px); letter-spacing: -0.04em; line-height: 1.05; }
-  .nums p { margin-top: 8px; font-size: var(--t-lead); max-width: 44ch; }
+  /* each row: numeral, its text, and a wide photo running to the right edge; the photos stack 6px apart */
+  .nums { --N: clamp(64px, 8vw, 140px); --H: clamp(24px, 2.4vw, 40px);
+    list-style: none; margin-top: clamp(36px, 4vw, 64px); display: grid; gap: 6px; }
+  .nums li { display: grid; grid-template-columns: clamp(64px, 8vw, 140px) minmax(0, 30ch) minmax(0, 1fr); column-gap: var(--gap); align-items: center; }
+  .n { align-self: start; font-size: var(--N); font-weight: 850; letter-spacing: -0.06em; line-height: 0.8; color: var(--accent); }
+  /* line the heading's capitals up with the numeral's top (Noto Sans: cap top sits 0.074em into a 0.8 line, 0.199em into a 1.05 line) */
+  .wt { display: grid; gap: 8px; margin-top: calc(var(--N) * 0.074 - var(--H) * 0.199); align-self: start; }
+  .nums h3 { font-size: var(--H); letter-spacing: -0.04em; line-height: 1.05; }
+  .nums p { font-size: var(--t-lead); line-height: 1.4; }
+  .wp { aspect-ratio: 3 / 1; margin-right: calc(var(--margin) * -1); }
+  .wp img { transition: filter 450ms ease; }
+  @media (hover: hover) and (pointer: fine) { .nums li:hover .wp img { filter: none; } }
 
   /* How we hire · photo cards */
   .cards { list-style: none; margin-top: clamp(36px, 4vw, 64px); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap); }
@@ -108,6 +119,9 @@ const mail = (subject: string) => `mailto:${site.email}?subject=${encodeURICompo
 
   @media (max-width: 860px) {
     .cards { grid-template-columns: 1fr; }
+    .nums { gap: 36px; }
+    .nums li { grid-template-columns: clamp(56px, 16vw, 80px) minmax(0, 1fr); row-gap: 16px; }
+    .wp { grid-column: 1 / -1; aspect-ratio: 5 / 2; margin-inline: calc(var(--margin) * -1); }
     .bh, .rl { grid-column: 1 / -1; }
     .rl { margin-top: 28px; }
     .go { white-space: normal; }
