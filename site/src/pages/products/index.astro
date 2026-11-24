@@ -1,6 +1,6 @@
 ---
-// Our software: each product as a short story. The problem it answers, a photo of its world with the product's
-// own screen laid over it, then what we built. Screens are placeholders until real screenshots arrive.
+// Our software: each product as a short story. The problem it answers, a looping clip of its world (grey, colour on
+// hover) with the product's own screen laid over it, then what we built.
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import PageHead from '../../components/PageHead.astro';
@@ -9,6 +9,14 @@ import { img } from '../../data/site';
 const products = (await getCollection('products', (p) => !p.data.hidden)).sort((a, b) => a.data.order - b.data.order);
 // Kept is an iPhone app; the others run in the browser
 const isPhone = (id: string) => id === 'kept';
+// real screenshots: [file, widths, alt]
+const shots: Record<string, { w: number[]; alt: string }> = {
+  kept: { w: [400, 800], alt: 'The Kept app’s Challenges screen, with free habit trackers for reading and working out.' },
+  doigetgas: { w: [800, 1600], alt: 'DoIGetGas showing its gas-price gauge pointing to “Might fall”, above this week’s U.S. average prices.' },
+  realdoc: { w: [800, 1600], alt: 'RealDoc’s certificate form: course details, a CSV upload and a signature picker.' },
+  shiftwize: { w: [800, 1073], alt: 'Shiftwize’s availability planner: a week grid of preferred and available hours.' },
+};
+const shotSrc = (id: string) => { const s = shots[id]; return { src: `/images/shot-${id}-${s.w[1]}.webp`, srcset: s.w.map((w) => `/images/shot-${id}-${w}.webp ${w}w`).join(', ') }; };
 // the problem's first sentence goes in large type; any further sentences follow at reading size
 const split = (t: string) => { const m = t.match(/^(.+?[.!?])\s+(.*)$/s); return m ? [m[1], m[2]] : [t, '']; };
 ---
@@ -18,17 +26,19 @@ const split = (t: string) => { const m = t.match(/^(.+?[.!?])\s+(.*)$/s); return
     <section class={`prod ${i % 2 ? 'prod--flip' : 'field'}`} aria-labelledby={`p-${p.id}`}>
       <div class="wrap grid12 inner">
         <div class="vis" data-reveal>
-          {p.data.cover_image && (
-            <figure class="photo pic"><img src={img(p.data.cover_image, 1600)} width="1280" height="720" alt={p.data.cover_alt} loading="lazy" /></figure>
-          )}
+          <figure class="photo pic">
+            <video data-prod-video muted loop playsinline preload="none" width="960" height="540" aria-hidden="true" poster={img(`prod-${p.id}-poster`, 1600)}>
+              <source src={`/video/prod-${p.id}.mp4`} type="video/mp4" />
+            </video>
+          </figure>
           {isPhone(p.id) ? (
-            <div class="screen screen--phone" data-ui role="img" aria-label={`Placeholder for a screenshot of the ${p.data.name} app`}>
-              <div class="shot"><span class="shot-name">{p.data.name}</span><span class="shot-note">App screenshot</span></div>
+            <div class="screen screen--phone" data-ui>
+              <img class="shot" src={shotSrc(p.id).src} srcset={shotSrc(p.id).srcset} sizes="(max-width: 860px) 34vw, 16vw" width="1206" height="2394" alt={shots[p.id].alt} loading="lazy" />
             </div>
           ) : (
-            <div class="screen screen--web" data-ui role="img" aria-label={`Placeholder for a screenshot of ${p.data.name}`}>
-              <div class="bar"><span class="addr">{p.data.url ? p.data.url.replace('https://', '') : p.data.name.toLowerCase()}</span></div>
-              <div class="shot"><span class="shot-name">{p.data.name}</span><span class="shot-note">Screenshot</span></div>
+            <div class="screen screen--web" data-ui>
+              <div class="bar"><span class="addr">{p.data.url ? p.data.url.replace('https://', '') : `${p.data.name.toLowerCase()}.app`}</span></div>
+              <img class="shot" src={shotSrc(p.id).src} srcset={shotSrc(p.id).srcset} sizes="(max-width: 860px) 78vw, 33vw" alt={shots[p.id].alt} loading="lazy" />
             </div>
           )}
         </div>
@@ -59,8 +69,8 @@ const split = (t: string) => { const m = t.match(/^(.+?[.!?])\s+(.*)$/s); return
   .vis { grid-column: 1 / 7; position: relative; padding-bottom: clamp(48px, 6vw, 88px); }
   .prod--flip .vis { grid-column: 7 / -1; grid-row: 1; }
   .pic { aspect-ratio: 5 / 4; }
-  .pic img { transition: filter 450ms ease; }
-  @media (hover: hover) and (pointer: fine) { .vis:hover .pic img { filter: none; } }
+  .pic video { display: block; width: 100%; height: 100%; object-fit: cover; filter: var(--photo-filter); transition: filter 450ms ease; }
+  @media (hover: hover) and (pointer: fine) { .vis:hover .pic video { filter: none; } }
 
   .screen { position: absolute; bottom: 0; background: var(--bg); color: var(--ink); display: grid; }
   .screen--web { right: clamp(-40px, -2vw, -16px); width: 66%; aspect-ratio: 16 / 10.5; grid-template-rows: auto 1fr; border: 10px solid var(--bg); }
@@ -68,10 +78,8 @@ const split = (t: string) => { const m = t.match(/^(.+?[.!?])\s+(.*)$/s); return
   .bar { display: flex; align-items: center; gap: 8px; height: 28px; padding: 0 12px; background: var(--surface-2); }
   .addr { font-size: 11px; font-weight: 600; color: var(--muted); }
   .screen--phone { right: 8%; width: 30%; aspect-ratio: 9 / 19.5; border: 6px solid var(--ink); border-radius: 28px; overflow: hidden; outline: 8px solid var(--bg); }
-  /* the empty screen: the product's name on a flat tone, until the real screenshot goes here */
-  .shot { display: grid; place-content: center; justify-items: center; gap: 6px; text-align: center; padding: 12px; background: var(--surface); }
-  .shot-name { font-size: clamp(18px, 1.8vw, 26px); font-weight: 850; letter-spacing: -0.04em; }
-  .shot-note { font-size: 12px; font-weight: 600; color: var(--muted); }
+  /* the product's own screen, in its own colours, pinned to the top-left like a real window */
+  .shot { display: block; width: 100%; height: 100%; min-height: 0; object-fit: cover; object-position: left top; background: var(--surface); }
 
   /* the story: status, name, the problem in large type, then what we built */
   .text { grid-column: 8 / -1; display: grid; gap: 22px; justify-items: start; }
@@ -97,3 +105,16 @@ const split = (t: string) => { const m = t.match(/^(.+?[.!?])\s+(.*)$/s); return
     .screen--web { border-width: 6px; }
   }
 </style>
+
+<script>
+  // the clips loop only while on screen; with reduced motion they stay on their first frame
+  const vids = [...document.querySelectorAll<HTMLVideoElement>('[data-prod-video]')];
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => entries.forEach((e) => {
+      const v = e.target as HTMLVideoElement;
+      if (e.isIntersecting) { if (v.preload !== 'auto') { v.preload = 'auto'; v.load(); } v.play().catch(() => {}); }
+      else v.pause();
+    }), { rootMargin: '200px 0px' });
+    vids.forEach((v) => io.observe(v));
+  }
+</script>
