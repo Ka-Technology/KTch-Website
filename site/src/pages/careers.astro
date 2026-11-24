@@ -9,6 +9,9 @@ const ways = [
   { name: 'Profit sharing.', text: 'Developers share in the profit of the projects they work on.' },
   { name: 'Flexible hours.', text: 'Part-time-friendly involvement that fits around school or another job.' },
 ];
+// TEMPORARY (?w= and ?h=): versions of How we work and How we hire to compare
+const wLabels = [['', 'Work: current'], ['a', 'W-A · Big rows'], ['b', 'W-B · Three columns'], ['c', 'W-C · Manifesto'], ['d', 'W-D · Headline + list']];
+const hLabels = [['', 'Hire: current'], ['a', 'H-A · Timeline'], ['b', 'H-B · Big numerals'], ['c', 'H-C · Cards'], ['d', 'H-D · Sentence']];
 const process = [
   { name: 'A short case study', text: 'A small, real-world problem to show how you think and build with AI.' },
   { name: 'A get-to-know-you chat', text: 'Who you are, what you want to build, and how you like to work.' },
@@ -18,9 +21,58 @@ const process = [
 <Base og="careers" title="Careers" description="Join Ka Technology: a small, remote-friendly team of AI-native developers shipping real software for real businesses.">
   <PageHead title="Build with us" lede="We’re a small, remote-friendly team that ships real software for real businesses. We look for AI-native developers: people who know how to build with AI and use it well." />
 
-  <section class="wrap grid12 how" aria-labelledby="how-t">
+  <section class="wrap grid12 how wv wv--cur" aria-labelledby="how-t">
     <h2 id="how-t" class="t-h2 bh">How we work</h2>
     <ul class="wl" data-reveal>{ways.map((w) => <li><h3>{w.name}</h3><p>{w.text}</p></li>)}</ul>
+  </section>
+
+
+  <section class="wrap how wv wv--a" aria-labelledby="wa-t">
+    <h2 id="wa-t" class="t-h2">How we work</h2>
+    <ul class="wa">{ways.map((w) => <li><h3>{w.name}</h3><p>{w.text}</p></li>)}</ul>
+  </section>
+
+  <section class="wrap how wv wv--b" aria-labelledby="wb-t">
+    <h2 id="wb-t" class="t-h2">How we work</h2>
+    <ul class="wb">{ways.map((w) => <li><h3>{w.name}</h3><p>{w.text}</p></li>)}</ul>
+  </section>
+
+  <section class="wrap how wv wv--c" aria-labelledby="wc-t">
+    <h2 id="wc-t" class="t-h2">How we work</h2>
+    <p class="wc">{ways.map((w, i) => <><strong>{w.name}</strong>{' '}{w.text}{i < ways.length - 1 ? ' ' : ''}</>)}</p>
+  </section>
+
+  <section class="wrap grid12 how wv wv--d" aria-labelledby="wd-t">
+    <div class="wd-head">
+      <h2 id="wd-t" class="t-h2">How we work</h2>
+      <p class="wd-big">Real work.<br />A real share.<br />Your hours.</p>
+    </div>
+    <ul class="wd">{ways.map((w) => <li><h3>{w.name}</h3><p>{w.text}</p></li>)}</ul>
+  </section>
+
+  <section class="wrap grid12 proc hv hv--cur" aria-labelledby="proc-t">
+    <h2 id="proc-t" class="t-h2 bh">How we hire</h2>
+    <ol class="pl" data-reveal>{process.map((p) => <li><h3>{p.name}</h3><p>{p.text}</p></li>)}</ol>
+  </section>
+
+  <section class="wrap proc hv hv--a" aria-labelledby="ha-t">
+    <h2 id="ha-t" class="t-h2">How we hire</h2>
+    <ol class="ha">{process.map((p, i) => <li><span class="ha-dot" aria-hidden="true">{i + 1}</span><h3>{p.name}</h3><p>{p.text}</p></li>)}</ol>
+  </section>
+
+  <section class="wrap proc hv hv--b" aria-labelledby="hb-t">
+    <h2 id="hb-t" class="t-h2">How we hire</h2>
+    <ol class="hb">{process.map((p, i) => <li><span class="hb-n" aria-hidden="true">{i + 1}</span><div><h3>{p.name}</h3><p>{p.text}</p></div></li>)}</ol>
+  </section>
+
+  <section class="wrap proc hv hv--c" aria-labelledby="hc-t">
+    <h2 id="hc-t" class="t-h2">How we hire</h2>
+    <ol class="hc">{process.map((p, i) => <li><p class="hc-k">Step {i + 1} of {process.length}</p><h3>{p.name}</h3><p>{p.text}</p></li>)}</ol>
+  </section>
+
+  <section class="wrap proc hv hv--d" aria-labelledby="hd-t">
+    <h2 id="hd-t" class="t-h2">How we hire</h2>
+    <p class="hd">Three steps: <strong>{process[0].name.toLowerCase()}</strong> to see how you think and build with AI, <strong>{process[1].name.toLowerCase()}</strong> about who you are and how you like to work, then <strong>{process[2].name.toLowerCase()}</strong> that goes deeper on both.</p>
   </section>
 
   <section class="roles field" aria-labelledby="roles-t">
@@ -49,10 +101,22 @@ const process = [
     </div>
   </section>
 
-  <section class="wrap grid12 proc section" aria-labelledby="proc-t">
-    <h2 id="proc-t" class="t-h2 bh">How we hire</h2>
-    <ol class="pl" data-reveal>{process.map((p) => <li><h3>{p.name}</h3><p>{p.text}</p></li>)}</ol>
-  </section>
+  <nav class="cswitch" aria-label="Careers section versions">
+    <div>{wLabels.map(([k, l]) => <a data-k="w" data-v={k}>{l}</a>)}</div>
+    <div>{hLabels.map(([k, l]) => <a data-k="h" data-v={k}>{l}</a>)}</div>
+  </nav>
+  <script is:inline>
+    (function () {
+      var q = new URLSearchParams(location.search), w = q.get('w') || '', h = q.get('h') || '';
+      document.documentElement.dataset.wv = w || 'cur'; document.documentElement.dataset.hv = h || 'cur';
+      document.querySelectorAll('.cswitch a').forEach(function (a) {
+        var k = a.dataset.k, v = a.dataset.v, n = new URLSearchParams(location.search);
+        if (v) n.set(k, v); else n.delete(k);
+        a.href = '?' + n.toString();
+        if ((k === 'w' ? w : h) === v) a.setAttribute('aria-current', 'true');
+      });
+    })();
+  </script>
 </Base>
 
 <style>
@@ -76,5 +140,69 @@ const process = [
   @media (max-width: 860px) {
     .bh, .wl, .pl, .rl { grid-column: 1 / -1; }
     .rl { margin-top: 28px; }
+  }
+
+  /* the sections now run: how we work, how we hire, open roles (last) */
+  .proc { margin-top: var(--section); }
+  .roles { margin-bottom: 0; }
+
+  /* ---- TEMPORARY version switcher ---- */
+  .wv, .hv { display: none; }
+  :global(html[data-wv='cur']) .wv--cur, :global(html[data-wv='d']) .wv--d, :global(html[data-hv='cur']) .hv--cur { display: grid; }
+  :global(html[data-wv='a']) .wv--a, :global(html[data-wv='b']) .wv--b, :global(html[data-wv='c']) .wv--c,
+  :global(html[data-hv='a']) .hv--a, :global(html[data-hv='b']) .hv--b, :global(html[data-hv='c']) .hv--c, :global(html[data-hv='d']) .hv--d { display: block; }
+  .cswitch { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 50; display: grid; gap: 4px; padding: 6px; background: var(--ink); max-width: calc(100vw - 24px); }
+  .cswitch div { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; }
+  .cswitch a { padding: 7px 11px; font-size: 13px; font-weight: 700; color: var(--bg); text-decoration: none; cursor: pointer; }
+  .cswitch a[aria-current] { background: var(--accent); color: var(--on-accent); }
+
+  /* W-A · big rows */
+  .wa { list-style: none; margin-top: clamp(36px, 4vw, 64px); display: grid; gap: clamp(28px, 3.4vw, 48px); }
+  .wa li { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--gap); align-items: baseline; }
+  .wa h3 { font-size: clamp(36px, 4.6vw, 80px); letter-spacing: -0.05em; line-height: 0.95; }
+  .wa p { font-size: var(--t-lead); font-weight: 600; max-width: 34ch; }
+  /* W-B · three columns on a tone, each with a red bar */
+  .wb { list-style: none; margin-top: clamp(36px, 4vw, 64px); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap); }
+  .wb li { background: var(--surface); padding: clamp(24px, 2.6vw, 40px); display: grid; gap: 14px; align-content: start; }
+  .wb h3 { font-size: clamp(26px, 2.4vw, 38px); letter-spacing: -0.04em; line-height: 1.05; }
+  .wb h3::before { content: ""; display: block; width: 36px; height: 6px; background: var(--accent); margin-bottom: 20px; }
+  .wb p { font-size: var(--t-lead); line-height: 1.4; }
+  /* W-C · manifesto, like About: red names, grey text */
+  .wc { margin-top: clamp(28px, 3vw, 48px); font-size: clamp(26px, 3.3vw, 56px); font-weight: 650; letter-spacing: -0.035em; line-height: 1.18; color: var(--muted); }
+  .wc strong { color: var(--accent); font-weight: 850; }
+  /* W-D · a three-line headline on the left, the details on the right */
+  .wd-head { grid-column: 1 / 6; display: grid; gap: 24px; align-content: start; }
+  .wd-big { font-size: clamp(36px, 4.4vw, 76px); font-weight: 850; letter-spacing: -0.05em; line-height: 1; color: var(--accent); }
+  .wd { grid-column: 7 / -1; list-style: none; display: grid; gap: 32px; padding-top: 8px; }
+  .wd li { display: grid; gap: 8px; }
+  .wd h3 { font-size: var(--t-lead); letter-spacing: -0.02em; }
+
+  /* H-A · timeline: three steps across, joined by a red rule */
+  .ha { list-style: none; margin-top: clamp(36px, 4vw, 64px); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap); position: relative; }
+  .ha::before { content: ""; position: absolute; left: 22px; right: 22px; top: 21px; height: 4px; background: var(--accent); }
+  .ha li { position: relative; display: grid; gap: 10px; align-content: start; }
+  .ha-dot { width: 46px; height: 46px; border-radius: 50%; background: var(--accent); color: var(--on-accent); display: grid; place-items: center; font-weight: 850; font-size: 20px; margin-bottom: 14px; position: relative; }
+  .ha h3 { font-size: var(--t-lead); letter-spacing: -0.02em; }
+  .ha p { max-width: 34ch; }
+  /* H-B · big numerals */
+  .hb { list-style: none; margin-top: clamp(36px, 4vw, 64px); display: grid; gap: clamp(28px, 3vw, 44px); }
+  .hb li { display: grid; grid-template-columns: clamp(72px, 9vw, 150px) minmax(0, 1fr); gap: var(--gap); align-items: baseline; }
+  .hb-n { font-size: clamp(64px, 8vw, 140px); font-weight: 850; letter-spacing: -0.06em; line-height: 0.8; color: var(--accent); }
+  .hb h3 { font-size: clamp(26px, 2.6vw, 42px); letter-spacing: -0.04em; line-height: 1.05; }
+  .hb p { margin-top: 8px; font-size: var(--t-lead); max-width: 44ch; }
+  /* H-C · cards */
+  .hc { list-style: none; margin-top: clamp(36px, 4vw, 64px); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap); }
+  .hc li { background: var(--surface); padding: clamp(24px, 2.6vw, 40px); display: grid; gap: 12px; align-content: start; }
+  .hc-k { font-size: var(--t-small); font-weight: 800; color: var(--accent); letter-spacing: 0.02em; }
+  .hc h3 { font-size: clamp(24px, 2.2vw, 34px); letter-spacing: -0.04em; line-height: 1.08; }
+  /* H-D · one sentence */
+  .hd { margin-top: clamp(28px, 3vw, 48px); font-size: clamp(24px, 2.8vw, 46px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.25; max-width: 40ch; color: var(--muted); }
+  .hd strong { color: var(--ink); font-weight: 850; }
+
+  @media (max-width: 860px) {
+    .wa li { grid-template-columns: 1fr; gap: 8px; }
+    .wb, .ha, .hc { grid-template-columns: 1fr; }
+    .ha::before { display: none; }
+    .wd-head, .wd { grid-column: 1 / -1; }
   }
 </style>
