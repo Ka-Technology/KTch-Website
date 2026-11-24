@@ -54,7 +54,7 @@ const big = !['svc-software', 'svc-automation'].includes(d.cover_image);
     </section>
 
     {d.results.length > 0 && (
-      <section class="results inverse" aria-labelledby="res">
+      <section class="results field" aria-labelledby="res">
         <div class="wrap grid12">
           <h2 id="res" class="t-h2 bh">Results</h2>
           <ul class="rl" data-reveal>{d.results.map((r) => <li>{r}</li>)}</ul>

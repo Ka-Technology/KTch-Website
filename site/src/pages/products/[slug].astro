@@ -30,7 +30,7 @@ const d = product.data;
     </section>
 
     {d.how_it_works.length > 0 && (
-      <section class="steps inverse" aria-labelledby="how">
+      <section class="steps field" aria-labelledby="how">
         <div class="wrap">
           <h2 id="how" class="t-h2">How it works</h2>
           <ol class="sl" data-reveal>{d.how_it_works.map((s) => <li><p>{s}</p></li>)}</ol>
@@ -69,7 +69,7 @@ const d = product.data;
   .body { grid-column: 6 / -1; max-width: 62ch; }
   .steps { padding-block: clamp(80px, 9vw, 140px); margin-bottom: 0; }
   .sl { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap); margin-top: 48px; }
-  .sl li { background: var(--inv-surface); padding: 28px; font-size: var(--t-lead); line-height: 1.35; font-weight: 600; }
+  .sl li { background: var(--surface); padding: 28px; font-size: var(--t-lead); line-height: 1.35; font-weight: 600; }
   .sl li::before { content: ""; display: block; width: 28px; height: 6px; background: var(--accent); margin-bottom: 20px; }
   .fl li { font-size: var(--t-body); }
   .allp { padding-bottom: var(--section); }

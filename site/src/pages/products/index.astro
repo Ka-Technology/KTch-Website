@@ -8,7 +8,7 @@ const products = (await getCollection('products', (p) => !p.data.hidden)).sort((
 <Base og="products" title="Our software" description="Kept, DoIGetGas and RealDoc: software Ka Technology builds and runs itself.">
   <PageHead title="Our software" lede="Besides client work, we build our own products. Some started as a client’s problem that turned out to be everyone’s problem." />
   {products.map((p, i) => (
-    <section class={`prod ${i % 2 ? 'inverse' : 'tone'}`} aria-labelledby={`p-${p.id}`}>
+    <section class={`prod ${i % 2 ? '' : 'field'}`} aria-labelledby={`p-${p.id}`}>
       <div class="wrap grid12 inner" data-reveal>
         <div class="left">
           <h2 id={`p-${p.id}`} class="pname"><a href={`/products/${p.id}`}>{p.data.name}</a></h2>
@@ -28,7 +28,6 @@ const products = (await getCollection('products', (p) => !p.data.hidden)).sort((
 
 <style>
   .prod { padding-block: clamp(80px, 9vw, 140px); }
-  .tone { background: var(--surface); }
   .inner { row-gap: 32px; }
   .left { grid-column: 1 / 7; display: grid; gap: 18px; align-content: start; }
   .right { grid-column: 7 / -1; display: grid; gap: 22px; justify-items: start; }
