@@ -1,0 +1,194 @@
+---
+// TEMPORARY: four layout options for the Products page, at /products/layouts/a … /d. Delete once one is chosen.
+import { getCollection } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+import PageHead from '../../../components/PageHead.astro';
+import CloseCTA from '../../../components/CloseCTA.astro';
+import { img } from '../../../data/site';
+
+export function getStaticPaths() { return ['a', 'b', 'c', 'd'].map((v) => ({ params: { v } })); }
+const { v } = Astro.params;
+const products = (await getCollection('products', (p) => !p.data.hidden)).sort((a, b) => a.data.order - b.data.order);
+const isPhone = (id: string) => id === 'kept';
+const shots: Record<string, { w: number[]; h: number; alt: string }> = {
+  kept: { w: [400, 800], h: 2394 / 1206, alt: 'The Kept app’s Challenges screen, with free habit trackers for reading and working out.' },
+  doigetgas: { w: [800, 1600], h: 1898 / 2942, alt: 'DoIGetGas showing its gas-price gauge pointing to “Might fall”, above this week’s U.S. average prices.' },
+  realdoc: { w: [800, 1600], h: 1161 / 2048, alt: 'RealDoc’s certificate form: course details, a CSV upload and a signature picker.' },
+  shiftwize: { w: [800, 1073], h: 1311 / 1073, alt: 'Shiftwize’s availability planner: a week grid of preferred and available hours.' },
+};
+const src = (id: string) => `/images/shot-${id}-${shots[id].w[1]}.webp`;
+const set = (id: string) => shots[id].w.map((w) => `/images/shot-${id}-${w}.webp ${w}w`).join(', ');
+const addr = (p: any) => (p.data.url ? p.data.url.replace('https://', '') : `${p.data.name.toLowerCase()}.app`);
+const first = (t: string) => (t.match(/^(.+?[.!?])(\s|$)/s)?.[1] ?? t);
+const labels: [string, string][] = [['', 'Current'], ['a', 'A · Full-screen scenes'], ['b', 'B · Screenshot first'], ['c', 'C · Video tiles'], ['d', 'D · Side by side']];
+---
+<Base og="products" title="Our software" description="Layout options for the Products page." strip={true}>
+  <PageHead title="Our software" lede="Besides client work, we build our own products. Some started as a client’s problem that turned out to be everyone’s problem." />
+
+  {v === 'a' && products.map((p) => (
+    <section class="a-scene" aria-labelledby={`a-${p.id}`}>
+      <video class="bgv" data-pv muted loop playsinline preload="none" aria-hidden="true" poster={img(`prod-${p.id}-poster`, 1600)}><source src={`/video/prod-${p.id}.mp4`} type="video/mp4" /></video>
+      <div class="a-inner wrap">
+        <div class="a-text">
+          <p class="meta"><span class="dot"></span>{p.data.status}</p>
+          <h2 id={`a-${p.id}`} class="a-name">{p.data.name}</h2>
+          <p class="a-tag">{p.data.tagline}</p>
+          <a class="a-link arrow" href={`/products/${p.id}`}>About {p.data.name}</a>
+        </div>
+        <div class={`a-shot ${isPhone(p.id) ? 'is-phone' : ''}`} data-ui>
+          {!isPhone(p.id) && <div class="bar"><span>{addr(p)}</span></div>}
+          <img src={src(p.id)} srcset={set(p.id)} sizes="60vw" alt={shots[p.id].alt} loading="lazy" />
+        </div>
+      </div>
+    </section>
+  ))}
+
+  {v === 'b' && products.map((p, i) => (
+    <section class={`b-row ${i % 2 ? '' : 'field'}`} aria-labelledby={`b-${p.id}`}>
+      <div class="wrap grid12 b-inner">
+        <div class="b-text">
+          <p class="meta"><span class="dot"></span>{p.data.status}{p.data.url && <> · <a class="link" href={p.data.url} rel="noopener">{addr(p)}</a></>}</p>
+          <h2 id={`b-${p.id}`} class="b-name">{p.data.name}</h2>
+          <p class="b-problem">{first(p.data.problem)}</p>
+          <a class="link b-go" href={`/products/${p.id}`}><span class="arrow">See how {p.data.name} works</span></a>
+        </div>
+        <div class={`b-shot ${isPhone(p.id) ? 'is-phone' : ''}`} data-ui>
+          {!isPhone(p.id) && <div class="bar"><span>{addr(p)}</span></div>}
+          <img src={src(p.id)} srcset={set(p.id)} sizes="(max-width: 860px) 100vw, 58vw" alt={shots[p.id].alt} loading="lazy" />
+        </div>
+      </div>
+    </section>
+  ))}
+
+  {v === 'c' && (
+    <section class="wrap c-grid" aria-label="Our products">
+      {products.map((p) => (
+        <a class="c-tile" href={`/products/${p.id}`}>
+          <div class="c-media">
+            <video data-pv muted loop playsinline preload="none" aria-hidden="true" poster={img(`prod-${p.id}-poster`, 1600)}><source src={`/video/prod-${p.id}.mp4`} type="video/mp4" /></video>
+            <div class={`c-shot ${isPhone(p.id) ? 'is-phone' : ''}`} data-ui><img src={src(p.id)} srcset={set(p.id)} sizes="40vw" alt={shots[p.id].alt} loading="lazy" /></div>
+          </div>
+          <div class="c-band">
+            <h2 class="c-name">{p.data.name}<span class="c-st"><span class="dot"></span>{p.data.status}</span></h2>
+            <p class="c-tag">{p.data.tagline}</p>
+          </div>
+        </a>
+      ))}
+    </section>
+  )}
+
+  {v === 'd' && products.map((p, i) => (
+    <section class={`d-row ${i % 2 ? '' : 'field'}`} aria-labelledby={`d-${p.id}`}>
+      <div class="wrap">
+        <div class="d-head">
+          <h2 id={`d-${p.id}`} class="d-name">{p.data.name}</h2>
+          <p class="meta"><span class="dot"></span>{p.data.status}{p.data.url && <> · <a class="link" href={p.data.url} rel="noopener">{addr(p)}</a></>}</p>
+        </div>
+        <div class="d-pair">
+          <figure class="photo d-vid"><video data-pv muted loop playsinline preload="none" aria-hidden="true" poster={img(`prod-${p.id}-poster`, 1600)}><source src={`/video/prod-${p.id}.mp4`} type="video/mp4" /></video></figure>
+          <div class={`d-shot ${isPhone(p.id) ? 'is-phone' : ''}`} data-ui>
+            {!isPhone(p.id) && <div class="bar"><span>{addr(p)}</span></div>}
+            <img src={src(p.id)} srcset={set(p.id)} sizes="(max-width: 860px) 100vw, 50vw" alt={shots[p.id].alt} loading="lazy" />
+          </div>
+        </div>
+        <div class="d-foot">
+          <p class="d-problem">{first(p.data.problem)}</p>
+          <a class="button button--ink" href={`/products/${p.id}`}>About {p.data.name}</a>
+        </div>
+      </div>
+    </section>
+  ))}
+
+  <nav class="vswitch" aria-label="Layout preview">
+    {labels.map(([k, l]) => <a href={k ? `/products/layouts/${k}` : '/products'} aria-current={k === v ? 'true' : undefined}>{l}</a>)}
+  </nav>
+  <CloseCTA title={['Your problem might be', 'everyone’s, too.']} text="Some of our products started as one client’s request. If yours sounds familiar, let’s talk." />
+</Base>
+
+<style>
+  .meta { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; font-weight: 700; font-size: var(--t-small); }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); flex: none; }
+  .bar { height: 28px; display: flex; align-items: center; padding: 0 12px; background: var(--surface-2); font-size: 11px; font-weight: 600; color: var(--muted); }
+  video { display: block; width: 100%; height: 100%; object-fit: cover; filter: var(--photo-filter); transition: filter 450ms ease; }
+
+  /* A · full-screen scenes: the clip fills the section, the screenshot sits large on top */
+  .a-scene { position: relative; overflow: clip; min-height: min(92vh, 880px); display: grid; align-items: center; color: #fafaf9; }
+  .a-scene .bgv { position: absolute; inset: 0; }
+  .a-scene::after { content: ""; position: absolute; inset: 0; background: rgb(11 11 12 / 0.55); transition: background-color 450ms ease; }
+  @media (hover: hover) and (pointer: fine) { .a-scene:hover .bgv { filter: none; } .a-scene:hover::after { background: rgb(11 11 12 / 0.35); } }
+  .a-inner { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: var(--gap); align-items: center; padding-block: clamp(64px, 8vw, 120px); }
+  .a-text { display: grid; gap: 16px; justify-items: start; }
+  .a-name { font-size: clamp(56px, 6.5vw, 112px); letter-spacing: -0.05em; line-height: 0.92; }
+  .a-tag { font-size: var(--t-lead); font-weight: 600; max-width: 22ch; }
+  .a-link { font-weight: 700; color: #fafaf9; text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 0.22em; }
+  .a-shot { background: #fafaf9; justify-self: end; width: 100%; }
+  .a-shot img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: left top; }
+  .a-shot.is-phone { width: min(300px, 70%); border: 8px solid #0b0b0c; border-radius: 36px; overflow: hidden; justify-self: center; }
+  .a-shot.is-phone img { aspect-ratio: 1206 / 2394; max-height: 70vh; }
+
+  /* B · screenshot first: no video, the product's screen large on a quiet field */
+  .b-row { padding-block: clamp(80px, 9vw, 136px); }
+  .b-inner { align-items: center; row-gap: 40px; }
+  .b-text { grid-column: 1 / 5; display: grid; gap: 18px; justify-items: start; }
+  .b-name { font-size: clamp(48px, 5vw, 84px); letter-spacing: -0.05em; line-height: 0.95; }
+  .b-problem { font-size: clamp(19px, 1.5vw, 23px); font-weight: 600; line-height: 1.4; max-width: 30ch; }
+  .b-go { font-weight: 700; }
+  .b-shot { grid-column: 6 / -1; background: var(--bg); border: 10px solid var(--bg); }
+  .b-shot img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: left top; }
+  .b-shot.is-phone { grid-column: 7 / 11; justify-self: center; width: min(320px, 100%); border: 8px solid var(--ink); border-radius: 36px; overflow: hidden; background: none; }
+  .b-shot.is-phone img { aspect-ratio: 1206 / 2394; }
+
+  /* C · video tiles: a 2×2 grid; hovering swaps the clip for the product's screen */
+  .c-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-bottom: var(--section); }
+  .c-tile { display: grid; grid-template-rows: auto auto; text-decoration: none; color: inherit; }
+  .c-media { position: relative; aspect-ratio: 16 / 10; overflow: clip; background: var(--surface-2); }
+  .c-shot { position: absolute; inset: 8% 10% 0; background: #fafaf9; opacity: 0; transform: translateY(24px); transition: opacity 350ms ease, transform 450ms var(--ease-out); }
+  .c-shot img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: left top; }
+  .c-shot.is-phone { inset: 8% 34% 0; border: 6px solid #0b0b0c; border-bottom: 0; border-radius: 28px 28px 0 0; overflow: hidden; }
+  @media (hover: hover) and (pointer: fine) { .c-tile:hover video { filter: none; } .c-tile:hover .c-shot { opacity: 1; transform: none; } }
+  .c-tile:focus-visible .c-shot { opacity: 1; transform: none; }
+  .c-band { background: var(--ink); color: var(--bg); padding: 18px 22px; display: grid; gap: 6px; }
+  .c-name { font-size: clamp(24px, 2.2vw, 34px); letter-spacing: -0.04em; display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .c-st { display: inline-flex; align-items: center; gap: 8px; font-size: var(--t-small); font-weight: 700; letter-spacing: 0; }
+  .c-tag { font-size: var(--t-small); opacity: 0.82; }
+
+  /* D · side by side: name on top, the clip and the screen next to each other (no overlap), one line below */
+  .d-row { padding-block: clamp(72px, 8vw, 120px); }
+  .d-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px 24px; }
+  .d-name { font-size: clamp(48px, 5vw, 84px); letter-spacing: -0.05em; line-height: 0.95; }
+  .d-pair { margin-top: 32px; display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 12px; height: clamp(320px, 36vw, 520px); }
+  .d-vid { height: 100%; }
+  .d-shot { background: var(--bg); display: grid; grid-template-rows: auto 1fr; min-height: 0; overflow: hidden; }
+  .d-shot img { display: block; width: 100%; height: 100%; min-height: 0; object-fit: cover; object-position: left top; }
+  .d-shot.is-phone { background: var(--surface-2); place-items: center; grid-template-rows: 1fr; }
+  .d-shot.is-phone img { width: auto; height: 92%; aspect-ratio: 1206 / 2394; border: 6px solid var(--ink); border-radius: 26px; }
+  @media (hover: hover) and (pointer: fine) { .d-pair:hover video { filter: none; } }
+  .d-foot { margin-top: 28px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px 40px; }
+  .d-problem { font-size: clamp(19px, 1.5vw, 23px); font-weight: 600; line-height: 1.4; max-width: 46ch; }
+
+  .vswitch { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 50; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 6px; background: var(--ink); max-width: calc(100vw - 24px); }
+  .vswitch a { padding: 8px 12px; font-size: 13px; font-weight: 700; color: var(--bg); text-decoration: none; }
+  .vswitch a[aria-current] { background: var(--accent); color: var(--on-accent); }
+
+  @media (max-width: 860px) {
+    .a-inner { grid-template-columns: 1fr; }
+    .b-text, .b-shot, .b-shot.is-phone { grid-column: 1 / -1; }
+    .c-grid { grid-template-columns: 1fr; }
+    .c-shot { opacity: 1; transform: none; inset: 12% 14% 0; }
+    .d-pair { grid-template-columns: 1fr; height: auto; }
+    .d-vid { aspect-ratio: 16 / 10; }
+    .d-shot img { aspect-ratio: 16 / 10; height: auto; }
+    .d-shot.is-phone { aspect-ratio: 4 / 5; }
+  }
+</style>
+
+<script>
+  const vids = [...document.querySelectorAll<HTMLVideoElement>('[data-pv]')];
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver((es) => es.forEach((e) => {
+      const v = e.target as HTMLVideoElement;
+      if (e.isIntersecting) { if (v.preload !== 'auto') { v.preload = 'auto'; v.load(); } v.play().catch(() => {}); } else v.pause();
+    }), { rootMargin: '200px 0px' });
+    vids.forEach((v) => io.observe(v));
+  }
+</script>
