@@ -1,23 +1,48 @@
 ---
+// Our software: each product as a short story. The problem it answers, a photo of its world with the product's
+// own screen laid over it, then what we built. Screens are placeholders until real screenshots arrive.
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import PageHead from '../../components/PageHead.astro';
 import CloseCTA from '../../components/CloseCTA.astro';
+import { img } from '../../data/site';
 const products = (await getCollection('products', (p) => !p.data.hidden)).sort((a, b) => a.data.order - b.data.order);
+// Kept is an iPhone app; the others run in the browser
+const isPhone = (id: string) => id === 'kept';
+// the problem's first sentence goes in large type; any further sentences follow at reading size
+const split = (t: string) => { const m = t.match(/^(.+?[.!?])\s+(.*)$/s); return m ? [m[1], m[2]] : [t, '']; };
 ---
 <Base og="products" title="Our software" description="Kept, DoIGetGas and RealDoc: software Ka Technology builds and runs itself.">
   <PageHead title="Our software" lede="Besides client work, we build our own products. Some started as a client’s problem that turned out to be everyone’s problem." />
   {products.map((p, i) => (
-    <section class={`prod ${i % 2 ? '' : 'field'}`} aria-labelledby={`p-${p.id}`}>
-      <div class="wrap grid12 inner" data-reveal>
-        <div class="left">
-          <h2 id={`p-${p.id}`} class="pname"><a href={`/products/${p.id}`}>{p.data.name}</a></h2>
-          <p class="t-lead tag">{p.data.tagline}</p>
+    <section class={`prod ${i % 2 ? 'prod--flip' : 'field'}`} aria-labelledby={`p-${p.id}`}>
+      <div class="wrap grid12 inner">
+        <div class="vis" data-reveal>
+          {p.data.cover_image && (
+            <figure class="photo pic"><img src={img(p.data.cover_image, 1600)} width="1280" height="720" alt={p.data.cover_alt} loading="lazy" /></figure>
+          )}
+          {isPhone(p.id) ? (
+            <div class="screen screen--phone" data-ui role="img" aria-label={`Placeholder for a screenshot of the ${p.data.name} app`}>
+              <div class="shot"><span class="shot-name">{p.data.name}</span><span class="shot-note">App screenshot</span></div>
+            </div>
+          ) : (
+            <div class="screen screen--web" data-ui role="img" aria-label={`Placeholder for a screenshot of ${p.data.name}`}>
+              <div class="bar"><span class="addr">{p.data.url ? p.data.url.replace('https://', '') : p.data.name.toLowerCase()}</span></div>
+              <div class="shot"><span class="shot-name">{p.data.name}</span><span class="shot-note">Screenshot</span></div>
+            </div>
+          )}
         </div>
-        <div class="right">
+
+        <div class="text" data-reveal>
           <p class="meta"><span class="dot"></span>{p.data.status}{p.data.url && <> · <a class="link" href={p.data.url} rel="noopener">{p.data.url.replace('https://', '')}</a></>}</p>
-          <p class="sum">{p.data.summary}</p>
-          <ul class="how">{p.data.how_it_works.map((s) => <li>{s}</li>)}</ul>
+          <h2 id={`p-${p.id}`} class="pname"><a href={`/products/${p.id}`}>{p.data.name}</a></h2>
+          <p class="problem">{split(p.data.problem)[0]}</p>
+          {split(p.data.problem)[1] && <p class="problem-more">{split(p.data.problem)[1]}</p>}
+          <div class="built">
+            <h3 class="bh">What we built</h3>
+            <p class="sum">{p.data.summary}</p>
+            <ol class="how">{p.data.how_it_works.map((s) => <li>{s}</li>)}</ol>
+          </div>
           <a class="button button--ink" href={`/products/${p.id}`}>About {p.data.name}</a>
         </div>
       </div>
@@ -27,19 +52,48 @@ const products = (await getCollection('products', (p) => !p.data.hidden)).sort((
 </Base>
 
 <style>
-  .prod { padding-block: clamp(80px, 9vw, 140px); }
-  .inner { row-gap: 32px; }
-  .left { grid-column: 1 / 7; display: grid; gap: 18px; align-content: start; }
-  .right { grid-column: 7 / -1; display: grid; gap: 22px; justify-items: start; }
-  .pname { font-size: var(--t-display); letter-spacing: -0.05em; }
+  .prod { padding-block: clamp(88px, 10vw, 152px); }
+  .inner { row-gap: 48px; align-items: center; }
+
+  /* the picture: the product's world in grey (colour on hover), with its own screen laid over a corner */
+  .vis { grid-column: 1 / 7; position: relative; padding-bottom: clamp(48px, 6vw, 88px); }
+  .prod--flip .vis { grid-column: 7 / -1; grid-row: 1; }
+  .pic { aspect-ratio: 5 / 4; }
+  .pic img { transition: filter 450ms ease; }
+  @media (hover: hover) and (pointer: fine) { .vis:hover .pic img { filter: none; } }
+
+  .screen { position: absolute; bottom: 0; background: var(--bg); color: var(--ink); display: grid; }
+  .screen--web { right: clamp(-40px, -2vw, -16px); width: 66%; aspect-ratio: 16 / 10.5; grid-template-rows: auto 1fr; border: 10px solid var(--bg); }
+  .prod--flip .screen--web { right: auto; left: clamp(-40px, -2vw, -16px); }
+  .bar { display: flex; align-items: center; gap: 8px; height: 28px; padding: 0 12px; background: var(--surface-2); }
+  .addr { font-size: 11px; font-weight: 600; color: var(--muted); }
+  .screen--phone { right: 8%; width: 30%; aspect-ratio: 9 / 19.5; border: 6px solid var(--ink); border-radius: 28px; overflow: hidden; outline: 8px solid var(--bg); }
+  /* the empty screen: the product's name on a flat tone, until the real screenshot goes here */
+  .shot { display: grid; place-content: center; justify-items: center; gap: 6px; text-align: center; padding: 12px; background: var(--surface); }
+  .shot-name { font-size: clamp(18px, 1.8vw, 26px); font-weight: 850; letter-spacing: -0.04em; }
+  .shot-note { font-size: 12px; font-weight: 600; color: var(--muted); }
+
+  /* the story: status, name, the problem in large type, then what we built */
+  .text { grid-column: 8 / -1; display: grid; gap: 22px; justify-items: start; }
+  .prod--flip .text { grid-column: 1 / 6; grid-row: 1; }
+  .meta { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; font-weight: 700; font-size: var(--t-small); }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+  .pname { font-size: clamp(48px, 5vw, 84px); letter-spacing: -0.05em; line-height: 0.95; }
   .pname a { text-decoration: none; transition: color var(--t-hover) ease; }
   @media (hover: hover) and (pointer: fine) { .pname a:hover { color: var(--accent); } }
-  .tag { font-weight: 700; max-width: 26ch; }
-  .meta { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; font-weight: 700; }
-  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
-  .sum { font-size: var(--t-lead); line-height: 1.4; max-width: 40ch; }
-  .how { list-style: none; display: grid; gap: 12px; max-width: 54ch; }
-  .how li { padding-left: 1.2em; position: relative; }
-  .how li::before { content: ""; position: absolute; left: 0; top: 0.62em; width: 0.45em; height: 0.45em; background: var(--accent); }
-  @media (max-width: 860px) { .left, .right { grid-column: 1 / -1; } }
+  .problem { font-size: clamp(20px, 1.7vw, 26px); font-weight: 600; line-height: 1.35; letter-spacing: -0.015em; max-width: 34ch; }
+  .problem-more { max-width: 48ch; color: var(--muted); margin-top: -6px; }
+  .built { display: grid; gap: 12px; margin-top: 8px; }
+  .bh { font-size: var(--t-small); font-weight: 700; color: var(--muted); }
+  .sum { max-width: 44ch; }
+  .how { list-style: none; counter-reset: s; display: grid; gap: 10px; max-width: 48ch; }
+  .how li { counter-increment: s; display: grid; grid-template-columns: 1.6em 1fr; }
+  .how li::before { content: counter(s); font-weight: 800; color: var(--accent); }
+
+  @media (max-width: 860px) {
+    .vis, .prod--flip .vis, .text, .prod--flip .text { grid-column: 1 / -1; grid-row: auto; }
+    .screen--web, .prod--flip .screen--web { right: 12px; left: auto; width: 78%; }
+    .screen--phone { right: 12px; width: 34%; border-width: 4px; border-radius: 20px; outline-width: 6px; }
+    .screen--web { border-width: 6px; }
+  }
 </style>
