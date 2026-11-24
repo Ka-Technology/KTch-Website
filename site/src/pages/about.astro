@@ -6,14 +6,16 @@ import CloseCTA from '../components/CloseCTA.astro';
 import { img, srcset } from '../data/site';
 const team = (await getCollection('team', (t) => t.data.current)).sort((a, b) => a.data.order - b.data.order);
 const initials = (n: string) => n.split(' ').map((w) => w[0]).join('').slice(0, 2);
+// TEMPORARY (?v=a…e): five versions of "What we believe" to compare
+const vlabels = [['', 'Current'], ['a', 'A · Big rows'], ['b', 'B · Manifesto'], ['c', 'C · Ka letters'], ['d', 'D · Pinned heading'], ['e', 'E · Portland photos']];
 const values = [
-  { name: 'Meaningful choices.', text: 'Tech should give you options, not lock you in.' },
-  { name: 'Human first.', text: 'AI handles the tedious parts; people keep the meaningful ones.' },
-  { name: 'Partners, not vendors.', text: 'On bigger projects we sometimes take equity or revenue share, because we want to be invested in your growth.' },
+  { name: 'Meaningful choices.', text: 'Tech should give you options, not lock you in.', glyph: 'kannada', r: 0.714, pic: 'hawthorne-1912' },
+  { name: 'Human first.', text: 'AI handles the tedious parts; people keep the meaningful ones.', glyph: 'hindi', r: 1.346, pic: 'union-station' },
+  { name: 'Partners, not vendors.', text: 'On bigger projects we sometimes take equity or revenue share, because we want to be invested in your growth.', glyph: 'tamil', r: 1.449, pic: 'st-johns-1938' },
 ];
 ---
-<Base og="about" title="About" description="Ka Technology started in May 2024 as four friends from Oregon State with one idea: small businesses deserve the same technology big companies have.">
-  <PageHead title="Our story" lede="Small businesses deserve the same technology big companies have, without the big-company price tag or jargon."
+<Base og="about" title="About" description="Ka Technology started in May 2024 with four friends from Oregon State University, bringing local businesses the technology big companies have.">
+  <PageHead title="Our story" lede="Small enough to care. Skilled enough to ship. We bring local businesses the technology big companies have."
     image="hawthorne-pan" imageAlt="A panorama of Portland’s Hawthorne Bridge spanning the Willamette River." imageH={441} />
 
   <section class="wrap grid12 story" aria-label="How Ka Technology started">
@@ -23,18 +25,65 @@ const values = [
       </figure>
     </div>
     <div class="prose text" data-reveal>
-      <p class="t-lead first">Ka Technology started in May 2024 as four friends from Oregon State’s computer science program with one idea: small businesses deserve the same technology big companies have, without the big-company price tag or jargon.</p>
-      <p>Our first products came from real frustrations. Santosh worked as a real-estate broker and watched his principal broker spend close to an hour every week typing out continuing-education certificates by hand. We built <a class="link" href="/products/realdoc">RealDoc</a> to do it in one click. A title company later used it across its Oregon branch.</p>
+      <p class="t-lead first">Ka Technology started in May 2024 with four friends from Oregon State University and one observation: great young engineers were struggling to find work, and local businesses were struggling to find tech help. We set out to bring the two together.</p>
+      <p>Our first products came from real frustrations. One of us worked as a real-estate broker and watched the office’s principal broker spend close to an hour every week typing out continuing-education certificates by hand. We built <a class="link" href="/products/realdoc">RealDoc</a> to do it in one click. A title company later used it across its Oregon branch.</p>
       <p>Since then we’ve built AI document platforms, schedulers, gym software and websites for businesses across the Portland area. We still believe what we wrote on day one: AI is a tool, not a replacement. Its job is to give people more time, and more meaningful choices.</p>
     </div>
   </section>
 
-  <section class="values field" aria-labelledby="values-t">
+  <section class="values field vv vv--cur" aria-labelledby="values-t">
     <div class="wrap">
       <h2 id="values-t" class="t-h2">What we believe</h2>
       <ul class="vl" data-reveal>
         {values.map((v) => <li><h3>{v.name}</h3><p class="t-lead">{v.text}</p></li>)}
       </ul>
+    </div>
+  </section>
+
+  <section class="values field vv vv--a" aria-labelledby="va-t">
+    <div class="wrap">
+      <h2 id="va-t" class="t-h2">What we believe</h2>
+      <ul class="a-list">{values.map((v) => <li><h3>{v.name}</h3><p>{v.text}</p></li>)}</ul>
+    </div>
+  </section>
+
+  <section class="values field vv vv--b" aria-labelledby="vb-t">
+    <div class="wrap b-wrap">
+      <h2 id="vb-t" class="b-k">What we believe</h2>
+      <p class="b-text">{values.map((v, i) => <><strong>{v.name}</strong>{' '}{v.text}{i < values.length - 1 ? ' ' : ''}</>)}</p>
+    </div>
+  </section>
+
+  <section class="values field vv vv--c" aria-labelledby="vc-t">
+    <div class="wrap">
+      <h2 id="vc-t" class="t-h2">What we believe</h2>
+      <ul class="c-list">{values.map((v) => (
+        <li>
+          <span class="c-glyph" aria-hidden="true" style={`--m:url(/brand/letters/${v.glyph}.svg);--r:${v.r}`}></span>
+          <h3>{v.name}</h3>
+          <p>{v.text}</p>
+        </li>
+      ))}</ul>
+    </div>
+  </section>
+
+  <section class="values field vv vv--d" aria-labelledby="vd-t">
+    <div class="wrap grid12 d-wrap">
+      <div class="d-head"><h2 id="vd-t" class="t-h2">What we believe</h2><p class="t-lead">Three things we hold to on every project, big or small.</p></div>
+      <ul class="d-list">{values.map((v) => <li><h3>{v.name}</h3><p class="t-lead">{v.text}</p></li>)}</ul>
+    </div>
+  </section>
+
+  <section class="values field vv vv--e" aria-labelledby="ve-t">
+    <div class="wrap">
+      <h2 id="ve-t" class="t-h2">What we believe</h2>
+      <ul class="e-list">{values.map((v) => (
+        <li>
+          <figure class="photo e-pic"><img src={img(v.pic, 800)} width="800" height="1000" alt="" loading="lazy" /></figure>
+          <h3>{v.name}</h3>
+          <p>{v.text}</p>
+        </li>
+      ))}</ul>
     </div>
   </section>
 
@@ -58,6 +107,13 @@ const values = [
     </ul>
     <p class="join">Want to build with us? <a class="link" href="/careers"><span class="arrow">See careers</span></a></p>
   </section>
+  <nav class="vswitch" aria-label="What we believe versions">
+    {vlabels.map(([k, l]) => <a href={k ? `?v=${k}` : '?'} data-v={k}>{l}</a>)}
+  </nav>
+  <script is:inline>
+    (function () { var v = new URLSearchParams(location.search).get('v') || ''; document.documentElement.dataset.vv = v || 'cur';
+      document.querySelectorAll('.vswitch a').forEach(function (a) { if (a.dataset.v === v) a.setAttribute('aria-current', 'true'); }); })();
+  </script>
   <CloseCTA />
 </Base>
 
@@ -75,7 +131,8 @@ const values = [
   .values { padding-bottom: clamp(64px, 6vw, 96px) !important; }
   .vl h3 { font-size: var(--t-h2); letter-spacing: -0.04em; }
   .vl h3::after { content: ""; display: block; width: 36px; height: 6px; background: var(--accent); margin-top: 18px; }
-  .th { display: grid; gap: 18px; max-width: 46ch; margin-bottom: 56px; }
+  .th { display: grid; gap: 18px; margin-bottom: 56px; }
+  .th p { max-width: 46ch; }
   .tg { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 56px var(--gap); }
   .member { display: grid; gap: 8px; align-content: start; }
   .mp { aspect-ratio: 1; margin-bottom: 12px; }
@@ -93,5 +150,54 @@ const values = [
     .vl { grid-template-columns: 1fr; }
     .vl li:nth-child(n) { margin-top: 0; }
     .tg { grid-template-columns: 1fr 1fr; gap: 40px 16px; }
+  }
+
+  /* ---- TEMPORARY: switch between the versions ---- */
+  .vv { display: none; }
+  :global(html[data-vv='cur']) .vv--cur, :global(html[data-vv='a']) .vv--a, :global(html[data-vv='b']) .vv--b,
+  :global(html[data-vv='c']) .vv--c, :global(html[data-vv='d']) .vv--d, :global(html[data-vv='e']) .vv--e { display: block; }
+  .vswitch { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 50; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 6px; background: var(--ink); max-width: calc(100vw - 24px); }
+  .vswitch a { padding: 8px 12px; font-size: 13px; font-weight: 700; color: var(--bg); text-decoration: none; }
+  .vswitch a[aria-current] { background: var(--accent); color: var(--on-accent); }
+
+  /* A · big rows: each belief a full-width line, name large on the left, the reason on the right */
+  .a-list { list-style: none; margin-top: clamp(40px, 5vw, 72px); display: grid; gap: clamp(36px, 4vw, 56px); }
+  .a-list li { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--gap); align-items: baseline; }
+  .a-list h3 { font-size: clamp(40px, 5.4vw, 92px); letter-spacing: -0.05em; line-height: 0.95; }
+  .a-list p { font-size: var(--t-lead); font-weight: 600; line-height: 1.4; max-width: 36ch; }
+
+  /* B · manifesto: the three beliefs as one paragraph in large type */
+  .b-wrap { display: grid; gap: 28px; }
+  .b-k { font-size: var(--t-small); font-weight: 700; color: var(--accent); letter-spacing: 0; }
+  .b-text { font-size: clamp(28px, 3.3vw, 54px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.2; max-width: 30ch; color: var(--muted); }
+  .b-text strong { color: var(--ink); font-weight: 850; }
+
+  /* C · Ka letters: each belief under a large "ka" from a different script, in Ka red */
+  .c-list { list-style: none; margin-top: clamp(40px, 5vw, 72px); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap); }
+  .c-list li { background: var(--bg); padding: clamp(24px, 2.6vw, 40px); display: grid; gap: 14px; align-content: start; }
+  .c-glyph { display: block; height: clamp(72px, 7vw, 112px); width: calc(clamp(72px, 7vw, 112px) * var(--r)); background: var(--accent); -webkit-mask: var(--m) left bottom / contain no-repeat; mask: var(--m) left bottom / contain no-repeat; margin-bottom: 18px; }
+  .c-list h3 { font-size: clamp(26px, 2.4vw, 38px); letter-spacing: -0.04em; line-height: 1.05; }
+  .c-list p { font-size: var(--t-lead); line-height: 1.4; }
+
+  /* D · pinned heading: the heading stays while the beliefs scroll past on the right */
+  .d-wrap { align-items: start; }
+  .d-head { grid-column: 1 / 5; position: sticky; top: 14vh; display: grid; gap: 18px; }
+  .d-list { grid-column: 6 / -1; list-style: none; display: grid; gap: clamp(48px, 6vw, 96px); }
+  .d-list h3 { font-size: clamp(36px, 4vw, 64px); letter-spacing: -0.05em; line-height: 1; }
+  .d-list h3::before { content: ""; display: block; width: 36px; height: 6px; background: var(--accent); margin-bottom: 22px; }
+  .d-list p { margin-top: 14px; max-width: 40ch; }
+
+  /* E · Portland photos: each belief with an old Portland picture, grey with colour on hover */
+  .e-list { list-style: none; margin-top: clamp(40px, 5vw, 72px); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap); }
+  .e-list li { display: grid; gap: 12px; align-content: start; }
+  .e-pic { aspect-ratio: 4 / 5; margin-bottom: 10px; }
+  .e-list h3 { font-size: clamp(26px, 2.4vw, 38px); letter-spacing: -0.04em; }
+  .e-list p { font-size: var(--t-lead); line-height: 1.4; max-width: 30ch; }
+
+  @media (max-width: 860px) {
+    .a-list li { grid-template-columns: 1fr; gap: 10px; }
+    .c-list, .e-list { grid-template-columns: 1fr; }
+    .d-head, .d-list { grid-column: 1 / -1; }
+    .d-head { position: static; }
   }
 </style>
