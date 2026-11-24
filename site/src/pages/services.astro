@@ -8,6 +8,9 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
 const workFor = (tags: string[]) => projects.filter((p) => p.data.services.some((s) => tags.includes(s)));
 // photos that only exist at 800px
 const small = ['svc-software', 'svc-automation'];
+// TEMPORARY (?v= preview of colour schemes): Portland photos for the photo-band option
+const bands = [['hawthorne-1912', 'union-station', 'downtown-portland', 'st-johns-1938'], ['vista-bridge', 'st-johns-1938', 'hawthorne-1912', 'union-station'], ['downtown-portland', 'vista-bridge', 'union-station', 'hawthorne-1912']];
+const variants = [['', 'Current (black/white)'], ['tone', '1 · Soft grey'], ['none', '2 · Numbers, no fields'], ['red', '3 · One red section'], ['bands', '4 · Photo bands']];
 ---
 <Base og="services" title="Services" description="AI applications, custom software, process automation and data analytics for small and growing businesses in Portland, Oregon and beyond.">
   <PageHead title="Consulting">
@@ -16,7 +19,7 @@ const small = ['svc-software', 'svc-automation'];
     </Fragment>
   </PageHead>
 
-  {pillars.map((p, i) => (
+  {pillars.map((p, i) => (<>
     <section id={p.slug} class={`pillar ${i % 2 ? 'inverse' : ''} ${i === 0 ? 'pillar--first' : ''}`} aria-labelledby={`${p.slug}-t`}>
       <div class="wrap grid12 inner">
         <figure class={`photo pic ${i % 2 ? 'pic--right' : ''}`}>
@@ -24,6 +27,7 @@ const small = ['svc-software', 'svc-automation'];
             sizes="(max-width: 860px) 100vw, 40vw" width="800" height="1100" alt={p.imageAlt} loading="lazy" />
         </figure>
         <div class={`text ${i % 2 ? 'text--left' : ''}`} data-reveal>
+          <p class="num" aria-hidden="true">0{i + 1}</p>
           <h2 id={`${p.slug}-t`} class="t-h2">{p.name}</h2>
           <p class="t-lead pitch">{p.pitch}</p>
           <ul class="offers">
@@ -48,7 +52,12 @@ const small = ['svc-software', 'svc-automation'];
         </div>
       </div>
     </section>
-  ))}
+    {i < pillars.length - 1 && (
+      <div class="vband" aria-hidden="true">
+        {bands[i].map((n) => <figure class="photo"><img src={img(n, 800)} width="800" height="500" alt="" loading="lazy" /></figure>)}
+      </div>
+    )}
+  </>))}
   <script>
     // the links in the description bring a section's photo and heading to the middle of the screen
     // (on phones, to just below the top, since the photo sits above the heading there)
@@ -70,6 +79,16 @@ const small = ['svc-software', 'svc-automation'];
       if (go(id, true)) { e.preventDefault(); history.replaceState(null, '', `#${id}`); }
     }));
     if (location.hash) addEventListener('load', () => go(location.hash.slice(1), false));
+  </script>
+  <nav class="vswitch" aria-label="Colour scheme preview">
+    {variants.map(([v, label]) => <a href={v ? `?v=${v}` : '?'} data-v={v}>{label}</a>)}
+  </nav>
+  <script is:inline>
+    (function () {
+      var v = new URLSearchParams(location.search).get('v') || '';
+      if (v) document.documentElement.dataset.v = v;
+      document.querySelectorAll('.vswitch a').forEach(function (a) { if (a.dataset.v === v) a.setAttribute('aria-current', 'true'); });
+    })();
   </script>
   <CloseCTA title={['Not sure which one', 'you need?']} text="Most projects mix two or three of these. Tell us the problem and we’ll suggest the simplest fix." />
 </Base>
@@ -107,4 +126,29 @@ const small = ['svc-software', 'svc-automation'];
     .clients li > * { flex-direction: column; gap: 2px; }
     .cw { text-align: left; }
   }
+
+  /* ---- TEMPORARY colour-scheme preview (?v=) ---- */
+  .num, .vband { display: none; }
+  .vswitch { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 50; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 6px; background: var(--ink); max-width: calc(100vw - 24px); }
+  .vswitch a { padding: 8px 12px; font-size: 13px; font-weight: 700; color: var(--bg); text-decoration: none; }
+  .vswitch a[aria-current] { background: var(--accent); color: var(--on-accent); }
+  /* every option: the flipped sections go back to the page's own colours */
+  :global(html[data-v]) .pillar.inverse { --ink: inherit; --bg: inherit; --muted: inherit; --accent-text: inherit; --surface: inherit; --surface-2: inherit; background: var(--bg); color: var(--ink); }
+  /* 1 · soft grey fields */
+  :global(html[data-v='tone']) .pillar.inverse { background: var(--surface); }
+  :global(html[data-v='tone']) .pillar.inverse .clients li:nth-child(odd) > * { background: var(--surface-2); }
+  /* 2 · no fields, big red numbers */
+  :global(html[data-v='none']) .num { display: block; font-size: clamp(56px, 6vw, 96px); font-weight: 850; letter-spacing: -0.05em; line-height: 0.9; color: var(--accent); }
+  :global(html[data-v='none']) .pillar + .pillar { padding-top: clamp(24px, 4vw, 56px); }
+  /* 3 · the lead section on a Ka red field */
+  :global(html[data-v='red']) .pillar--first { background: var(--accent); --ink: #0b0b0c; --muted: rgb(11 11 12 / 0.78); --surface: rgb(11 11 12 / 0.08); color: #0b0b0c; padding-top: var(--section); }
+  :global(html[data-v='red']) .pillar--first .offers li::before { background: #0b0b0c; }
+  :global(html[data-v='red']) .pillar--first .link { text-decoration-color: #0b0b0c; }
+  :global(html[data-v='red']) .ph { padding-bottom: clamp(48px, 6vw, 80px); }
+  /* 4 · Portland photo bands between sections */
+  :global(html[data-v='bands']) .vband { display: grid; grid-template-columns: repeat(4, 1fr); }
+  :global(html[data-v='bands']) .vband figure { aspect-ratio: 16 / 10; }
+  :global(html[data-v='bands']) .pillar + .vband { margin-top: 0; }
+  :global(html[data-v='bands']) .vband + .pillar { padding-top: var(--section); }
+  @media (max-width: 860px) { :global(html[data-v='bands']) .vband { grid-template-columns: 1fr 1fr; } }
 </style>
