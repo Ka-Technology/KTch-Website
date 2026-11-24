@@ -1,120 +1,206 @@
 ---
-// Our software: each product as a short story. The problem it answers, a looping clip of its world (grey, colour on
-// hover) with the product's own screen laid over it, then what we built.
+// Our software, as a split screen: a full-height clip of each product's world is pinned on the left (grey, with the
+// product's name in its top third), and everything about the product scrolls past on the right. A pill on the right
+// edge jumps between products. This page holds all product information; the old per-product pages redirect here.
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import PageHead from '../../components/PageHead.astro';
 import CloseCTA from '../../components/CloseCTA.astro';
 import { img } from '../../data/site';
 const products = (await getCollection('products', (p) => !p.data.hidden)).sort((a, b) => a.data.order - b.data.order);
-// Kept is an iPhone app; the others run in the browser
 const isPhone = (id: string) => id === 'kept';
-// real screenshots: [file, widths, alt]
 const shots: Record<string, { w: number[]; alt: string }> = {
   kept: { w: [400, 800], alt: 'The Kept app’s Challenges screen, with free habit trackers for reading and working out.' },
   doigetgas: { w: [800, 1600], alt: 'DoIGetGas showing its gas-price gauge pointing to “Might fall”, above this week’s U.S. average prices.' },
   realdoc: { w: [800, 1600], alt: 'RealDoc’s certificate form: course details, a CSV upload and a signature picker.' },
   shiftwize: { w: [800, 1073], alt: 'Shiftwize’s availability planner: a week grid of preferred and available hours.' },
 };
-const shotSrc = (id: string) => { const s = shots[id]; return { src: `/images/shot-${id}-${s.w[1]}.webp`, srcset: s.w.map((w) => `/images/shot-${id}-${w}.webp ${w}w`).join(', ') }; };
-// the problem's first sentence goes in large type; any further sentences follow at reading size
+const src = (id: string) => `/images/shot-${id}-${shots[id].w[1]}.webp`;
+const set = (id: string) => shots[id].w.map((w) => `/images/shot-${id}-${w}.webp ${w}w`).join(', ');
+const host = (u: string) => u.replace(/^https?:\/\//, '').replace(/\/$/, '');
+// the problem's first sentence in large type, the rest at reading size
 const split = (t: string) => { const m = t.match(/^(.+?[.!?])\s+(.*)$/s); return m ? [m[1], m[2]] : [t, '']; };
 ---
-<Base og="products" title="Our software" description="Kept, DoIGetGas and RealDoc: software Ka Technology builds and runs itself.">
+<Base og="products" title="Our software" description="Kept, DoIGetGas, RealDoc and Shiftwize: software Ka Technology builds and runs itself.">
   <PageHead title="Our software" lede="Besides client work, we build our own products. Some started as a client’s problem that turned out to be everyone’s problem." />
-  {products.map((p, i) => (
-    <section class={`prod ${i % 2 ? 'prod--flip' : 'field'}`} aria-labelledby={`p-${p.id}`}>
-      <div class="wrap grid12 inner">
-        <div class="vis" data-reveal>
-          <figure class="photo pic">
-            <video data-prod-video muted loop playsinline preload="none" width="960" height="540" aria-hidden="true" poster={img(`prod-${p.id}-poster`, 1600)}>
-              <source src={`/video/prod-${p.id}.mp4`} type="video/mp4" />
-            </video>
-          </figure>
-          {isPhone(p.id) ? (
-            <div class="screen screen--phone" data-ui>
-              <img class="shot" src={shotSrc(p.id).src} srcset={shotSrc(p.id).srcset} sizes="(max-width: 860px) 34vw, 16vw" width="1206" height="2394" alt={shots[p.id].alt} loading="lazy" />
-            </div>
-          ) : (
-            <div class="screen screen--web" data-ui>
-              <div class="bar"><span class="addr">{p.data.url ? p.data.url.replace('https://', '') : `${p.data.name.toLowerCase()}.app`}</span></div>
-              <img class="shot" src={shotSrc(p.id).src} srcset={shotSrc(p.id).srcset} sizes="(max-width: 860px) 78vw, 33vw" alt={shots[p.id].alt} loading="lazy" />
-            </div>
-          )}
-        </div>
 
-        <div class="text" data-reveal>
-          <p class="meta"><span class="dot"></span>{p.data.status}{p.data.url && <> · <a class="link" href={p.data.url} rel="noopener">{p.data.url.replace('https://', '')}</a></>}</p>
-          <h2 id={`p-${p.id}`} class="pname"><a href={`/products/${p.id}`}>{p.data.name}</a></h2>
-          <p class="problem">{split(p.data.problem)[0]}</p>
-          {split(p.data.problem)[1] && <p class="problem-more">{split(p.data.problem)[1]}</p>}
-          <div class="built">
-            <h3 class="bh">What we built</h3>
-            <p class="sum">{p.data.summary}</p>
-            <ol class="how">{p.data.how_it_works.map((s) => <li>{s}</li>)}</ol>
-          </div>
-          <a class="button button--ink" href={`/products/${p.id}`}>About {p.data.name}</a>
+  <section class="split" data-split aria-label="Our products">
+    <div class="stage" aria-hidden="true">
+      {products.map((p, i) => (
+        <div class={`layer ${i === 0 ? 'is-on' : ''}`} data-layer={i}>
+          <video muted loop playsinline preload="none" poster={img(`prod-${p.id}-poster`, 1600)}><source src={`/video/prod-${p.id}.mp4`} type="video/mp4" /></video>
+          <span class="tag">{p.data.name}</span>
         </div>
-      </div>
-    </section>
-  ))}
+      ))}
+    </div>
+
+    <div class="stories">
+      {products.map((p, i) => {
+        const d = p.data;
+        const [lead, more] = split(d.problem);
+        return (
+          <article class="story" id={p.id} data-story={i} aria-labelledby={`n-${p.id}`}>
+            <h2 id={`n-${p.id}`} class="sr">{d.name}</h2>
+            <p class="meta"><span class="dot"></span>{d.status}, since {d.year}</p>
+            <p class="tagline">{d.tagline}</p>
+
+            <div class="block">
+              <h3 class="k">The problem</h3>
+              <p class="lead">{lead}</p>
+              {more && <p class="more">{more}</p>}
+            </div>
+
+            <div class="block">
+              <h3 class="k">What we built</h3>
+              <p>{d.summary}</p>
+              <div class={`shot ${isPhone(p.id) ? 'is-phone' : ''}`} data-ui>
+                {!isPhone(p.id) && <div class="bar"><span>{d.url ? host(d.url) : `${d.name.toLowerCase()}.app`}</span></div>}
+                <img src={src(p.id)} srcset={set(p.id)} sizes="(max-width: 860px) 90vw, 45vw" alt={shots[p.id].alt} loading="lazy" />
+              </div>
+            </div>
+
+            {d.how_it_works.length > 0 && (
+              <div class="block">
+                <h3 class="k">How it works</h3>
+                <ol class="how">{d.how_it_works.map((s) => <li>{s}</li>)}</ol>
+              </div>
+            )}
+
+            {d.features.length > 0 && (
+              <div class="block">
+                <h3 class="k">The details</h3>
+                <ul class="feats">{d.features.map((f) => <li>{f}</li>)}</ul>
+              </div>
+            )}
+
+            {d.tech.length > 0 && (
+              <div class="block">
+                <h3 class="k">Built with</h3>
+                <ul class="tech">{d.tech.map((t) => <li>{t}</li>)}</ul>
+              </div>
+            )}
+
+            {d.url && <a class="button visit" href={d.url} rel="noopener">Visit {host(d.url)}</a>}
+          </article>
+        );
+      })}
+    </div>
+
+    <!-- the jump pill: one button per product, the current one in Ka red; shown while the products are on screen -->
+    <nav class="pill" data-pill aria-label="Jump to a product">
+      {products.map((p, i) => (
+        <a href={`#${p.id}`} data-jump={i} aria-current={i === 0 ? 'true' : undefined}>
+          <span class="pl">{p.data.name}</span>
+        </a>
+      ))}
+    </nav>
+  </section>
+
   <CloseCTA title={['Your problem might be', 'everyone’s, too.']} text="Some of our products started as one client’s request. If yours sounds familiar, let’s talk." />
 </Base>
 
-<style>
-  .prod { padding-block: clamp(88px, 10vw, 152px); }
-  .inner { row-gap: 48px; align-items: center; }
-
-  /* the picture: the product's world in grey (colour on hover), with its own screen laid over a corner */
-  .vis { grid-column: 1 / 7; position: relative; padding-bottom: clamp(48px, 6vw, 88px); }
-  .prod--flip .vis { grid-column: 7 / -1; grid-row: 1; }
-  .pic { aspect-ratio: 5 / 4; }
-  .pic video { display: block; width: 100%; height: 100%; object-fit: cover; filter: var(--photo-filter); transition: filter 450ms ease; }
-  @media (hover: hover) and (pointer: fine) { .vis:hover .pic video { filter: none; } }
-
-  .screen { position: absolute; bottom: 0; background: var(--bg); color: var(--ink); display: grid; }
-  .screen--web { right: clamp(-40px, -2vw, -16px); width: 66%; aspect-ratio: 16 / 10.5; grid-template-rows: auto 1fr; border: 10px solid var(--bg); }
-  .prod--flip .screen--web { right: auto; left: clamp(-40px, -2vw, -16px); }
-  .bar { display: flex; align-items: center; gap: 8px; height: 28px; padding: 0 12px; background: var(--surface-2); }
-  .addr { font-size: 11px; font-weight: 600; color: var(--muted); }
-  .screen--phone { right: 8%; width: 30%; aspect-ratio: 9 / 19.5; border: 6px solid var(--ink); border-radius: 28px; overflow: hidden; outline: 8px solid var(--bg); }
-  /* the product's own screen, in its own colours, pinned to the top-left like a real window */
-  .shot { display: block; width: 100%; height: 100%; min-height: 0; object-fit: cover; object-position: left top; background: var(--surface); }
-
-  /* the story: status, name, the problem in large type, then what we built */
-  .text { grid-column: 8 / -1; display: grid; gap: 22px; justify-items: start; }
-  .prod--flip .text { grid-column: 1 / 6; grid-row: 1; }
-  .meta { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; font-weight: 700; font-size: var(--t-small); }
-  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
-  .pname { font-size: clamp(48px, 5vw, 84px); letter-spacing: -0.05em; line-height: 0.95; }
-  .pname a { text-decoration: none; transition: color var(--t-hover) ease; }
-  @media (hover: hover) and (pointer: fine) { .pname a:hover { color: var(--accent); } }
-  .problem { font-size: clamp(20px, 1.7vw, 26px); font-weight: 600; line-height: 1.35; letter-spacing: -0.015em; max-width: 34ch; }
-  .problem-more { max-width: 48ch; color: var(--muted); margin-top: -6px; }
-  .built { display: grid; gap: 12px; margin-top: 8px; }
-  .bh { font-size: var(--t-small); font-weight: 700; color: var(--muted); }
-  .sum { max-width: 44ch; }
-  .how { list-style: none; counter-reset: s; display: grid; gap: 10px; max-width: 48ch; }
-  .how li { counter-increment: s; display: grid; grid-template-columns: 1.6em 1fr; }
-  .how li::before { content: counter(s); font-weight: 800; color: var(--accent); }
-
-  @media (max-width: 860px) {
-    .vis, .prod--flip .vis, .text, .prod--flip .text { grid-column: 1 / -1; grid-row: auto; }
-    .screen--web, .prod--flip .screen--web { right: 12px; left: auto; width: 78%; }
-    .screen--phone { right: 12px; width: 34%; border-width: 4px; border-radius: 20px; outline-width: 6px; }
-    .screen--web { border-width: 6px; }
-  }
-</style>
-
 <script>
-  // the clips loop only while on screen; with reduced motion they stay on their first frame
-  const vids = [...document.querySelectorAll<HTMLVideoElement>('[data-prod-video]')];
-  if (!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {
-    const io = new IntersectionObserver((entries) => entries.forEach((e) => {
-      const v = e.target as HTMLVideoElement;
-      if (e.isIntersecting) { if (v.preload !== 'auto') { v.preload = 'auto'; v.load(); } v.play().catch(() => {}); }
-      else v.pause();
-    }), { rootMargin: '200px 0px' });
-    vids.forEach((v) => io.observe(v));
+  // The story in the middle of the screen picks the clip on the left and the lit button in the pill;
+  // only the active clip plays, and only while the products are on screen.
+  const root = document.querySelector<HTMLElement>('[data-split]');
+  if (root) {
+    const layers = [...root.querySelectorAll<HTMLElement>('[data-layer]')];
+    const vids = layers.map((l) => l.querySelector('video')!);
+    const jumps = [...root.querySelectorAll<HTMLAnchorElement>('[data-jump]')];
+    const pill = root.querySelector<HTMLElement>('[data-pill]')!;
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let active = 0, visible = false;
+    const sync = () => {
+      layers.forEach((l, i) => l.classList.toggle('is-on', i === active));
+      jumps.forEach((j, i) => (i === active ? j.setAttribute('aria-current', 'true') : j.removeAttribute('aria-current')));
+      vids.forEach((v, i) => {
+        if (!still && visible && i === active) { if (v.preload !== 'auto') { v.preload = 'auto'; v.load(); } v.play().catch(() => {}); }
+        else v.pause();
+      });
+    };
+    const io = new IntersectionObserver((es) => es.forEach((e) => {
+      if (e.isIntersecting) { active = Number((e.target as HTMLElement).dataset.story); sync(); }
+    }), { rootMargin: '-45% 0px -45% 0px' });
+    root.querySelectorAll('[data-story]').forEach((s) => io.observe(s));
+    // the pill shows only while the split section fills the screen
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; sync(); }).observe(root);
+    // the section is several screens tall, so "in view" means: the middle of the screen is inside it
+    new IntersectionObserver(([e]) => pill.classList.toggle('is-on', e.isIntersecting), { rootMargin: '-50% 0px -50% 0px' }).observe(root);
+    jumps.forEach((j, i) => j.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target = document.getElementById(j.hash.slice(1));
+      if (!target) return;
+      // on phones the clip stays pinned across the top, so land the story just below it
+      const pinned = matchMedia('(max-width: 860px)').matches ? root.querySelector<HTMLElement>('.stage')!.offsetHeight : 0;
+      window.scrollTo({ top: target.getBoundingClientRect().top + scrollY - pinned, behavior: still ? 'auto' : 'smooth' });
+      history.replaceState(null, '', j.hash);
+      active = i; sync();
+    }));
   }
 </script>
+
+<style>
+  .split { display: grid; grid-template-columns: 1fr 1fr; }
+
+  /* left: the pinned clip, grey, with the product's name centred in its top third */
+  .stage { position: sticky; top: 0; height: 100svh; overflow: clip; background: #0b0b0c; }
+  .layer { position: absolute; inset: 0; opacity: 0; transition: opacity 600ms ease; }
+  .layer.is-on { opacity: 1; }
+  .layer video { display: block; width: 100%; height: 100%; object-fit: cover; filter: var(--photo-filter); }
+  .layer::after { content: ""; position: absolute; inset: 0; background: rgb(11 11 12 / 0.28); }
+  .tag { position: absolute; z-index: 1; left: 50%; top: calc(100% / 6); transform: translate(-50%, -50%); color: #fafaf9;
+    font-size: clamp(44px, 5.6vw, 104px); font-weight: 850; letter-spacing: -0.05em; line-height: 1; white-space: nowrap; }
+
+  /* right: everything about the product */
+  .stories { padding-inline: clamp(24px, 4vw, 72px) clamp(64px, 6vw, 104px); }
+  .story { min-height: 100svh; display: grid; align-content: center; gap: 28px; justify-items: start; padding-block: clamp(72px, 10svh, 120px); }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .meta { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: var(--t-small); }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+  .tagline { margin-top: -14px; font-size: clamp(28px, 2.6vw, 44px); font-weight: 850; letter-spacing: -0.04em; line-height: 1.05; max-width: 20ch; }
+  .block { display: grid; gap: 12px; width: 100%; max-width: 60ch; }
+  .k { font-size: var(--t-small); font-weight: 800; color: var(--accent); letter-spacing: 0.01em; }
+  .lead { font-size: clamp(19px, 1.5vw, 23px); font-weight: 600; line-height: 1.4; }
+  .more { color: var(--muted); }
+  .how { list-style: none; counter-reset: s; display: grid; gap: 10px; }
+  .how li { counter-increment: s; display: grid; grid-template-columns: 1.6em 1fr; }
+  .how li::before { content: counter(s); font-weight: 800; color: var(--accent); }
+  .feats { list-style: none; display: grid; gap: 10px; }
+  .feats li { padding-left: 1.2em; position: relative; }
+  .feats li::before { content: ""; position: absolute; left: 0; top: 0.62em; width: 0.45em; height: 0.45em; background: var(--accent); }
+  .tech { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
+  .tech li { padding: 6px 12px; background: var(--surface-2); font-size: var(--t-small); font-weight: 600; }
+
+  /* the product's own screen, in its own colours */
+  .shot { margin-top: 8px; width: 100%; background: #fafaf9; display: grid; grid-template-rows: auto 1fr; overflow: hidden; aspect-ratio: 16 / 10; }
+  .shot img { width: 100%; height: 100%; min-height: 0; object-fit: cover; object-position: left top; display: block; }
+  .shot.is-phone { width: min(260px, 60%); aspect-ratio: 1206 / 2394; grid-template-rows: 1fr; border: 7px solid #0b0b0c; border-radius: 30px; }
+  .bar { height: 28px; display: flex; align-items: center; padding: 0 12px; background: var(--surface-2); font-size: 11px; font-weight: 600; color: var(--muted); }
+  .visit { margin-top: 4px; }
+
+  /* the jump pill, fixed to the right edge (a real overlay, so it may carry its own shape) */
+  .pill { position: fixed; right: clamp(12px, 1.6vw, 24px); top: 50%; z-index: 30; display: grid; gap: 10px; padding: 14px 10px;
+    background: var(--ink); border-radius: 999px; transform: translate(12px, -50%); opacity: 0; pointer-events: none;
+    transition: opacity 250ms ease, transform 350ms var(--ease-out); }
+  .pill.is-on { opacity: 1; transform: translate(0, -50%); pointer-events: auto; }
+  .pill a { position: relative; display: block; width: 12px; height: 12px; border-radius: 999px; background: var(--bg); opacity: 0.45;
+    transition: height 300ms var(--ease-out), opacity 200ms ease, background-color 200ms ease; }
+  .pill a::before { content: ""; position: absolute; inset: -8px; }   /* a bigger target than the dot */
+  .pill a[aria-current] { height: 34px; opacity: 1; background: var(--accent); }
+  .pill a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; opacity: 1; }
+  .pl { position: absolute; right: calc(100% + 18px); top: 50%; transform: translate(6px, -50%); white-space: nowrap; background: var(--ink); color: var(--bg);
+    font-size: 13px; font-weight: 700; padding: 6px 10px; border-radius: 999px; opacity: 0; pointer-events: none; transition: opacity 180ms ease, transform 220ms var(--ease-out); }
+  @media (hover: hover) and (pointer: fine) {
+    .pill a:hover { opacity: 1; }
+    .pill a:hover .pl { opacity: 1; transform: translate(0, -50%); }
+  }
+  .pill a:focus-visible .pl { opacity: 1; transform: translate(0, -50%); }
+
+  @media (max-width: 860px) {
+    .split { grid-template-columns: 1fr; }
+    .stage { height: 42svh; z-index: 2; }
+    .stories { padding-inline: var(--margin) calc(var(--margin) + 36px); }
+    .story { min-height: 0; padding-block: 48px; }
+    .story { scroll-margin-top: 42svh; }
+  }
+</style>

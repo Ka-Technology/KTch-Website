@@ -1,82 +1,27 @@
 ---
+// Each product's details now live on the Products page; these addresses send visitors to that product's section,
+// so older links (home page, About, search results) keep working.
 import { getCollection } from 'astro:content';
-import Base from '../../layouts/Base.astro';
-import CloseCTA from '../../components/CloseCTA.astro';
-
 export async function getStaticPaths() {
   const products = await getCollection('products', (p) => !p.data.hidden);
-  return products.map((p) => ({ params: { slug: p.id }, props: { product: p } }));
+  return products.map((p) => ({ params: { slug: p.id }, props: { name: p.data.name } }));
 }
-const { product } = Astro.props;
-const d = product.data;
+const { slug } = Astro.params;
+const { name } = Astro.props;
+const to = `/products/#${slug}`;
 ---
-<Base title={`${d.name}: ${d.tagline}`} description={d.summary} og={`product-${product.id}`}>
-  <article>
-    <header class="wrap hd">
-      <h1 class="t-display lines"><span class="line"><span data-line style="--i:0">{d.name}</span></span></h1>
-      <div class="grid12 sub">
-        <p class="t-lead tag" data-load style="--d:300ms">{d.tagline}</p>
-        <div class="side" data-load style="--d:380ms">
-          <p class="meta"><span class="dot"></span>{d.status}, since {d.year}</p>
-          {d.cta_url && <a class="button" href={d.cta_url} rel="noopener">{d.cta_label ?? `Visit ${d.name}`}</a>}
-          {d.url && d.cta_url !== d.url && <a class="link" href={d.url} rel="noopener">{d.url.replace('https://', '')}</a>}
-        </div>
-      </div>
-    </header>
-
-    <section class="wrap grid12 block" aria-labelledby="prob">
-      <h2 id="prob" class="t-h2 bh">The problem</h2>
-      <p class="t-lead body" data-reveal><span>{d.problem}</span></p>
-    </section>
-
-    {d.how_it_works.length > 0 && (
-      <section class="steps field" aria-labelledby="how">
-        <div class="wrap">
-          <h2 id="how" class="t-h2">How it works</h2>
-          <ol class="sl" data-reveal>{d.how_it_works.map((s) => <li><p>{s}</p></li>)}</ol>
-        </div>
-      </section>
-    )}
-
-    {d.features.length > 0 && (
-      <section class="wrap grid12 block" aria-labelledby="det">
-        <h2 id="det" class="t-h2 bh">The details</h2>
-        <ul class="prose body fl" data-reveal>{d.features.map((f) => <li>{f}</li>)}</ul>
-      </section>
-    )}
-
-    {d.tech.length > 0 && (
-      <section class="wrap grid12 block last" aria-labelledby="tech">
-        <h2 id="tech" class="t-h2 bh">Built with</h2>
-        <ul class="tech body" data-reveal>{d.tech.map((t) => <li>{t}</li>)}</ul>
-      </section>
-    )}
-    <p class="wrap allp"><a class="link" href="/products">See all products</a></p>
-  </article>
-  <CloseCTA title={['Want something', 'like this built?']} />
-</Base>
-
-<style>
-  .hd { padding-top: clamp(24px, 5vh, 64px); padding-bottom: var(--section); }
-  .sub { margin-top: 36px; row-gap: 28px; align-items: start; }
-  .tag { grid-column: 1 / 7; font-weight: 700; max-width: 30ch; }
-  .side { grid-column: 8 / -1; display: grid; gap: 18px; justify-items: start; }
-  .meta { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; }
-  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
-  .block { padding-bottom: var(--section); row-gap: 28px; }
-  .steps + .block { padding-top: var(--section); }
-  .bh { grid-column: 1 / 6; }
-  .body { grid-column: 6 / -1; max-width: 62ch; }
-  .steps { padding-block: clamp(80px, 9vw, 140px); margin-bottom: 0; }
-  .sl { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap); margin-top: 48px; }
-  .sl li { background: var(--surface); padding: 28px; font-size: var(--t-lead); line-height: 1.35; font-weight: 600; }
-  .sl li::before { content: ""; display: block; width: 28px; height: 6px; background: var(--accent); margin-bottom: 20px; }
-  .fl li { font-size: var(--t-body); }
-  .allp { padding-bottom: var(--section); }
-  .tech { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
-  .tech li { background: var(--surface-2); padding: 8px 14px; font-weight: 600; }
-  @media (max-width: 860px) {
-    .tag, .side, .bh, .body { grid-column: 1 / -1; }
-    .sl { grid-template-columns: 1fr; }
-  }
-</style>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{name} · Ka Technology</title>
+    <meta http-equiv="refresh" content={`0; url=${to}`} />
+    <link rel="canonical" href={`https://ka-tch.com${to}`} />
+    <meta name="robots" content="noindex" />
+  </head>
+  <body>
+    <p>{name} has moved to <a href={to}>our products page</a>.</p>
+    <script is:inline define:vars={{ to }}>location.replace(to);</script>
+  </body>
+</html>
