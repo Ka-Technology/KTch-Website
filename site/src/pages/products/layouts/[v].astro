@@ -6,7 +6,7 @@ import PageHead from '../../../components/PageHead.astro';
 import CloseCTA from '../../../components/CloseCTA.astro';
 import { img } from '../../../data/site';
 
-export function getStaticPaths() { return ['a', 'b', 'c', 'd'].map((v) => ({ params: { v } })); }
+export function getStaticPaths() { return ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'].map((v) => ({ params: { v } })); }
 const { v } = Astro.params;
 const products = (await getCollection('products', (p) => !p.data.hidden)).sort((a, b) => a.data.order - b.data.order);
 const isPhone = (id: string) => id === 'kept';
@@ -20,7 +20,7 @@ const src = (id: string) => `/images/shot-${id}-${shots[id].w[1]}.webp`;
 const set = (id: string) => shots[id].w.map((w) => `/images/shot-${id}-${w}.webp ${w}w`).join(', ');
 const addr = (p: any) => (p.data.url ? p.data.url.replace('https://', '') : `${p.data.name.toLowerCase()}.app`);
 const first = (t: string) => (t.match(/^(.+?[.!?])(\s|$)/s)?.[1] ?? t);
-const labels: [string, string][] = [['', 'Current'], ['a', 'A · Full-screen scenes'], ['b', 'B · Screenshot first'], ['c', 'C · Video tiles'], ['d', 'D · Side by side']];
+const labels: [string, string][] = [['', 'Current'], ['a', 'A · Full-screen scenes'], ['b', 'B · Screenshot first'], ['c', 'C · Video tiles'], ['d', 'D · Side by side'], ['e', 'E · Scroll story'], ['f', 'F · Swipe rail'], ['g', 'G · Name list'], ['h', 'H · Switcher'], ['i', 'I · Problem posters']];
 ---
 <Base og="products" title="Our software" description="Layout options for the Products page." strip={true}>
   <PageHead title="Our software" lede="Besides client work, we build our own products. Some started as a client’s problem that turned out to be everyone’s problem." />
@@ -99,6 +99,129 @@ const labels: [string, string][] = [['', 'Current'], ['a', 'A · Full-screen sce
     </section>
   ))}
 
+  {v === 'e' && (
+    <section class="wrap e-wrap" data-e>
+      <div class="e-stage" aria-hidden="true">
+        {products.map((p, i) => (
+          <div class={`e-layer ${i === 0 ? 'is-on' : ''}`} data-layer={i}>
+            <video data-pv muted loop playsinline preload="none" poster={img(`prod-${p.id}-poster`, 1600)}><source src={`/video/prod-${p.id}.mp4`} type="video/mp4" /></video>
+            <div class={`e-shot ${isPhone(p.id) ? 'is-phone' : ''}`}><img src={src(p.id)} srcset={set(p.id)} sizes="45vw" alt="" loading="lazy" /></div>
+          </div>
+        ))}
+      </div>
+      <div class="e-steps">
+        {products.map((p, i) => (
+          <article class="e-step" data-step={i} aria-labelledby={`e-${p.id}`}>
+            <div class={`e-inline ${isPhone(p.id) ? 'is-phone' : ''}`}><img src={src(p.id)} srcset={set(p.id)} sizes="100vw" alt={shots[p.id].alt} loading="lazy" /></div>
+            <p class="e-count">0{i + 1} / 0{products.length}</p>
+            <p class="meta"><span class="dot"></span>{p.data.status}</p>
+            <h2 id={`e-${p.id}`} class="e-name">{p.data.name}</h2>
+            <p class="e-problem">{first(p.data.problem)}</p>
+            <ol class="e-how">{p.data.how_it_works.map((x) => <li>{x}</li>)}</ol>
+            <a class="link" href={`/products/${p.id}`}><span class="arrow">About {p.data.name}</span></a>
+          </article>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {v === 'f' && (
+    <section class="f-sec" aria-label="Our products" data-f>
+      <div class="wrap f-top">
+        <p class="f-hint">Swipe or use the arrows</p>
+        <div class="f-btns"><button type="button" data-f-prev aria-label="Previous product">←</button><button type="button" data-f-next aria-label="Next product">→</button></div>
+      </div>
+      <div class="f-track" data-f-track>
+        {products.map((p, i) => (
+          <article class={`f-card ${i % 2 ? 'f-card--alt' : ''}`} aria-labelledby={`f-${p.id}`}>
+            <div class="f-media">
+              <video data-pv muted loop playsinline preload="none" aria-hidden="true" poster={img(`prod-${p.id}-poster`, 1600)}><source src={`/video/prod-${p.id}.mp4`} type="video/mp4" /></video>
+              <div class={`f-shot ${isPhone(p.id) ? 'is-phone' : ''}`} data-ui><img src={src(p.id)} srcset={set(p.id)} sizes="50vw" alt={shots[p.id].alt} loading="lazy" /></div>
+            </div>
+            <div class="f-body">
+              <p class="meta"><span class="dot"></span>{p.data.status}</p>
+              <h2 id={`f-${p.id}`} class="f-name">{p.data.name}</h2>
+              <p class="f-tag">{p.data.tagline}</p>
+              <a class="link" href={`/products/${p.id}`}><span class="arrow">About {p.data.name}</span></a>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {v === 'g' && (
+    <section class="wrap g-sec" aria-label="Our products" data-g>
+      <ol class="g-list">
+        {products.map((p, i) => (
+          <li>
+            <a class="g-row" href={`/products/${p.id}`} data-g-i={i}>
+              <span class="g-name">{p.data.name}</span>
+              <span class="g-side"><span class="meta"><span class="dot"></span>{p.data.status}</span><span class="g-tag">{p.data.tagline}</span></span>
+            </a>
+            <div class={`g-inline ${isPhone(p.id) ? 'is-phone' : ''}`}><img src={src(p.id)} srcset={set(p.id)} sizes="100vw" alt={shots[p.id].alt} loading="lazy" /></div>
+          </li>
+        ))}
+      </ol>
+      <div class="g-float" data-g-float aria-hidden="true">
+        {products.map((p, i) => (
+          <div class="g-layer" data-g-layer={i}>
+            <video data-pv muted loop playsinline preload="none" poster={img(`prod-${p.id}-poster`, 800)}><source src={`/video/prod-${p.id}.mp4`} type="video/mp4" /></video>
+            <div class={`g-shot ${isPhone(p.id) ? 'is-phone' : ''}`}><img src={src(p.id)} alt="" loading="lazy" /></div>
+          </div>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {v === 'h' && (
+    <section class="wrap h-sec" data-h>
+      <div class="h-tabs" role="tablist" aria-label="Our products">
+        {products.map((p, i) => (
+          <button type="button" role="tab" id={`ht-${p.id}`} aria-controls={`hp-${p.id}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1} data-h-tab={i}>
+            <span class="h-tn">{p.data.name}</span><span class="h-ts"><span class="dot"></span>{p.data.status}</span>
+          </button>
+        ))}
+      </div>
+      {products.map((p, i) => (
+        <div class="h-panel" role="tabpanel" id={`hp-${p.id}`} aria-labelledby={`ht-${p.id}`} hidden={i !== 0} data-h-panel={i}>
+          <div class="h-stage">
+            <video data-pv muted loop playsinline preload="none" aria-hidden="true" poster={img(`prod-${p.id}-poster`, 1600)}><source src={`/video/prod-${p.id}.mp4`} type="video/mp4" /></video>
+            <div class={`h-shot ${isPhone(p.id) ? 'is-phone' : ''}`} data-ui>
+              {!isPhone(p.id) && <div class="bar"><span>{addr(p)}</span></div>}
+              <img src={src(p.id)} srcset={set(p.id)} sizes="60vw" alt={shots[p.id].alt} loading="lazy" />
+            </div>
+          </div>
+          <div class="h-info">
+            <p class="h-problem">{first(p.data.problem)}</p>
+            <ol class="e-how">{p.data.how_it_works.map((x) => <li>{x}</li>)}</ol>
+            <a class="button button--ink" href={`/products/${p.id}`}>About {p.data.name}</a>
+          </div>
+        </div>
+      ))}
+    </section>
+  )}
+
+  {v === 'i' && products.map((p, i) => (
+    <section class={`i-poster ${i % 2 ? '' : 'field'}`} aria-labelledby={`i-${p.id}`}>
+      <div class="wrap">
+        <p class="i-label"><span id={`i-${p.id}`} class="i-name">{p.data.name}</span><span class="meta"><span class="dot"></span>{p.data.status}</span></p>
+        <p class="i-problem">{first(p.data.problem)}</p>
+      </div>
+      <div class="i-band">
+        <video data-pv muted loop playsinline preload="none" aria-hidden="true" poster={img(`prod-${p.id}-poster`, 1600)}><source src={`/video/prod-${p.id}.mp4`} type="video/mp4" /></video>
+        <div class={`i-shot ${isPhone(p.id) ? 'is-phone' : ''}`} data-ui>
+          {!isPhone(p.id) && <div class="bar"><span>{addr(p)}</span></div>}
+          <img src={src(p.id)} srcset={set(p.id)} sizes="70vw" alt={shots[p.id].alt} loading="lazy" />
+        </div>
+      </div>
+      <div class="wrap i-foot">
+        <p class="i-answer"><strong>{p.data.name}:</strong> {p.data.summary}</p>
+        <a class="link" href={`/products/${p.id}`}><span class="arrow">See how it works</span></a>
+      </div>
+    </section>
+  ))}
+
   <nav class="vswitch" aria-label="Layout preview">
     {labels.map(([k, l]) => <a href={k ? `/products/layouts/${k}` : '/products'} aria-current={k === v ? 'true' : undefined}>{l}</a>)}
   </nav>
@@ -166,6 +289,116 @@ const labels: [string, string][] = [['', 'Current'], ['a', 'A · Full-screen sce
   .d-foot { margin-top: 28px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px 40px; }
   .d-problem { font-size: clamp(19px, 1.5vw, 23px); font-weight: 600; line-height: 1.4; max-width: 46ch; }
 
+  /* E · scroll story: the picture stays put while the stories scroll past it */
+  .e-wrap { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: clamp(32px, 5vw, 80px); padding-bottom: var(--section); }
+  .e-stage { position: sticky; top: 12vh; height: 76vh; align-self: start; overflow: clip; background: var(--surface-2); }
+  .e-layer { position: absolute; inset: 0; opacity: 0; transition: opacity 500ms ease; }
+  .e-layer.is-on { opacity: 1; }
+  .e-stage:hover video { filter: none; }
+  .e-shot { position: absolute; left: 8%; right: 8%; bottom: 8%; height: 58%; background: #fafaf9; border: 8px solid #fafaf9; }
+  .e-shot img { width: 100%; height: 100%; object-fit: cover; object-position: left top; display: block; }
+  .e-shot.is-phone { left: auto; right: 12%; width: 32%; height: 80%; border: 7px solid #0b0b0c; border-radius: 30px; overflow: hidden; }
+  .e-steps { display: grid; }
+  .e-step { min-height: 76vh; display: grid; align-content: center; gap: 16px; justify-items: start; padding-block: 8vh; }
+  .e-inline { display: none; }
+  .e-count { font-weight: 800; color: var(--accent); font-size: var(--t-small); letter-spacing: 0.04em; }
+  .e-name { font-size: clamp(48px, 5vw, 84px); letter-spacing: -0.05em; line-height: 0.95; }
+  .e-problem { font-size: clamp(19px, 1.5vw, 23px); font-weight: 600; line-height: 1.4; max-width: 30ch; }
+  .e-how { list-style: none; counter-reset: s; display: grid; gap: 8px; max-width: 44ch; }
+  .e-how li { counter-increment: s; display: grid; grid-template-columns: 1.6em 1fr; }
+  .e-how li::before { content: counter(s); font-weight: 800; color: var(--accent); }
+
+  /* F · swipe rail: large cards in a sideways scroller */
+  .f-sec { padding-bottom: var(--section); }
+  .f-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .f-hint { font-size: var(--t-small); font-weight: 600; color: var(--muted); }
+  .f-btns { display: flex; gap: 8px; }
+  .f-btns button { width: 52px; height: 52px; border: 0; background: var(--ink); color: var(--bg); font-size: 20px; cursor: pointer; transition: background-color var(--t-hover) ease, transform var(--t-press) var(--ease-out); }
+  .f-btns button:hover { background: var(--accent); color: var(--on-accent); }
+  .f-btns button:active { transform: scale(0.94); }
+  .f-track { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 0 var(--margin) 8px; scroll-padding-inline: var(--margin); scrollbar-width: none; }
+  .f-track::-webkit-scrollbar { display: none; }
+  .f-card { flex: 0 0 min(82vw, 920px); scroll-snap-align: start; display: grid; grid-template-rows: auto auto; background: var(--surface); }
+  .f-card--alt { background: var(--surface-2); }
+  .f-media { position: relative; aspect-ratio: 16 / 9; overflow: clip; }
+  .f-card:hover video { filter: none; }
+  .f-shot { position: absolute; right: 5%; bottom: 0; width: 56%; aspect-ratio: 16 / 10; background: #fafaf9; border: 8px solid #fafaf9; border-bottom: 0; }
+  .f-shot img { width: 100%; height: 100%; object-fit: cover; object-position: left top; display: block; }
+  .f-shot.is-phone { width: 24%; aspect-ratio: auto; height: 88%; border: 7px solid #0b0b0c; border-bottom: 0; border-radius: 28px 28px 0 0; overflow: hidden; }
+  .f-body { padding: 24px 28px 28px; display: grid; gap: 10px; justify-items: start; }
+  .f-name { font-size: clamp(36px, 3.6vw, 60px); letter-spacing: -0.05em; line-height: 0.95; }
+  .f-tag { font-size: var(--t-lead); font-weight: 600; }
+
+  /* G · name list: giant names; the product's clip and screen follow the cursor */
+  .g-sec { padding-bottom: var(--section); position: relative; }
+  .g-list { list-style: none; }
+  .g-row { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; padding: 12px 0; text-decoration: none; color: inherit; }
+  .g-name { font-size: clamp(56px, 9vw, 160px); font-weight: 850; letter-spacing: -0.055em; line-height: 0.95; transition: color var(--t-hover) ease; }
+  .g-row:hover .g-name { color: var(--accent); }
+  .g-side { display: grid; gap: 6px; justify-items: end; text-align: right; }
+  .g-tag { font-weight: 600; max-width: 26ch; }
+  .g-inline { display: none; }
+  .g-float { position: fixed; left: 0; top: 0; width: 360px; aspect-ratio: 4 / 3; pointer-events: none; z-index: 40; opacity: 0; transform: translate(-50%, -50%) scale(0.92); transition: opacity 220ms ease; }
+  .g-float.is-on { opacity: 1; }
+  .g-layer { position: absolute; inset: 0; opacity: 0; transition: opacity 200ms ease; overflow: clip; }
+  .g-layer.is-on { opacity: 1; }
+  .g-layer video { filter: none; }
+  .g-shot { position: absolute; left: 10%; right: 10%; bottom: 0; height: 62%; background: #fafaf9; border: 6px solid #fafaf9; border-bottom: 0; }
+  .g-shot img { width: 100%; height: 100%; object-fit: cover; object-position: left top; display: block; }
+  .g-shot.is-phone { left: auto; right: 12%; width: 30%; height: 86%; border: 5px solid #0b0b0c; border-bottom: 0; border-radius: 20px 20px 0 0; overflow: hidden; }
+
+  /* H · switcher: one stage, the tabs swap the product shown */
+  .h-sec { padding-bottom: var(--section); }
+  .h-tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
+  .h-tabs button { all: unset; cursor: pointer; display: grid; gap: 6px; padding: 18px 20px; background: var(--surface); border-top: 4px solid transparent; transition: background-color var(--t-hover) ease; }
+  .h-tabs button:hover { background: var(--surface-2); }
+  .h-tabs button[aria-selected='true'] { background: var(--ink); color: var(--bg); border-top-color: var(--accent); }
+  .h-tabs button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .h-tn { font-size: clamp(20px, 2vw, 30px); font-weight: 850; letter-spacing: -0.04em; }
+  .h-ts { display: inline-flex; align-items: center; gap: 8px; font-size: var(--t-small); font-weight: 700; }
+  .h-panel { display: grid; grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); gap: clamp(24px, 3vw, 48px); margin-top: 4px; }
+  .h-panel[hidden] { display: none; }
+  .h-stage { position: relative; aspect-ratio: 16 / 10; overflow: clip; }
+  .h-stage:hover video { filter: none; }
+  .h-shot { position: absolute; left: 10%; right: 10%; bottom: 0; height: 74%; background: #fafaf9; display: grid; grid-template-rows: auto 1fr; }
+  .h-shot img { width: 100%; height: 100%; min-height: 0; object-fit: cover; object-position: left top; display: block; }
+  .h-shot.is-phone { left: auto; right: 14%; width: 28%; height: 90%; border: 7px solid #0b0b0c; border-bottom: 0; border-radius: 30px 30px 0 0; overflow: hidden; grid-template-rows: 1fr; }
+  .h-info { display: grid; gap: 20px; align-content: center; justify-items: start; padding-block: 24px; }
+  .h-problem { font-size: clamp(20px, 1.7vw, 26px); font-weight: 600; line-height: 1.35; }
+
+  /* I · problem posters: the problem in huge type, then the product on a wide band */
+  .i-poster { padding-block: clamp(80px, 9vw, 140px); }
+  .i-label { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; }
+  .i-name { font-size: var(--t-lead); font-weight: 850; letter-spacing: -0.02em; }
+  .i-problem { margin-top: 20px; font-size: clamp(36px, 4.6vw, 80px); font-weight: 850; letter-spacing: -0.045em; line-height: 1.02; max-width: 22ch; }
+  .i-band { position: relative; margin-top: clamp(40px, 5vw, 72px); height: clamp(320px, 40vw, 600px); overflow: clip; }
+  .i-band:hover video { filter: none; }
+  .i-shot { position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); width: min(68%, 900px); height: 82%; background: #fafaf9; display: grid; grid-template-rows: auto 1fr; }
+  .i-shot img { width: 100%; height: 100%; min-height: 0; object-fit: cover; object-position: left top; display: block; }
+  .i-shot.is-phone { width: auto; aspect-ratio: 1206 / 2394; height: 92%; border: 8px solid #0b0b0c; border-bottom: 0; border-radius: 34px 34px 0 0; overflow: hidden; grid-template-rows: 1fr; }
+  .i-foot { margin-top: 28px; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 16px 40px; }
+  .i-answer { max-width: 60ch; font-size: var(--t-lead); }
+
+  @media (max-width: 860px) {
+    .e-wrap { grid-template-columns: 1fr; }
+    .e-stage { display: none; }
+    .e-step { min-height: 0; padding-block: 32px; }
+    .e-inline { display: block; width: 100%; aspect-ratio: 16 / 10; overflow: hidden; background: var(--surface); }
+    .e-inline img { width: 100%; height: 100%; object-fit: cover; object-position: left top; }
+    .e-inline.is-phone { width: 46%; aspect-ratio: 1206 / 2394; border: 5px solid var(--ink); border-radius: 22px; }
+    .g-row { flex-direction: column; gap: 8px; }
+    .g-side { justify-items: start; text-align: left; }
+    .g-inline { display: block; aspect-ratio: 16 / 10; overflow: hidden; margin-bottom: 24px; }
+    .g-inline img { width: 100%; height: 100%; object-fit: cover; object-position: left top; }
+    .g-inline.is-phone { width: 46%; aspect-ratio: 1206 / 2394; border: 5px solid var(--ink); border-radius: 22px; }
+    .g-float { display: none; }
+    .h-tabs { grid-template-columns: 1fr 1fr; }
+    .h-panel { grid-template-columns: 1fr; }
+    .f-card { flex-basis: 86vw; }
+    .f-shot { width: 70%; }
+    .i-shot { width: 84%; }
+  }
+
   .vswitch { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 50; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 6px; background: var(--ink); max-width: calc(100vw - 24px); }
   .vswitch a { padding: 8px 12px; font-size: 13px; font-weight: 700; color: var(--bg); text-decoration: none; }
   .vswitch a[aria-current] { background: var(--accent); color: var(--on-accent); }
@@ -191,4 +424,36 @@ const labels: [string, string][] = [['', 'Current'], ['a', 'A · Full-screen sce
     }), { rootMargin: '200px 0px' });
     vids.forEach((v) => io.observe(v));
   }
+
+  // E: whichever story is in the middle of the screen picks the picture
+  const ew = document.querySelector('[data-e]');
+  if (ew) {
+    const layers = [...ew.querySelectorAll<HTMLElement>('[data-layer]')];
+    const io2 = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { const i = (e.target as HTMLElement).dataset.step; layers.forEach((l) => l.classList.toggle('is-on', l.dataset.layer === i)); } }), { rootMargin: '-45% 0px -45% 0px' });
+    ew.querySelectorAll('[data-step]').forEach((s) => io2.observe(s));
+  }
+  // F: the arrows move one card
+  const ft = document.querySelector<HTMLElement>('[data-f-track]');
+  if (ft) {
+    const step = () => (ft.querySelector('.f-card') as HTMLElement).offsetWidth + 16;
+    document.querySelector('[data-f-prev]')?.addEventListener('click', () => ft.scrollBy({ left: -step(), behavior: 'smooth' }));
+    document.querySelector('[data-f-next]')?.addEventListener('click', () => ft.scrollBy({ left: step(), behavior: 'smooth' }));
+  }
+  // G: the preview follows the cursor, easing behind it
+  const gf = document.querySelector<HTMLElement>('[data-g-float]');
+  if (gf && matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    const gl = [...gf.querySelectorAll<HTMLElement>('[data-g-layer]')];
+    let x = 0, y = 0, cx = 0, cy = 0, raf = 0;
+    const tick = () => { cx += (x - cx) * 0.18; cy += (y - cy) * 0.18; gf.style.transform = `translate(${cx - 180}px, ${cy - 135}px)`; raf = requestAnimationFrame(tick); };
+    document.querySelectorAll<HTMLElement>('[data-g-i]').forEach((row) => {
+      row.addEventListener('pointerenter', (e) => { if (!raf) { cx = x = e.clientX; cy = y = e.clientY; raf = requestAnimationFrame(tick); } gl.forEach((l) => l.classList.toggle('is-on', l.dataset.gLayer === row.dataset.gI)); gf.classList.add('is-on'); });
+      row.addEventListener('pointermove', (e) => { x = e.clientX; y = e.clientY; });
+      row.addEventListener('pointerleave', () => { gf.classList.remove('is-on'); });
+    });
+  }
+  // H: tabs, with arrow keys between them
+  const tabs = [...document.querySelectorAll<HTMLButtonElement>('[data-h-tab]')];
+  const panels = [...document.querySelectorAll<HTMLElement>('[data-h-panel]')];
+  const pick = (i: number) => { tabs.forEach((t, k) => { t.setAttribute('aria-selected', String(k === i)); t.tabIndex = k === i ? 0 : -1; }); panels.forEach((p, k) => (p.hidden = k !== i)); panels[i]?.querySelector('video')?.play().catch(() => {}); };
+  tabs.forEach((t, i) => { t.addEventListener('click', () => pick(i)); t.addEventListener('keydown', (e) => { const d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0; if (d) { const n = (i + d + tabs.length) % tabs.length; pick(n); tabs[n].focus(); } }); });
 </script>
