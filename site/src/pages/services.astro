@@ -93,7 +93,8 @@ const small = ['svc-software', 'svc-automation'];
   .clients { margin-top: 16px; display: grid; gap: 12px; }
   .ch { font-size: var(--t-lead); letter-spacing: -0.02em; }
   .clients ul { list-style: none; }
-  .clients li > * { display: flex; justify-content: space-between; align-items: baseline; gap: 24px; padding: 14px 16px; margin-inline: -16px; text-decoration: none; }
+  /* the rows sit inside the text column: their edges line up with it, the words inside are inset */
+  .clients li > * { display: flex; justify-content: space-between; align-items: baseline; gap: 24px; padding: 14px 16px; text-decoration: none; }
   .clients li:nth-child(odd) > * { background: var(--surface); }
   .cn { font-weight: 700; }
   .cw { color: var(--muted); text-align: right; }
