@@ -1,0 +1,257 @@
+---
+// PREVIEW: Our software as a stack of rows. Each row is a strip of the product's world: its clip (grey), its tagline
+// set in the product's own typeface and colours, its brand marks and art. Clicking a row opens it in place to show
+// the product itself (screenshots) and everything about it. One row open at a time.
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import PageHead from '../../components/PageHead.astro';
+import CloseCTA from '../../components/CloseCTA.astro';
+import { img } from '../../data/site';
+const products = (await getCollection('products', (p) => !p.data.hidden)).sort((a, b) => a.data.order - b.data.order);
+
+type Tile =
+  | { k: 'clip'; r: number }
+  | { k: 'quote'; r: number }
+  | { k: 'pic'; r: number; src: string; srcset?: string; alt: string; fit?: 'cover' | 'contain'; bg?: string; pad?: string; pos?: string }
+  | { k: 'word'; r: number; text: string; bg: string; fg: string };
+// each product's own type and colours (taken from its code and live site); used only in its tiles
+const brand: Record<string, { font: string; bg: string; fg: string; fs: number; tiles: Tile[] }> = {
+  kept: { font: "'Kept Bricolage'", bg: '#F6F4EF', fg: '#1C2143', fs: 1.2, tiles: [
+    { k: 'clip', r: 1.25 },
+    { k: 'quote', r: 2 },
+    { k: 'pic', r: 1.34, src: '/images/pb-kept-stamps-1600.webp', srcset: '/images/pb-kept-stamps-800.webp 800w, /images/pb-kept-stamps-1600.webp 1600w', alt: 'Kept’s green K stamps in a row across lined paper, one for each day kept.' },
+    { k: 'pic', r: 1, src: '/images/pb-kept-icon-600.webp', alt: 'The Kept app icon: a green stamped K on navy.' },
+  ] },
+  doigetgas: { font: "'Gas Space Grotesk'", bg: '#0F0A08', fg: '#F3ECE4', fs: 1.1, tiles: [
+    { k: 'quote', r: 1.8 },
+    { k: 'clip', r: 1.25 },
+    { k: 'pic', r: 1.03, src: '/images/pb-gas-gauge-800.webp', alt: 'DoIGetGas’s forecast gauge, its needle in the green, over a “Might fall” verdict.', fit: 'contain', bg: '#0F0A08', pad: '6%' },
+    { k: 'pic', r: 1, src: '/images/pb-gas-icon.svg', alt: 'The DoIGetGas icon: an orange fuel pump.', fit: 'contain', bg: '#0F0A08', pad: '24%' },
+  ] },
+  realdoc: { font: "'RealDoc Geist'", bg: '#0A4A74', fg: '#FFFFFF', fs: 0.72, tiles: [
+    { k: 'pic', r: 1.5, src: '/images/pb-realdoc-word-1600.webp', srcset: '/images/pb-realdoc-word-800.webp 800w, /images/pb-realdoc-word-1600.webp 1600w', alt: 'The RealDoc wordmark: “Real” in script and “Doc” in blue, with a signature line.', fit: 'contain', bg: '#E9EFF5', pad: '10%' },
+    { k: 'clip', r: 1.25 },
+    { k: 'quote', r: 2.2 },
+    { k: 'pic', r: 1.2, src: '/images/pb-realdoc-laptop-1600.webp', srcset: '/images/pb-realdoc-laptop-800.webp 800w, /images/pb-realdoc-laptop-1600.webp 1600w', alt: 'RealDoc open on a laptop and a phone.', fit: 'contain', bg: '#DCE6EF', pad: '7%' },
+  ] },
+  shiftwize: { font: "'Shiftwize Jakarta'", bg: '#00AFFE', fg: '#04121F', fs: 0.9, tiles: [
+    { k: 'clip', r: 1.25 },
+    { k: 'pic', r: 1.7, src: '/images/pb-shiftwize-grid-800.webp', alt: 'Shiftwize’s week grid of preferred, available and ask-first hours.', bg: '#FAFAF9', pos: 'left top' },
+    { k: 'quote', r: 1.9 },
+    { k: 'word', r: 1.3, text: 'SHIFTWIZE', bg: '#E3F5FE', fg: '#1A9FE8' },
+  ] },
+};
+const isPhone = (id: string) => id === 'kept';
+const shots: Record<string, { w: number[]; alt: string }> = {
+  kept: { w: [400, 800], alt: 'The Kept app’s Challenges screen, with free habit trackers for reading and working out.' },
+  doigetgas: { w: [800, 1600], alt: 'DoIGetGas showing its gas-price gauge pointing to “Might fall”, above this week’s U.S. average prices.' },
+  realdoc: { w: [800, 1600], alt: 'RealDoc’s certificate form: course details, a CSV upload and a signature picker.' },
+  shiftwize: { w: [800, 1073], alt: 'Shiftwize’s availability planner: a week grid of preferred and available hours.' },
+};
+// a second picture of the product itself, shown beside the main screen when the row is open
+const extra: Record<string, { src: string; alt: string }> = {
+  kept: { src: '/images/pb-kept-rolls-1600.webp', alt: 'Kept’s shield art: rolls of K-stamped tape on navy.' },
+  realdoc: { src: '/images/pb-realdoc-qr-1600.webp', alt: 'RealDoc’s QR-code page beside the sign-in form it opens for a class.' },
+  shiftwize: { src: '/images/pb-shiftwize-prefs-800.webp', alt: 'Shiftwize’s scheduling preferences and team context, such as a critical gap on Friday.' },
+};
+const shotSrc = (id: string) => `/images/shot-${id}-${shots[id].w[1]}.webp`;
+const shotSet = (id: string) => shots[id].w.map((w) => `/images/shot-${id}-${w}.webp ${w}w`).join(', ');
+const host = (u: string) => u.replace(/^https?:\/\//, '').replace(/\/$/, '');
+const split = (t: string) => { const m = t.match(/^(.+?[.!?])\s+(.*)$/s); return m ? [m[1], m[2]] : [t, '']; };
+---
+<Base og="products" title="Our software" description="Kept, DoIGetGas, RealDoc and Shiftwize: software Ka Technology builds and runs itself.">
+  <PageHead title="Our software" lede="Besides client work, we build our own products. Some started as a client’s problem that turned out to be everyone’s problem." />
+
+  <section class="rows" aria-label="Our products" data-rows>
+    {products.map((p, i) => {
+      const d = p.data; const b = brand[p.id];
+      const [lead, more] = split(d.problem);
+      return (
+        <article class="prod" id={p.id} data-prod style={`--bf:${b.font};--bb:${b.bg};--bc:${b.fg};--bs:${b.fs}`}>
+          <div class="row" data-row>
+            <h2 class="name" style={`--len:${d.name.length + 3}`}>
+              <button type="button" class="open" aria-expanded="false" aria-controls={`more-${p.id}`} data-open>
+                <span class="nm">{i + 1}. {d.name}</span>
+                <span class="plus" aria-hidden="true"></span>
+                <span class="sr">, show details</span>
+              </button>
+            </h2>
+            <div class="strip" aria-hidden="true">
+              {b.tiles.map((t) => (
+                <div class={`tile t-${t.k}`} style={`--r:${t.r}${t.k === 'pic' && t.bg ? `;background:${t.bg}` : ''}${t.k === 'word' ? `;background:${t.bg};color:${t.fg}` : ''}`}>
+                  {t.k === 'clip' && <video muted loop playsinline preload="none" poster={img(`prod-${p.id}-poster`, 800)}><source src={`/video/prod-${p.id}.mp4`} type="video/mp4" /></video>}
+                  {t.k === 'quote' && <p>{d.tagline}</p>}
+                  {t.k === 'pic' && <img src={t.src} srcset={t.srcset} sizes="(max-width: 860px) 60vw, 30vw" alt="" loading="lazy" style={`object-fit:${t.fit ?? 'cover'}${t.pad ? `;padding:${t.pad}` : ''}${t.pos ? `;object-position:${t.pos}` : ''}`} />}
+                  {t.k === 'word' && <span>{t.text}</span>}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div class="more" id={`more-${p.id}`} data-more>
+            <div class="more-in">
+              <div class="wrap grid12 body">
+                <div class="pics">
+                  <div class={`shot ${isPhone(p.id) ? 'is-phone' : ''}`}>
+                    {!isPhone(p.id) && <div class="bar"><span>{d.url ? host(d.url) : `${d.name.toLowerCase()}.app`}</span></div>}
+                    <img src={shotSrc(p.id)} srcset={shotSet(p.id)} sizes="(max-width: 860px) 90vw, 55vw" alt={shots[p.id].alt} loading="lazy" />
+                  </div>
+                  {extra[p.id] && <img class="extra" src={extra[p.id].src} alt={extra[p.id].alt} loading="lazy" />}
+                </div>
+                <div class="facts">
+                  <p class="meta">{d.status}, since {d.year}</p>
+                  <div class="blk">
+                    <h3 class="k">The problem</h3>
+                    <p class="lead">{lead}</p>
+                    {more && <p class="dim">{more}</p>}
+                  </div>
+                  <div class="blk">
+                    <h3 class="k">What we built</h3>
+                    <p>{d.summary}</p>
+                  </div>
+                  {d.how_it_works.length > 0 && (
+                    <div class="blk">
+                      <h3 class="k">How it works</h3>
+                      <ol class="how">{d.how_it_works.map((s) => <li>{s}</li>)}</ol>
+                    </div>
+                  )}
+                  {d.features.length > 0 && (
+                    <div class="blk">
+                      <h3 class="k">The details</h3>
+                      <ul class="feats">{d.features.map((f) => <li>{f}</li>)}</ul>
+                    </div>
+                  )}
+                  {d.tech.length > 0 && <p class="tech">Built with {d.tech.join(', ')}.</p>}
+                  {d.url && <a class="button visit" href={d.url} rel="noopener">Visit {host(d.url)}</a>}
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+      );
+    })}
+  </section>
+
+  <CloseCTA title={['Your problem might be', 'everyone’s, too.']} text="Some of our products started as one client’s request. If yours sounds familiar, let’s talk." />
+</Base>
+
+<script>
+  // Rows open in place, one at a time; the whole row is clickable (the name is the real button). Clips play only
+  // while their row is on screen. A link to /products/#id opens that product.
+  const root = document.querySelector<HTMLElement>('[data-rows]');
+  if (root) {
+    const prods = [...root.querySelectorAll<HTMLElement>('[data-prod]')];
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const set = (el: HTMLElement, open: boolean) => {
+      el.classList.toggle('is-open', open);
+      el.querySelector('[data-open]')!.setAttribute('aria-expanded', String(open));
+      el.querySelector<HTMLElement>('[data-more]')!.inert = !open;
+    };
+    root.classList.add('is-live');
+    prods.forEach((el) => set(el, false));
+    const toggle = (el: HTMLElement, scroll = false) => {
+      const opening = !el.classList.contains('is-open');
+      prods.forEach((o) => o !== el && o.classList.contains('is-open') && set(o, false));
+      set(el, opening);
+      if (opening) history.replaceState(null, '', `#${el.id}`);
+      if (opening && scroll) el.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'start' });
+    };
+    prods.forEach((el) => {
+      const btn = el.querySelector<HTMLButtonElement>('[data-open]')!;
+      btn.addEventListener('click', (e) => { e.stopPropagation(); toggle(el); });
+      el.querySelector('[data-row]')!.addEventListener('click', () => toggle(el));
+    });
+    const fromHash = () => { const t = prods.find((el) => `#${el.id}` === location.hash); if (t && !t.classList.contains('is-open')) toggle(t, true); };
+    fromHash(); addEventListener('hashchange', fromHash);
+    if (!still) {
+      const io = new IntersectionObserver((es) => es.forEach((e) => {
+        const v = e.target as HTMLVideoElement;
+        if (e.isIntersecting) { if (v.preload !== 'auto') { v.preload = 'auto'; v.load(); } v.play().catch(() => {}); } else v.pause();
+      }), { rootMargin: '0px 0px -10% 0px' });
+      root.querySelectorAll('video').forEach((v) => io.observe(v));
+    }
+  }
+</script>
+
+<style>
+  /* each product's own typeface, used only inside its own tiles */
+  @font-face { font-family: 'Kept Bricolage'; src: url('/fonts/kept-bricolage-800.woff2') format('woff2'); font-weight: 800; font-display: swap; }
+  @font-face { font-family: 'Gas Space Grotesk'; src: url('/fonts/gas-spacegrotesk-700.woff2') format('woff2'); font-weight: 800; font-display: swap; }
+  @font-face { font-family: 'RealDoc Geist'; src: url('/fonts/realdoc-geist-700.woff2') format('woff2'); font-weight: 800; font-display: swap; }
+  @font-face { font-family: 'Shiftwize Jakarta'; src: url('/fonts/shiftwize-jakarta-800.woff2') format('woff2'); font-weight: 800; font-display: swap; }
+  @font-face { font-family: 'Shiftwize Jakarta'; src: url('/fonts/shiftwize-jakarta-800i.woff2') format('woff2'); font-weight: 800; font-style: italic; font-display: swap; }
+
+  .rows { --H: clamp(190px, 18vw, 300px); display: grid; gap: clamp(14px, 1.4vw, 22px); padding-bottom: var(--section); }
+
+  /* a row: the product's name on its side, then its strip running to the right edge */
+  .row { display: grid; grid-template-columns: calc(var(--margin) + clamp(56px, 5.4vw, 92px)) minmax(0, 1fr); height: var(--H); }
+  .name { position: relative; height: var(--H); }
+  /* the plus at the top, the name reading up from the row's bottom edge */
+  .open { all: unset; box-sizing: border-box; cursor: pointer; position: absolute; inset: 0; display: flex; flex-direction: column-reverse; align-items: center; justify-content: space-between;
+    padding: 0 0 0 var(--margin); }
+  .nm { writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; font-weight: 800; letter-spacing: -0.04em; line-height: 1;
+    font-size: min(clamp(34px, 3.8vw, 64px), calc((var(--H) - 52px) / (var(--len) * 0.56))); }
+  .plus { position: relative; flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--ink); transition: transform 350ms var(--ease-out), background-color 200ms ease; }
+  .plus::before, .plus::after { content: ""; position: absolute; left: 50%; top: 50%; width: 12px; height: 2px; background: var(--bg); transform: translate(-50%, -50%); }
+  .plus::after { transform: translate(-50%, -50%) rotate(90deg); }
+  .open:focus-visible .plus { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+  .strip { display: flex; gap: 6px; height: 100%; min-width: 0; cursor: pointer; }
+  .tile { position: relative; flex: var(--r) 1 0; min-width: 0; overflow: hidden; background: var(--surface); container-type: size; }
+  .tile img, .tile video { display: block; width: 100%; height: 100%; object-fit: cover; box-sizing: border-box; transition: transform 600ms var(--ease-out); }
+  .t-clip video { filter: var(--photo-filter); }
+  .t-quote { background: var(--bb); color: var(--bc); display: grid; place-items: center; padding: 0 9cqw; }
+  .t-quote p { font-family: var(--bf), var(--font); font-weight: 800; line-height: 1.02; letter-spacing: -0.03em; text-wrap: balance; text-align: center;
+    font-size: calc(min(14cqh, 11cqw) * var(--bs)); }
+  .t-word { display: grid; place-items: center; }
+  .t-word span { font-family: 'Shiftwize Jakarta', var(--font); font-style: italic; font-weight: 800; letter-spacing: -0.02em; font-size: 13cqw; }
+
+  /* a row you can open: on hover the plus turns red and the pictures lean in a touch */
+  @media (hover: hover) and (pointer: fine) {
+    .row:hover .plus { background: var(--accent); }
+    .row:hover .tile img, .row:hover .tile video { transform: scale(1.03); }
+  }
+  .is-open .plus { background: var(--accent); transform: rotate(45deg); }
+
+  /* the opened row: the product's screens on the left, everything about it on the right */
+  .rows.is-live .more { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 520ms var(--ease-out); }
+  .rows.is-live .is-open .more { grid-template-rows: 1fr; }
+  .more-in { overflow: hidden; min-height: 0; }
+  .body { padding-block: clamp(40px, 5vw, 72px) clamp(56px, 7vw, 104px); row-gap: 40px; }
+  .rows.is-live .body { opacity: 0; transition: opacity 300ms ease; }
+  .rows.is-live .is-open .body { opacity: 1; transition-delay: 150ms; }
+  .pics { grid-column: 1 / 8; display: grid; gap: 6px; align-content: start; }
+  .facts { grid-column: 8 / -1; display: grid; gap: 26px; align-content: start; justify-items: start; }
+  .shot { width: 100%; background: #fafaf9; display: grid; grid-template-rows: auto 1fr; overflow: hidden; }
+  .shot img { width: 100%; display: block; }
+  .shot.is-phone { width: min(300px, 70%); grid-template-rows: 1fr; border: 7px solid #0b0b0c; border-radius: 30px; justify-self: center; }
+  .bar { height: 28px; display: flex; align-items: center; padding: 0 12px; background: var(--surface-2); font-size: 11px; font-weight: 600; color: var(--muted); }
+  .extra { width: 100%; display: block; }
+  .shot.is-phone + .extra { margin-top: 18px; }
+  .meta { font-weight: 700; font-size: var(--t-small); color: var(--muted); }
+  .blk { display: grid; gap: 10px; max-width: 56ch; }
+  .k { font-size: var(--t-small); font-weight: 800; }
+  .lead { font-size: var(--t-lead); font-weight: 650; line-height: 1.35; }
+  .dim, .tech { color: var(--muted); }
+  .tech { font-size: var(--t-small); max-width: 56ch; }
+  .how { list-style: none; counter-reset: s; display: grid; gap: 8px; }
+  .how li { counter-increment: s; display: grid; grid-template-columns: 1.6em 1fr; }
+  .how li::before { content: counter(s); font-weight: 800; }
+  .feats { list-style: none; display: grid; gap: 8px; }
+  .feats li { padding-left: 1.1em; position: relative; }
+  .feats li::before { content: ""; position: absolute; left: 0; top: 0.62em; width: 0.4em; height: 0.4em; background: var(--ink); }
+
+  @media (max-width: 860px) {
+    .rows { --H: 200px; gap: 28px; }
+    .row { grid-template-columns: 1fr; height: auto; }
+    .name { height: auto; padding-inline: var(--margin); margin-bottom: 12px; }
+    .open { position: static; flex-direction: row; justify-content: space-between; width: 100%; padding: 0; }
+    .nm { writing-mode: horizontal-tb; transform: none; font-size: clamp(30px, 8vw, 40px); }
+    .strip { height: var(--H); overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding-inline: var(--margin); scroll-padding-inline: var(--margin); }
+    .strip::-webkit-scrollbar { display: none; }
+    .tile { flex: 0 0 calc(var(--H) * var(--r)); scroll-snap-align: start; }
+    .pics, .facts { grid-column: 1 / -1; }
+    .body { padding-block: 28px 16px; }
+  }
+</style>
