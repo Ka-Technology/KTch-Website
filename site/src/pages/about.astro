@@ -5,6 +5,7 @@ import PageHead from '../components/PageHead.astro';
 import CloseCTA from '../components/CloseCTA.astro';
 import { img, srcset } from '../data/site';
 const team = (await getCollection('team', (t) => t.data.current)).sort((a, b) => a.data.order - b.data.order);
+const products = await getCollection('products', (p) => !p.data.hidden);
 const initials = (n: string) => n.split(' ').map((w) => w[0]).join('').slice(0, 2);
 // What we believe: the three beliefs from the spec. The grey sentence after each name takes turns rewording
 // itself (same number of words, each word close in length), so the bold names never move.
@@ -29,6 +30,12 @@ for (const v of values) { const base = v.texts[0].split(' ').map((w) => w.length
       <p class="t-lead first">Ka Technology started in May 2024 with four friends from Oregon State University and one observation: great young engineers were struggling to find work, and local businesses were struggling to find tech help. We set out to bring the two together.</p>
       <p>Our first products came from real frustrations. One of us worked as a real-estate broker and watched the office’s principal broker spend close to an hour every week typing out continuing-education certificates by hand. We built <a class="link" href="/products/realdoc">RealDoc</a> to do it in one click. A title company later used it across its Oregon branch.</p>
       <p>Since then we’ve built AI document platforms, schedulers, gym software and websites for businesses across the Portland area. We still believe what we wrote on day one: AI is a tool, not a replacement. Its job is to give people more time, and more meaningful choices.</p>
+      <ul class="facts" aria-label="Ka Technology in numbers">
+        <li><span class="fn">May 2024</span><span class="fl">Founded</span></li>
+        <li><span class="fn">4</span><span class="fl">Friends from Oregon State</span></li>
+        <li><span class="fn">{products.length}</span><span class="fl">Products of our own</span></li>
+        <li><span class="fn">3 months</span><span class="fl">To our first client project</span></li>
+      </ul>
     </div>
   </section>
 
@@ -47,7 +54,7 @@ for (const v of values) { const base = v.texts[0].split(' ').map((w) => w.length
     </div>
   </section>
 
-  <section class="team wrap section" aria-labelledby="team-t">
+  <section class="team wrap" aria-labelledby="team-t">
     <div class="th" data-reveal>
       <h2 id="team-t" class="t-h2">The Dream Team</h2>
       <p class="t-lead">Engineers, a former broker and a data scientist, building together since day one.</p>
@@ -133,7 +140,7 @@ for (const v of values) { const base = v.texts[0].split(' ').map((w) => w.length
         slots[i].forEach((el, k) => { if (el.textContent !== sets[i][now[i]][k]) morph(el, sets[i][now[i]][k], k * 45, i, k); });
       };
       let timer = 0;
-      const io = new IntersectionObserver(([e]) => { clearInterval(timer); if (e.isIntersecting) timer = window.setInterval(tick, 2600); });
+      const io = new IntersectionObserver(([e]) => { clearInterval(timer); if (e.isIntersecting) { window.setTimeout(tick, 350); timer = window.setInterval(tick, 2600); } }, { threshold: 0.35 });
       io.observe(root);
     }
   }
@@ -142,10 +149,21 @@ for (const v of values) { const base = v.texts[0].split(' ').map((w) => w.length
 <style>
   .story { row-gap: 40px; align-items: start; }
   .side-pic { grid-column: 1 / 5; }
-  .side-pic .photo { aspect-ratio: 3 / 4; }
+  /* the photo runs the full height of the story and its facts, so both columns end together */
+  .side-pic { align-self: stretch; }
+  .side-pic .photo { height: 100%; min-height: 420px; }
   .text { grid-column: 6 / -1; max-width: 62ch; }
   .first { font-weight: 600; margin-bottom: 0.4em; }
+  .text .facts { padding: 0; }
+  .text .facts li { margin: 0; padding-left: 0; }
+  .facts { list-style: none; margin-top: clamp(32px, 4vw, 56px); display: grid; grid-template-columns: 1fr 1fr; gap: clamp(24px, 3vw, 40px) var(--gap); }
+  .facts li { display: grid; gap: 6px; padding-top: 16px; position: relative; }
+  .facts li::before { content: ""; position: absolute; top: 0; left: 0; width: 28px; height: 5px; background: var(--accent); }
+  .fn { font-size: clamp(36px, 3.6vw, 60px); font-weight: 850; letter-spacing: -0.05em; line-height: 1; }
+  .fl { font-weight: 600; color: var(--muted); }
   .values { margin-top: var(--section); padding-block: clamp(80px, 9vw, 140px); }
+  /* the team follows the beliefs closely; the closing section brings its own space after */
+  .team { padding-top: clamp(64px, 7vw, 104px); }
   .th { display: grid; gap: 18px; margin-bottom: 56px; }
   .th p { max-width: 46ch; }
   .tg { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 56px var(--gap); }
@@ -158,10 +176,11 @@ for (const v of values) { const base = v.texts[0].split(' ').map((w) => w.length
   .member h3 { font-size: var(--t-lead); letter-spacing: -0.02em; }
   .role { font-weight: 600; color: var(--accent-text); font-size: var(--t-small); }
   .bio { max-width: 34ch; }
-  .join { margin-top: 64px; font-weight: 600; }
+  .join { margin-top: clamp(40px, 4vw, 56px); font-size: var(--t-lead); font-weight: 600; }
   @media (max-width: 860px) {
     .side-pic, .text { grid-column: 1 / -1; }
     .side-pic { order: 2; }
+    .side-pic .photo { height: auto; min-height: 0; aspect-ratio: 4 / 3; }
         .tg { grid-template-columns: 1fr 1fr; gap: 40px 16px; }
   }
 
