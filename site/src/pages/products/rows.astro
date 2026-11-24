@@ -14,33 +14,59 @@ type Tile =
   | { k: 'quote'; r: number }
   | { k: 'pic'; r: number; src: string; srcset?: string; alt: string; fit?: 'cover' | 'contain'; bg?: string; pad?: string; pos?: string }
   | { k: 'word'; r: number; text: string; bg: string; fg: string };
-// each product's own type and colours (taken from its code and live site); used only in its tiles
+// each product's own type and colours (taken from its code and live site); used only in its tiles.
+// Its strip: the clip, the tagline, its marks and art, and photos of its world (credited on /credits).
+const ph = (n: string, r = 1.33): Tile => ({ k: 'pic', r, src: `/images/${n}-800.webp`, alt: '' });
 const brand: Record<string, { font: string; bg: string; fg: string; fs: number; tiles: Tile[] }> = {
-  kept: { font: "'Kept Bricolage'", bg: '#F6F4EF', fg: '#1C2143', fs: 1.2, tiles: [
+  kept: { font: "'Kept Bricolage'", bg: '#F6F4EF', fg: '#1C2143', fs: 1.3, tiles: [
     { k: 'clip', r: 1.25 },
     { k: 'quote', r: 2 },
-    { k: 'pic', r: 1.34, src: '/images/pb-kept-stamps-1600.webp', srcset: '/images/pb-kept-stamps-800.webp 800w, /images/pb-kept-stamps-1600.webp 1600w', alt: 'Kept’s green K stamps in a row across lined paper, one for each day kept.' },
-    { k: 'pic', r: 1, src: '/images/pb-kept-icon-600.webp', alt: 'The Kept app icon: a green stamped K on navy.' },
+    ph('pw-kept-3'),
+    { k: 'pic', r: 1, src: '/images/pb-kept-icon-600.webp', alt: '' },
+    ph('pw-kept-0'),
+    { k: 'pic', r: 1.34, src: '/images/pb-kept-stamps-800.webp', alt: '' },
+    ph('pw-kept-2'),
+    ph('pw-kept-5', 1),
+    ph('pw-kept-1'),
   ] },
-  doigetgas: { font: "'Gas Space Grotesk'", bg: '#0F0A08', fg: '#F3ECE4', fs: 1.1, tiles: [
+  doigetgas: { font: "'Gas Space Grotesk'", bg: '#0F0A08', fg: '#F3ECE4', fs: 1.3, tiles: [
     { k: 'quote', r: 1.8 },
+    ph('pw-gas-0'),
     { k: 'clip', r: 1.25 },
-    { k: 'pic', r: 1.03, src: '/images/pb-gas-gauge-800.webp', alt: 'DoIGetGas’s forecast gauge, its needle in the green, over a “Might fall” verdict.', fit: 'contain', bg: '#0F0A08', pad: '6%' },
-    { k: 'pic', r: 1, src: '/images/pb-gas-icon.svg', alt: 'The DoIGetGas icon: an orange fuel pump.', fit: 'contain', bg: '#0F0A08', pad: '24%' },
+    ph('pw-gas-4', 1.6),
+    { k: 'pic', r: 1, src: '/images/pb-gas-icon.svg', alt: '', fit: 'contain', bg: '#0F0A08', pad: '24%' },
+    ph('pw-gas-2', 1.6),
+    ph('pw-gas-1'),
+    ph('pw-gas-5'),
+    ph('pw-gas-3'),
   ] },
-  realdoc: { font: "'RealDoc Geist'", bg: '#0A4A74', fg: '#FFFFFF', fs: 0.72, tiles: [
-    { k: 'pic', r: 1.5, src: '/images/pb-realdoc-word-1600.webp', srcset: '/images/pb-realdoc-word-800.webp 800w, /images/pb-realdoc-word-1600.webp 1600w', alt: 'The RealDoc wordmark: “Real” in script and “Doc” in blue, with a signature line.', fit: 'contain', bg: '#E9EFF5', pad: '10%' },
+  realdoc: { font: "'RealDoc Geist'", bg: '#0A4A74', fg: '#FFFFFF', fs: 0.85, tiles: [
+    { k: 'pic', r: 1.5, src: '/images/pb-realdoc-word-800.webp', alt: '', fit: 'contain', bg: '#E9EFF5', pad: '10%' },
+    ph('pw-rd-0'),
     { k: 'clip', r: 1.25 },
     { k: 'quote', r: 2.2 },
-    { k: 'pic', r: 1.2, src: '/images/pb-realdoc-laptop-1600.webp', srcset: '/images/pb-realdoc-laptop-800.webp 800w, /images/pb-realdoc-laptop-1600.webp 1600w', alt: 'RealDoc open on a laptop and a phone.', fit: 'contain', bg: '#DCE6EF', pad: '7%' },
+    ph('pw-rd-4'),
+    { k: 'pic', r: 0.9, src: '/images/pb-realdoc-pen.webp', alt: '', fit: 'contain', bg: '#E9EFF5', pad: '16%' },
+    ph('pw-rd-2', 0.8),
+    ph('pw-rd-3'),
+    ph('pw-rd-1', 1.6),
+    ph('pw-rd-5'),
   ] },
-  shiftwize: { font: "'Shiftwize Jakarta'", bg: '#00AFFE', fg: '#04121F', fs: 0.9, tiles: [
+  shiftwize: { font: "'Shiftwize Jakarta'", bg: '#00AFFE', fg: '#04121F', fs: 1.1, tiles: [
     { k: 'clip', r: 1.25 },
-    { k: 'pic', r: 1.7, src: '/images/pb-shiftwize-grid-800.webp', alt: 'Shiftwize’s week grid of preferred, available and ask-first hours.', bg: '#FAFAF9', pos: 'left top' },
+    ph('pw-sw-2'),
     { k: 'quote', r: 1.9 },
+    ph('pw-sw-0'),
     { k: 'word', r: 1.3, text: 'SHIFTWIZE', bg: '#E3F5FE', fg: '#1A9FE8' },
+    ph('pw-sw-5', 1),
+    ph('pw-sw-1', 1.2),
+    ph('pw-sw-3'),
+    ph('pw-sw-4'),
   ] },
 };
+// every name is set at the size that fits the longest one
+const nameLen = Math.max(...products.map((p, i) => `${i + 1}. ${p.data.name}`.length));
+const sumR = (id: string) => brand[id].tiles.reduce((t, x) => t + x.r, 0);
 const isPhone = (id: string) => id === 'kept';
 const shots: Record<string, { w: number[]; alt: string }> = {
   kept: { w: [400, 800], alt: 'The Kept app’s Challenges screen, with free habit trackers for reading and working out.' },
@@ -69,22 +95,28 @@ const split = (t: string) => { const m = t.match(/^(.+?[.!?])\s+(.*)$/s); return
       return (
         <article class="prod" id={p.id} data-prod style={`--bf:${b.font};--bb:${b.bg};--bc:${b.fg};--bs:${b.fs}`}>
           <div class="row" data-row>
-            <h2 class="name" style={`--len:${d.name.length + 3}`}>
+            <h2 class="name" style={`--len:${nameLen}`}>
               <button type="button" class="open" aria-expanded="false" aria-controls={`more-${p.id}`} data-open>
                 <span class="nm">{i + 1}. {d.name}</span>
                 <span class="plus" aria-hidden="true"></span>
                 <span class="sr">, show details</span>
               </button>
             </h2>
-            <div class="strip" aria-hidden="true">
-              {b.tiles.map((t) => (
-                <div class={`tile t-${t.k}`} style={`--r:${t.r}${t.k === 'pic' && t.bg ? `;background:${t.bg}` : ''}${t.k === 'word' ? `;background:${t.bg};color:${t.fg}` : ''}`}>
-                  {t.k === 'clip' && <video muted loop playsinline preload="none" poster={img(`prod-${p.id}-poster`, 800)}><source src={`/video/prod-${p.id}.mp4`} type="video/mp4" /></video>}
-                  {t.k === 'quote' && <p>{d.tagline}</p>}
-                  {t.k === 'pic' && <img src={t.src} srcset={t.srcset} sizes="(max-width: 860px) 60vw, 30vw" alt="" loading="lazy" style={`object-fit:${t.fit ?? 'cover'}${t.pad ? `;padding:${t.pad}` : ''}${t.pos ? `;object-position:${t.pos}` : ''}`} />}
-                  {t.k === 'word' && <span>{t.text}</span>}
-                </div>
-              ))}
+            <div class="strip" aria-hidden="true" style={`--dur:${Math.round(sumR(p.id) * 6.5)}s`}>
+              <div class={`track ${i % 2 ? 'is-rev' : ''}`}>
+                {[0, 1].map(() => (
+                  <div class="set">
+                  {b.tiles.map((t) => (
+                    <div class={`tile t-${t.k}`} style={`--r:${t.r}${t.k === 'pic' && t.bg ? `;background:${t.bg}` : ''}${t.k === 'word' ? `;background:${t.bg};color:${t.fg}` : ''}`}>
+                      {t.k === 'clip' && <video muted loop playsinline preload="none" poster={img(`prod-${p.id}-poster`, 800)}><source src={`/video/prod-${p.id}.mp4`} type="video/mp4" /></video>}
+                      {t.k === 'quote' && <p>{d.tagline}</p>}
+                      {t.k === 'pic' && <img src={t.src} alt="" loading="lazy" style={`object-fit:${t.fit ?? 'cover'}${t.pad ? `;padding:${t.pad}` : ''}${t.pos ? `;object-position:${t.pos}` : ''}`} />}
+                      {t.k === 'word' && <span>{t.text}</span>}
+                    </div>
+                  ))}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -181,7 +213,7 @@ const split = (t: string) => { const m = t.match(/^(.+?[.!?])\s+(.*)$/s); return
   @font-face { font-family: 'Shiftwize Jakarta'; src: url('/fonts/shiftwize-jakarta-800.woff2') format('woff2'); font-weight: 800; font-display: swap; }
   @font-face { font-family: 'Shiftwize Jakarta'; src: url('/fonts/shiftwize-jakarta-800i.woff2') format('woff2'); font-weight: 800; font-style: italic; font-display: swap; }
 
-  .rows { --H: clamp(190px, 18vw, 300px); display: grid; gap: clamp(14px, 1.4vw, 22px); padding-bottom: var(--section); }
+  .rows { --H: clamp(190px, 18vw, 300px); display: grid; gap: clamp(14px, 1.4vw, 22px); padding-bottom: clamp(8px, 1vw, 16px); }
 
   /* a row: the product's name on its side, then its strip running to the right edge */
   .row { display: grid; grid-template-columns: calc(var(--margin) + clamp(56px, 5.4vw, 92px)) minmax(0, 1fr); height: var(--H); }
@@ -197,10 +229,20 @@ const split = (t: string) => { const m = t.match(/^(.+?[.!?])\s+(.*)$/s); return
   .open:focus-visible .plus { outline: 2px solid var(--accent); outline-offset: 3px; }
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
-  .strip { display: flex; gap: 6px; height: 100%; min-width: 0; cursor: pointer; }
-  .tile { position: relative; flex: var(--r) 1 0; min-width: 0; overflow: hidden; background: var(--surface); container-type: size; }
+  /* the strip drifts sideways for ever (two copies of the tiles make the loop seamless); rows alternate direction */
+  .strip { height: 100%; min-width: 0; overflow: hidden; cursor: pointer; }
+  .track { display: flex; width: max-content; height: 100%; }
+  .set { display: flex; gap: 6px; padding-right: 6px; height: 100%; }
+  @media (prefers-reduced-motion: no-preference) {
+    .track { animation: drift var(--dur) linear infinite; }
+    .track.is-rev { animation-direction: reverse; }
+  }
+  @keyframes drift { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  .tile { position: relative; flex: none; width: calc(var(--H) * var(--r)); height: 100%; overflow: hidden; background: var(--surface); container-type: size;
+    filter: grayscale(1) contrast(1.05); transition: filter 700ms ease; }
+  /* everything in grey until the row is opened; then the product's own colours come back */
+  .is-open .tile { filter: none; }
   .tile img, .tile video { display: block; width: 100%; height: 100%; object-fit: cover; box-sizing: border-box; transition: transform 600ms var(--ease-out); }
-  .t-clip video { filter: var(--photo-filter); }
   .t-quote { background: var(--bb); color: var(--bc); display: grid; place-items: center; padding: 0 9cqw; }
   .t-quote p { font-family: var(--bf), var(--font); font-weight: 800; line-height: 1.02; letter-spacing: -0.03em; text-wrap: balance; text-align: center;
     font-size: calc(min(14cqh, 11cqw) * var(--bs)); }
@@ -243,14 +285,12 @@ const split = (t: string) => { const m = t.match(/^(.+?[.!?])\s+(.*)$/s); return
   .feats li::before { content: ""; position: absolute; left: 0; top: 0.62em; width: 0.4em; height: 0.4em; background: var(--ink); }
 
   @media (max-width: 860px) {
-    .rows { --H: 200px; gap: 28px; }
+    .rows { --H: 180px; gap: 28px; }
     .row { grid-template-columns: 1fr; height: auto; }
     .name { height: auto; padding-inline: var(--margin); margin-bottom: 12px; }
     .open { position: static; flex-direction: row; justify-content: space-between; width: 100%; padding: 0; }
     .nm { writing-mode: horizontal-tb; transform: none; font-size: clamp(30px, 8vw, 40px); }
-    .strip { height: var(--H); overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding-inline: var(--margin); scroll-padding-inline: var(--margin); }
-    .strip::-webkit-scrollbar { display: none; }
-    .tile { flex: 0 0 calc(var(--H) * var(--r)); scroll-snap-align: start; }
+    .strip { height: var(--H); }
     .pics, .facts { grid-column: 1 / -1; }
     .body { padding-block: 28px 16px; }
   }
