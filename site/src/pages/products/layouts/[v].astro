@@ -6,7 +6,7 @@ import PageHead from '../../../components/PageHead.astro';
 import CloseCTA from '../../../components/CloseCTA.astro';
 import { img } from '../../../data/site';
 
-export function getStaticPaths() { return ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'].map((v) => ({ params: { v } })); }
+export function getStaticPaths() { return ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l'].map((v) => ({ params: { v } })); }
 const { v } = Astro.params;
 const products = (await getCollection('products', (p) => !p.data.hidden)).sort((a, b) => a.data.order - b.data.order);
 const isPhone = (id: string) => id === 'kept';
@@ -20,7 +20,7 @@ const src = (id: string) => `/images/shot-${id}-${shots[id].w[1]}.webp`;
 const set = (id: string) => shots[id].w.map((w) => `/images/shot-${id}-${w}.webp ${w}w`).join(', ');
 const addr = (p: any) => (p.data.url ? p.data.url.replace('https://', '') : `${p.data.name.toLowerCase()}.app`);
 const first = (t: string) => (t.match(/^(.+?[.!?])(\s|$)/s)?.[1] ?? t);
-const labels: [string, string][] = [['', 'Current'], ['a', 'A · Full-screen scenes'], ['b', 'B · Screenshot first'], ['c', 'C · Video tiles'], ['d', 'D · Side by side'], ['e', 'E · Scroll story'], ['f', 'F · Swipe rail'], ['g', 'G · Name list'], ['h', 'H · Switcher'], ['i', 'I · Problem posters']];
+const labels: [string, string][] = (['j', 'k', 'l'] as string[]).includes(v ?? '') || true ? [['e', 'E · Scroll story'], ['a', 'A · Full-screen scenes'], ['j', 'J · Full-screen story'], ['k', 'K · Grow to full screen'], ['l', 'L · Split screen']] : [];
 ---
 <Base og="products" title="Our software" description="Layout options for the Products page." strip={true}>
   <PageHead title="Our software" lede="Besides client work, we build our own products. Some started as a client’s problem that turned out to be everyone’s problem." />
@@ -222,6 +222,82 @@ const labels: [string, string][] = [['', 'Current'], ['a', 'A · Full-screen sce
     </section>
   ))}
 
+  {v === 'j' && (
+    <section class="j-wrap" data-j>
+      <div class="j-stage" aria-hidden="true">
+        {products.map((p, i) => (
+          <div class={`j-layer ${i === 0 ? 'is-on' : ''}`} data-jl={i}>
+            <video data-pv muted loop playsinline preload="none" poster={img(`prod-${p.id}-poster`, 1600)}><source src={`/video/prod-${p.id}.mp4`} type="video/mp4" /></video>
+            <div class="j-shade"></div>
+            <div class={`fs-shot ${isPhone(p.id) ? 'is-phone' : ''}`} data-ui>{!isPhone(p.id) && <div class="bar"><span>{addr(p)}</span></div>}<img src={src(p.id)} srcset={set(p.id)} sizes="50vw" alt={shots[p.id].alt} loading="lazy" /></div>
+          </div>
+        ))}
+      </div>
+      <div class="j-steps">
+        {products.map((p, i) => (<>
+          <article class="j-step" data-js={i} data-phase="problem" aria-labelledby={`j-${p.id}`}>
+            <div class="j-card">
+              <p class="meta"><span class="dot"></span>{p.data.status}</p>
+              <h2 id={`j-${p.id}`} class="j-name">{p.data.name}</h2>
+              <p class="j-problem">{first(p.data.problem)}</p>
+            </div>
+          </article>
+          <article class="j-step" data-js={i} data-phase="built">
+            <div class="j-card">
+              <p class="j-k">What we built</p>
+              <p class="j-sum">{p.data.summary}</p>
+              <a class="link" href={`/products/${p.id}`}><span class="arrow">About {p.data.name}</span></a>
+            </div>
+          </article>
+        </>))}
+      </div>
+    </section>
+  )}
+
+  {v === 'k' && products.map((p) => (
+    <section class="k-sec" data-k aria-labelledby={`k-${p.id}`}>
+      <div class="k-pin">
+        <div class="k-frame">
+          <video data-pv muted loop playsinline preload="none" aria-hidden="true" poster={img(`prod-${p.id}-poster`, 1600)}><source src={`/video/prod-${p.id}.mp4`} type="video/mp4" /></video>
+          <div class="k-shade"></div>
+        </div>
+        <div class="k-text wrap">
+          <p class="meta"><span class="dot"></span>{p.data.status}</p>
+          <h2 id={`k-${p.id}`} class="k-name">{p.data.name}</h2>
+          <p class="k-problem">{first(p.data.problem)}</p>
+          <a class="k-link arrow" href={`/products/${p.id}`}>About {p.data.name}</a>
+        </div>
+        <div class="k-shotwrap"><div class={`fs-shot ${isPhone(p.id) ? 'is-phone' : ''}`} data-ui>{!isPhone(p.id) && <div class="bar"><span>{addr(p)}</span></div>}<img src={src(p.id)} srcset={set(p.id)} sizes="50vw" alt={shots[p.id].alt} loading="lazy" /></div></div>
+      </div>
+    </section>
+  ))}
+
+  {v === 'l' && (
+    <section class="l-wrap" data-l>
+      <div class="l-stage" aria-hidden="true">
+        {products.map((p, i) => (
+          <div class={`l-layer ${i === 0 ? 'is-on' : ''}`} data-ll={i}>
+            <video data-pv muted loop playsinline preload="none" poster={img(`prod-${p.id}-poster`, 1600)}><source src={`/video/prod-${p.id}.mp4`} type="video/mp4" /></video>
+            <span class="l-tag">{p.data.name}</span>
+          </div>
+        ))}
+      </div>
+      <div class="l-steps">
+        {products.map((p, i) => (
+          <article class="l-step" data-ls={i} aria-labelledby={`l-${p.id}`}>
+            <p class="meta"><span class="dot"></span>{p.data.status}</p>
+            <h2 id={`l-${p.id}`} class="l-name">{p.data.name}</h2>
+            <p class="l-problem">{first(p.data.problem)}</p>
+            <p class="j-k">What we built</p>
+            <p>{p.data.summary}</p>
+            <div class={`fs-shot ${isPhone(p.id) ? 'is-phone' : ''}`} data-ui>{!isPhone(p.id) && <div class="bar"><span>{addr(p)}</span></div>}<img src={src(p.id)} srcset={set(p.id)} sizes="50vw" alt={shots[p.id].alt} loading="lazy" /></div>
+            <a class="link" href={`/products/${p.id}`}><span class="arrow">About {p.data.name}</span></a>
+          </article>
+        ))}
+      </div>
+    </section>
+  )}
+
   <nav class="vswitch" aria-label="Layout preview">
     {labels.map(([k, l]) => <a href={k ? `/products/layouts/${k}` : '/products'} aria-current={k === v ? 'true' : undefined}>{l}</a>)}
   </nav>
@@ -399,6 +475,66 @@ const labels: [string, string][] = [['', 'Current'], ['a', 'A · Full-screen sce
     .i-shot { width: 84%; }
   }
 
+  /* shared screenshot frame for J/K/L */
+  .fs-shot { background: #fafaf9; display: grid; grid-template-rows: auto 1fr; overflow: hidden; }
+  .fs-shot img { width: 100%; height: 100%; min-height: 0; object-fit: cover; object-position: left top; display: block; }
+  .fs-shot.is-phone { grid-template-rows: 1fr; border: 7px solid #0b0b0c; border-radius: 30px; aspect-ratio: 1206 / 2394; }
+
+  /* J · full-screen story: the clip fills the pinned screen; the story scrolls over it in two beats */
+  .j-wrap { position: relative; }
+  .j-stage { position: sticky; top: 0; height: 100svh; overflow: clip; background: #0b0b0c; }
+  .j-layer { position: absolute; inset: 0; opacity: 0; transition: opacity 600ms ease; }
+  .j-layer.is-on { opacity: 1; }
+  .j-layer video { position: absolute; inset: 0; }
+  .j-shade { position: absolute; inset: 0; background: rgb(11 11 12 / 0.35); transition: background-color 500ms ease; }
+  .j-layer .fs-shot { position: absolute; right: 6vw; top: 50%; width: min(52vw, 760px); aspect-ratio: 16 / 10; transform: translateY(-40%); opacity: 0; transition: opacity 500ms ease, transform 700ms var(--ease-out); }
+  .j-layer .fs-shot.is-phone { width: auto; height: 74svh; aspect-ratio: 1206 / 2394; right: 14vw; }
+  .j-wrap[data-phase='built'] .j-layer.is-on .fs-shot { opacity: 1; transform: translateY(-50%); }
+  .j-wrap[data-phase='built'] .j-layer.is-on .j-shade { background: rgb(11 11 12 / 0.62); }
+  .j-steps { position: relative; margin-top: -100svh; z-index: 1; }
+  .j-step { min-height: 100svh; display: grid; align-items: center; padding-inline: var(--margin); }
+  .j-card { width: min(440px, 100%); background: var(--bg); color: var(--ink); padding: clamp(24px, 2.6vw, 40px); display: grid; gap: 14px; justify-items: start; }
+  .j-name { font-size: clamp(44px, 4.6vw, 80px); letter-spacing: -0.05em; line-height: 0.95; }
+  .j-problem { font-size: clamp(19px, 1.5vw, 23px); font-weight: 600; line-height: 1.4; }
+  .j-k { font-size: var(--t-small); font-weight: 800; color: var(--accent); }
+  .j-sum { font-size: var(--t-lead); line-height: 1.4; }
+
+  /* K · grow to full screen: a framed clip expands with the scroll, then the story and screen arrive */
+  .k-sec { height: 260svh; position: relative; }
+  .k-pin { position: sticky; top: 0; height: 100svh; overflow: clip; display: grid; place-items: center; }
+  .k-frame { position: absolute; inset: 0; clip-path: inset(var(--ki, 18%) var(--kx, 22%)); background: #0b0b0c; }
+  .k-shade { position: absolute; inset: 0; background: rgb(11 11 12 / calc(0.15 + var(--kd, 0) * 0.45)); }
+  .k-text { position: relative; z-index: 1; color: #fafaf9; display: grid; gap: 14px; justify-items: start; align-self: end; padding-bottom: 10svh; width: 100%; opacity: var(--kt, 0); transform: translateY(calc((1 - var(--kt, 0)) * 24px)); }
+  .k-name { font-size: clamp(56px, 7vw, 128px); letter-spacing: -0.05em; line-height: 0.92; }
+  .k-problem { font-size: clamp(19px, 1.6vw, 25px); font-weight: 600; max-width: 34ch; }
+  .k-link { color: #fafaf9; font-weight: 700; text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 0.22em; }
+  .k-shotwrap { position: absolute; z-index: 1; right: 6vw; bottom: 0; width: min(48vw, 720px); transform: translateY(calc((1 - var(--ks, 0)) * 110%)); }
+  .k-shotwrap .fs-shot { aspect-ratio: 16 / 10; }
+  .k-shotwrap .fs-shot.is-phone { width: min(260px, 40vw); margin-left: auto; aspect-ratio: 1206 / 2394; border-bottom: 0; border-radius: 30px 30px 0 0; }
+
+  /* L · split screen: a full-height clip pinned on the left; the stories scroll on the right */
+  .l-wrap { display: grid; grid-template-columns: 1fr 1fr; }
+  .l-stage { position: sticky; top: 0; height: 100svh; overflow: clip; background: #0b0b0c; }
+  .l-layer { position: absolute; inset: 0; opacity: 0; transition: opacity 600ms ease; }
+  .l-layer.is-on { opacity: 1; }
+  .l-tag { position: absolute; left: var(--margin); bottom: 28px; color: #fafaf9; font-size: clamp(40px, 5vw, 88px); font-weight: 850; letter-spacing: -0.05em; line-height: 1; }
+  .l-steps { padding-inline: clamp(24px, 4vw, 72px); }
+  .l-step { min-height: 100svh; display: grid; align-content: center; gap: 14px; justify-items: start; padding-block: 12svh; }
+  .l-name { font-size: clamp(44px, 4.4vw, 76px); letter-spacing: -0.05em; line-height: 0.95; }
+  .l-problem { font-size: clamp(19px, 1.5vw, 23px); font-weight: 600; line-height: 1.4; max-width: 34ch; margin-bottom: 18px; }
+  .l-step .fs-shot { width: 100%; aspect-ratio: 16 / 10; margin-block: 12px; }
+  .l-step .fs-shot.is-phone { width: min(260px, 60%); aspect-ratio: 1206 / 2394; }
+
+  @media (max-width: 860px) {
+    .j-layer .fs-shot { right: 50%; transform: translate(50%, -40%); width: 86vw; top: 58%; }
+    .j-wrap[data-phase='built'] .j-layer.is-on .fs-shot { transform: translate(50%, -50%); }
+    .j-step { align-items: start; padding-top: 10svh; }
+    .k-shotwrap { width: 86vw; right: 7vw; }
+    .l-wrap { grid-template-columns: 1fr; }
+    .l-stage { height: 40svh; z-index: 2; }
+    .l-step { min-height: 0; padding-block: 48px; }
+  }
+
   .vswitch { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 50; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 6px; background: var(--ink); max-width: calc(100vw - 24px); }
   .vswitch a { padding: 8px 12px; font-size: 13px; font-weight: 700; color: var(--bg); text-decoration: none; }
   .vswitch a[aria-current] { background: var(--accent); color: var(--on-accent); }
@@ -456,4 +592,39 @@ const labels: [string, string][] = [['', 'Current'], ['a', 'A · Full-screen sce
   const panels = [...document.querySelectorAll<HTMLElement>('[data-h-panel]')];
   const pick = (i: number) => { tabs.forEach((t, k) => { t.setAttribute('aria-selected', String(k === i)); t.tabIndex = k === i ? 0 : -1; }); panels.forEach((p, k) => (p.hidden = k !== i)); panels[i]?.querySelector('video')?.play().catch(() => {}); };
   tabs.forEach((t, i) => { t.addEventListener('click', () => pick(i)); t.addEventListener('keydown', (e) => { const d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0; if (d) { const n = (i + d + tabs.length) % tabs.length; pick(n); tabs[n].focus(); } }); });
+  // J: whichever beat is in the middle of the screen picks the product and whether its screen shows
+  const jw = document.querySelector<HTMLElement>('[data-j]');
+  if (jw) {
+    const layers = [...jw.querySelectorAll<HTMLElement>('[data-jl]')];
+    const io3 = new IntersectionObserver((es) => es.forEach((e) => { if (!e.isIntersecting) return; const t = e.target as HTMLElement; layers.forEach((l) => l.classList.toggle('is-on', l.dataset.jl === t.dataset.js)); jw.dataset.phase = t.dataset.phase!; }), { rootMargin: '-48% 0px -48% 0px' });
+    jw.querySelectorAll('[data-js]').forEach((s) => io3.observe(s));
+  }
+  // K: scroll progress through each section drives the frame, the text and the screen
+  const ks = [...document.querySelectorAll<HTMLElement>('[data-k]')];
+  if (ks.length) {
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const clamp = (x: number) => Math.max(0, Math.min(1, x));
+    const ease = (x: number) => 1 - Math.pow(1 - x, 3);
+    const upd = () => {
+      ks.forEach((sec) => {
+        const r = sec.getBoundingClientRect(); const total = r.height - innerHeight;
+        const p = still ? 1 : clamp(-r.top / total);
+        const g = ease(clamp(p / 0.4));
+        sec.style.setProperty('--ki', `${(1 - g) * 18}%`); sec.style.setProperty('--kx', `${(1 - g) * 22}%`);
+        sec.style.setProperty('--kd', String(clamp((p - 0.35) / 0.3)));
+        sec.style.setProperty('--kt', String(ease(clamp((p - 0.4) / 0.2))));
+        sec.style.setProperty('--ks', String(ease(clamp((p - 0.65) / 0.25))));
+      });
+    };
+    let ticking = false;
+    addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(() => { upd(); ticking = false; }); } }, { passive: true });
+    addEventListener('resize', upd); upd();
+  }
+  // L: the story in the middle of the screen picks the clip on the left
+  const lw = document.querySelector<HTMLElement>('[data-l]');
+  if (lw) {
+    const layers = [...lw.querySelectorAll<HTMLElement>('[data-ll]')];
+    const io4 = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { const i = (e.target as HTMLElement).dataset.ls; layers.forEach((l) => l.classList.toggle('is-on', l.dataset.ll === i)); } }), { rootMargin: '-45% 0px -45% 0px' });
+    lw.querySelectorAll('[data-ls]').forEach((s) => io4.observe(s));
+  }
 </script>
