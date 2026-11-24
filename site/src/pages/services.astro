@@ -17,7 +17,7 @@ const small = ['svc-software', 'svc-automation'];
   </PageHead>
 
   {pillars.map((p, i) => (
-    <section id={p.slug} class={`pillar ${i % 2 ? 'inverse' : ''}`} aria-labelledby={`${p.slug}-t`}>
+    <section id={p.slug} class={`pillar ${i % 2 ? 'inverse' : ''} ${i === 0 ? 'pillar--first' : ''}`} aria-labelledby={`${p.slug}-t`}>
       <div class="wrap grid12 inner">
         <figure class={`photo pic ${i % 2 ? 'pic--right' : ''}`}>
           <img src={img(p.image, small.includes(p.image) ? 800 : 1600)} srcset={small.includes(p.image) ? undefined : srcset(p.image)}
@@ -49,14 +49,38 @@ const small = ['svc-software', 'svc-automation'];
       </div>
     </section>
   ))}
-  <CloseCTA title={['Not sure which', 'one you need?']} text="Most projects mix two or three of these. Tell us the problem and we’ll suggest the simplest fix." />
+  <script>
+    // the links in the description bring a section's photo and heading to the middle of the screen
+    // (on phones, to just below the top, since the photo sits above the heading there)
+    const go = (id: string, smooth: boolean) => {
+      const sec = document.getElementById(id);
+      const pic = sec?.querySelector<HTMLElement>('.pic');
+      if (!sec || !pic) return false;
+      const behavior = smooth && !matchMedia('(prefers-reduced-motion: reduce)').matches ? 'smooth' : 'auto';
+      if (matchMedia('(max-width: 860px)').matches) {
+        window.scrollTo({ top: pic.getBoundingClientRect().top + scrollY - 24, behavior });
+      } else {
+        const r = pic.getBoundingClientRect();
+        window.scrollTo({ top: r.top + scrollY - (innerHeight - r.height) / 2, behavior });
+      }
+      return true;
+    };
+    document.querySelectorAll<HTMLAnchorElement>('.ph a[href^="#"]').forEach((a) => a.addEventListener('click', (e) => {
+      const id = a.hash.slice(1);
+      if (go(id, true)) { e.preventDefault(); history.replaceState(null, '', `#${id}`); }
+    }));
+    if (location.hash) addEventListener('load', () => go(location.hash.slice(1), false));
+  </script>
+  <CloseCTA title={['Not sure which one', 'you need?']} text="Most projects mix two or three of these. Tell us the problem and we’ll suggest the simplest fix." />
 </Base>
 
 <style>
   .pillar { padding-block: var(--section); scroll-margin-top: 0; }
   .pillar:not(.inverse) + .pillar:not(.inverse) { padding-top: 0; }
+  /* the page header already leaves room above the first section */
+  .pillar--first { padding-top: 0; }
   .inner { row-gap: 48px; align-items: start; }
-  .pic { grid-column: 1 / 6; aspect-ratio: 4 / 5; position: sticky; top: 6vh; }
+  .pic { grid-column: 1 / 6; aspect-ratio: 4 / 5; }
   .pic--right { grid-column: 8 / -1; grid-row: 1; }
   .text { grid-column: 7 / -1; display: grid; gap: 24px; }
   .text--left { grid-column: 1 / 7; grid-row: 1; }
