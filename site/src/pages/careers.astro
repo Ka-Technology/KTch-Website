@@ -7,7 +7,7 @@ const jobs = await getCollection('jobs', (j) => j.data.open);
 const ways = [
   { name: 'Real client work, day one.', text: 'You ship software that real businesses use, not practice projects.', pic: 'pdx-skyline', alt: 'Downtown Portland’s towers with Mount Hood behind, seen from Pittock Mansion.' },
   { name: 'Profit sharing.', text: 'Developers share in the profit of the projects they work on.', pic: 'pdx-square', alt: 'Pioneer Courthouse Square with flower beds laid out in front of the old courthouse.' },
-  { name: 'Flexible hours.', text: 'Part-time-friendly involvement that fits around school or another job.', pic: 'pdx-garden', alt: 'The raked-gravel Flat Garden at the Portland Japanese Garden, with pines and autumn maples.' },
+  { name: 'Flexible hours.', text: 'Part-time-friendly involvement that fits around school or another job.', pic: 'pdx-tilikum', alt: 'Tilikum Crossing’s cable-stayed span over the Willamette River.' },
 ];
 const noRoles = ['No open roles right now.'];
 const mail = (subject: string) => `mailto:${site.email}?subject=${encodeURIComponent(subject)}`;
@@ -50,7 +50,7 @@ const mail = (subject: string) => `mailto:${site.email}?subject=${encodeURICompo
       </div>
     </section>
   ) : (
-    <section class="noroles field" aria-labelledby="roles-t">
+    <section class="noroles" aria-labelledby="roles-t">
       <div class="wrap nr-inner">
         <h2 id="roles-t" class="t-display lines nr-h" style={`--len:${Math.max(...noRoles.map((t) => t.length))}`} data-reveal>
           {noRoles.map((t) => <span class="line"><span>{t}</span></span>)}
@@ -84,7 +84,7 @@ const mail = (subject: string) => `mailto:${site.email}?subject=${encodeURICompo
   .rl ul { list-style: none; display: grid; gap: 40px; }
   .rl h3 { font-size: var(--t-lead); }
   .jm { color: var(--muted); font-weight: 600; margin: 4px 0 10px; }
-  .nr-inner { display: flex; flex-direction: column; gap: clamp(32px, 4vw, 56px); padding-block: clamp(80px, 9vw, 140px) clamp(80px, 8vw, 128px); }
+  .nr-inner { display: flex; flex-direction: column; gap: clamp(32px, 4vw, 56px); padding-block: 0 clamp(80px, 8vw, 128px); }
   .nr-h { font-size: min(var(--t-display), calc((100vw - 2 * var(--margin)) / (var(--len) * 0.54))); }
   .nr-foot { font-size: var(--t-lead); max-width: 58ch; font-weight: 600; text-wrap: balance; }
   .go { white-space: nowrap; font-weight: 750; }
