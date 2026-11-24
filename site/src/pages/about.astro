@@ -6,6 +6,17 @@ import CloseCTA from '../components/CloseCTA.astro';
 import { img, srcset } from '../data/site';
 const team = (await getCollection('team', (t) => t.data.current)).sort((a, b) => a.data.order - b.data.order);
 const products = await getCollection('products', (p) => !p.data.hidden);
+const projects = await getCollection('projects');
+const people = await getCollection('team');
+import { stripNames } from '../data/site';
+// TEMPORARY (?f=a|b|c): alternative fact sets beside the story; every number restates something already on the site
+const factSets: Record<string, [string, string][]> = {
+  cur: [['May 2024', 'Founded'], ['4', 'Friends from Oregon State'], [String(products.length), 'Products of our own'], ['3 months', 'To our first client project']],
+  a: [[String(stripNames.length), 'Teams we’ve worked with'], [String(projects.length), 'Client projects'], [String(products.length), 'Products of our own'], [String(people.length), 'People on the team']],
+  b: [['1 click', 'For a week of hand-typed certificates'], ['800 pages', 'Of HOA documents, read by AI'], ['13+', 'Staff inboxes moved, no email lost'], ['2 states', 'Of certificate templates, built in']],
+  c: [['Portland', 'Home base'], ['Oregon State', 'Where we met'], ['2024', 'Founded'], ['Eugene to Beaverton', 'Where our clients are']],
+};
+const factLabels = [['', 'Current'], ['a', 'A · Our work so far'], ['b', 'B · What it replaced'], ['c', 'C · Where we’re from']];
 const initials = (n: string) => n.split(' ').map((w) => w[0]).join('').slice(0, 2);
 // What we believe: the three beliefs from the spec. The grey sentence after each name takes turns rewording
 // itself (same number of words, each word close in length), so the bold names never move.
@@ -30,12 +41,11 @@ for (const v of values) { const base = v.texts[0].split(' ').map((w) => w.length
       <p class="t-lead first">Ka Technology started in May 2024 with four friends from Oregon State University and one observation: great young engineers were struggling to find work, and local businesses were struggling to find tech help. We set out to bring the two together.</p>
       <p>Our first products came from real frustrations. One of us worked as a real-estate broker and watched the office’s principal broker spend close to an hour every week typing out continuing-education certificates by hand. We built <a class="link" href="/products/realdoc">RealDoc</a> to do it in one click. A title company later used it across its Oregon branch.</p>
       <p>Since then we’ve built AI document platforms, schedulers, gym software and websites for businesses across the Portland area. We still believe what we wrote on day one: AI is a tool, not a replacement. Its job is to give people more time, and more meaningful choices.</p>
-      <ul class="facts" aria-label="Ka Technology in numbers">
-        <li><span class="fn">May 2024</span><span class="fl">Founded</span></li>
-        <li><span class="fn">4</span><span class="fl">Friends from Oregon State</span></li>
-        <li><span class="fn">{products.length}</span><span class="fl">Products of our own</span></li>
-        <li><span class="fn">3 months</span><span class="fl">To our first client project</span></li>
-      </ul>
+      {Object.entries(factSets).map(([k, set]) => (
+        <ul class={`facts fs fs--${k}`} aria-label="Ka Technology in numbers">
+          {set.map(([n, l]) => <li><span class="fn">{n}</span><span class="fl">{l}</span></li>)}
+        </ul>
+      ))}
     </div>
   </section>
 
@@ -74,6 +84,13 @@ for (const v of values) { const base = v.texts[0].split(' ').map((w) => w.length
     </ul>
     <p class="join">Want to build with us? <a class="link" href="/careers"><span class="arrow">See careers</span></a></p>
   </section>
+  <nav class="fswitch" aria-label="Fact set options">
+    {factLabels.map(([k, l]) => <a href={k ? `?f=${k}` : '?'} data-f={k}>{l}</a>)}
+  </nav>
+  <script is:inline>
+    (function () { var f = new URLSearchParams(location.search).get('f') || ''; document.documentElement.dataset.fs = f || 'cur';
+      document.querySelectorAll('.fswitch a').forEach(function (a) { if (a.dataset.f === f) a.setAttribute('aria-current', 'true'); }); })();
+  </script>
   <CloseCTA />
 </Base>
 
@@ -191,4 +208,11 @@ for (const v of values) { const base = v.texts[0].split(' ').map((w) => w.length
   .mf-text strong { color: var(--accent); font-weight: 850; }
   .alt .w { display: inline-block; white-space: nowrap; text-align: center; }
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  /* ---- TEMPORARY fact-set switcher ---- */
+  .fs--c .fn { font-size: clamp(26px, 2.4vw, 40px); }
+  .fs { display: none; }
+  :global(html[data-fs='cur']) .fs--cur, :global(html[data-fs='a']) .fs--a, :global(html[data-fs='b']) .fs--b, :global(html[data-fs='c']) .fs--c { display: grid; }
+  .fswitch { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 50; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 6px; background: var(--ink); max-width: calc(100vw - 24px); }
+  .fswitch a { padding: 8px 12px; font-size: 13px; font-weight: 700; color: var(--bg); text-decoration: none; }
+  .fswitch a[aria-current] { background: var(--accent); color: var(--on-accent); }
 </style>
