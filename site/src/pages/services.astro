@@ -24,7 +24,6 @@ const small = ['svc-software', 'svc-automation'];
             sizes="(max-width: 860px) 100vw, 40vw" width="800" height="1100" alt={p.imageAlt} loading="lazy" />
         </figure>
         <div class={`text ${i % 2 ? 'text--left' : ''}`} data-reveal>
-          <p class="num" aria-hidden="true">0{i + 1}</p>
           <h2 id={`${p.slug}-t`} class="t-h2">{p.name}</h2>
           <p class="t-lead pitch">{p.pitch}</p>
           <ul class="offers">
@@ -85,8 +84,6 @@ const small = ['svc-software', 'svc-automation'];
   .pic--right { grid-column: 8 / -1; grid-row: 1; }
   .text { grid-column: 7 / -1; display: grid; gap: 24px; }
   .text--left { grid-column: 1 / 7; grid-row: 1; }
-  /* 01–04, matching the four things named at the top */
-  .num { font-size: clamp(56px, 6vw, 96px); font-weight: 850; letter-spacing: -0.05em; line-height: 0.9; color: var(--accent); }
   .pitch { max-width: 34ch; font-weight: 600; }
   .offers { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 32px var(--gap); margin-top: 16px; }
   .offers li { display: grid; gap: 8px; align-content: start; padding-top: 18px; border-top: 0; position: relative; }
