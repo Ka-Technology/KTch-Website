@@ -12,39 +12,42 @@ const products = (await getCollection('products', (p) => !p.data.hidden)).sort((
 type Tile =
   | { k: 'clip'; r: number }
   | { k: 'quote'; r: number; text?: string; by?: string; fs?: number }
-  | { k: 'pic'; r: number; src: string; alt: string; fit?: 'cover' | 'contain'; bg?: string; pad?: string; pos?: string }
-  | { k: 'word'; r: number; text: string; bg: string; fg: string };
+  | { k: 'pic'; r: number; src: string; alt: string };
 // each product's own type and colours (taken from its code and live site); used only in its tiles.
-// Its strip: the clip, its own lines, its marks, and photos of its world (credited on /credits).
+// Its strip: the clip with the product's logo over it, its own lines, and photos of its world (credited on /credits),
+// each photo carrying the product's mark small in its bottom-right corner.
+type Logo = { src?: string; text?: string; italic?: boolean; size?: number; tone: 'dark' | 'light' };
+type Badge = { src: string; bg?: string; pad?: string; round?: boolean };
 const ph = (n: string, r = 1.33): Tile => ({ k: 'pic', r, src: `/images/${n}-800.webp`, alt: '' });
-const mark = (src: string, bg: string, pad: string, r = 1): Tile => ({ k: 'pic', r, src, alt: '', fit: 'contain', bg, pad });
-const brand: Record<string, { font: string; bg: string; fg: string; fs: number; tiles: Tile[] }> = {
-  // Kept: its current icon and mark, people keeping the habits Kept offers, and lines from habitkept.com
-  kept: { font: "'Kept Bricolage'", bg: '#F6F4EF', fg: '#1C2143', fs: 1.2, tiles: [
+const brand: Record<string, { font: string; bg: string; fg: string; fs: number; logo: Logo; badge: Badge; tiles: Tile[] }> = {
+  // Kept: its logo as on habitkept.com (the K mark and the name), people keeping the habits Kept offers, its own lines
+  kept: { font: "'Kept Bricolage'", bg: '#F6F4EF', fg: '#1C2143', fs: 1.2,
+    logo: { src: '/images/pb-kept-icon-600.webp', text: 'Kept', tone: 'dark' },
+    badge: { src: '/images/pb-kept-icon-600.webp' },
+    tiles: [
     { k: 'clip', r: 1.25 },
     { k: 'quote', r: 2 },
     ph('pw-kept-h2'),
-    { k: 'pic', r: 1, src: '/images/pb-kept-icon-600.webp', alt: '' },
     ph('pw-kept-h5', 1.1),
     ph('pw-kept-h1'),
     { k: 'quote', r: 2.9, text: 'I will read every day for 28 days, or $25 goes to a charity I pick.', fs: 0.72 },
     ph('pw-kept-h6'),
-    mark('/images/pb-kept-mark.webp', '#F6F4EF', '18%'),
     ph('pw-kept-h4'),
     ph('pw-kept-h3'),
     { k: 'quote', r: 2.1, text: 'Be first to keep your word.' },
     ph('pw-kept-h0'),
-    ph('pw-kept-h8'),
     ph('pw-kept-h7', 1.1),
   ] },
-  // DoIGetGas: lines and this week's price from doigetgas.com
-  doigetgas: { font: "'Gas Space Grotesk'", bg: '#0F0A08', fg: '#F3ECE4', fs: 1, tiles: [
+  // DoIGetGas: its name as doigetgas.com sets it, its pump icon, its lines and this week's price
+  doigetgas: { font: "'Gas Space Grotesk'", bg: '#0F0A08', fg: '#F3ECE4', fs: 1,
+    logo: { text: 'Do I Get Gas?', size: 0.62, tone: 'dark' },
+    badge: { src: '/images/pb-gas-icon.svg', bg: '#0F0A08', pad: '17%' },
+    tiles: [
     { k: 'quote', r: 1.8 },
     ph('pw-gas-0'),
     { k: 'clip', r: 1.25 },
     { k: 'quote', r: 1.8, text: 'Pump prices lag crude.' },
     ph('pw-gas-4', 1.6),
-    mark('/images/pb-gas-icon.svg', '#0F0A08', '24%'),
     ph('pw-gas-2', 1.6),
     { k: 'quote', r: 2, text: 'Regular gas is $3.81 a gallon.', by: 'U.S. average, week of Nov 16 · EIA' },
     ph('pw-gas-1'),
@@ -52,35 +55,32 @@ const brand: Record<string, { font: string; bg: string; fg: string; fs: number; 
     { k: 'quote', r: 2.4, text: 'Crude oil is the biggest input to the cost of gasoline.', fs: 0.8 },
     ph('pw-gas-3'),
   ] },
-  // RealDoc: its wordmark, round mark and pen, classrooms and houses, and Tammy Sue's words from realdoc.app
-  realdoc: { font: "'RealDoc Geist'", bg: '#0A4A74', fg: '#FFFFFF', fs: 0.8, tiles: [
-    mark('/images/pb-realdoc-word-800.webp', '#E9EFF5', '10%', 1.5),
+  // RealDoc: its gradient logo (as on realdoc.app) and round brandmark, classrooms and houses, Tammy Sue's words
+  realdoc: { font: "'RealDoc Geist'", bg: '#0A4A74', fg: '#FFFFFF', fs: 0.8,
+    logo: { src: '/images/pb-realdoc-logo.webp', tone: 'light' },
+    badge: { src: '/images/pb-realdoc-badge.webp', round: true },
+    tiles: [
     ph('pw-rd-c0', 0.9),
     { k: 'clip', r: 1.25 },
     { k: 'quote', r: 2.2 },
     ph('pw-rd-0'),
-    mark('/images/pb-realdoc-mark.webp', '#E9EFF5', '20%'),
-    ph('pw-rd-c1'),
-    { k: 'quote', r: 3.2, text: '“This app has saved me so many hours! The developers made it very easy to use and implement. I’m thrilled to have this resource!”', by: 'Tammy Sue Schuck, Principal Broker, Keller Williams Eugene-Springfield', fs: 0.72 },
-    ph('pw-rd-2', 0.8),
     ph('pw-rd-c3'),
-    mark('/images/pb-realdoc-pen.webp', '#E9EFF5', '16%', 0.9),
+    { k: 'quote', r: 2.3, text: '“This app has saved me so many hours!”', by: 'Tammy Sue Schuck, Principal Broker, Keller Williams Eugene-Springfield' },
+    ph('pw-rd-2', 0.8),
     ph('pw-rd-c4'),
-    ph('pw-rd-3'),
-    ph('pw-rd-c2'),
   ] },
-  // Shiftwize: its bolt and wordmark, cafés and kitchens, and its own lines
-  shiftwize: { font: "'Shiftwize Jakarta'", bg: '#00AFFE', fg: '#04121F', fs: 1, tiles: [
+  // Shiftwize: its name and bolt, cafés and kitchens, and its own lines
+  shiftwize: { font: "'Shiftwize Jakarta'", bg: '#00AFFE', fg: '#04121F', fs: 1,
+    logo: { text: 'SHIFTWIZE', italic: true, size: 0.72, tone: 'dark' },
+    badge: { src: '/images/pb-shiftwize-bolt.svg', bg: '#FFFFFF', pad: '20%', round: true },
+    tiles: [
     { k: 'clip', r: 1.25 },
     ph('pw-sw-2'),
     { k: 'quote', r: 1.9 },
-    mark('/images/pb-shiftwize-bolt.svg', '#E3F5FE', '22%'),
     ph('pw-sw-0'),
     { k: 'quote', r: 1.8, text: 'Set your availability.' },
-    { k: 'word', r: 1.3, text: 'SHIFTWIZE', bg: '#E3F5FE', fg: '#1A9FE8' },
-    ph('pw-sw-5', 1),
-    { k: 'quote', r: 1.9, text: 'Hard rules it never breaks.' },
     ph('pw-sw-3'),
+    { k: 'quote', r: 1.9, text: 'Hard rules it never breaks.' },
   ] },
 };
 // every name is set at the size that fits the longest one
@@ -125,11 +125,21 @@ const split = (t: string) => { const m = t.match(/^(.+?[.!?])\s+(.*)$/s); return
                 {[0, 1].map(() => (
                   <div class="set">
                   {b.tiles.map((t) => (
-                    <div class={`tile t-${t.k}`} style={`--r:${t.r}${t.k === 'pic' && t.bg ? `;background:${t.bg}` : ''}${t.k === 'word' ? `;background:${t.bg};color:${t.fg}` : ''}`}>
+                    <div class={`tile t-${t.k}`} style={`--r:${t.r}`}>
                       {t.k === 'clip' && <video muted loop playsinline preload="none" poster={img(`prod-${p.id}-poster`, 800)}><source src={`/video/prod-${p.id}.mp4`} type="video/mp4" /></video>}
+                      {t.k === 'clip' && (
+                        <div class={`logo is-${b.logo.tone}`} style={`--ls:${b.logo.size ?? 1}`}>
+                          {b.logo.src && <img src={b.logo.src} alt="" class={b.logo.text ? 'lm' : 'lw'} />}
+                          {b.logo.text && <span class={b.logo.italic ? 'it' : undefined}>{b.logo.text}</span>}
+                        </div>
+                      )}
                       {t.k === 'quote' && <p style={t.fs ? `--qs:${t.fs}` : undefined}>{t.text ?? d.tagline}{t.by && <span class="by">{t.by}</span>}</p>}
-                      {t.k === 'pic' && <img src={t.src} alt="" loading="lazy" style={`object-fit:${t.fit ?? 'cover'}${t.pad ? `;padding:${t.pad}` : ''}${t.pos ? `;object-position:${t.pos}` : ''}`} />}
-                      {t.k === 'word' && <span>{t.text}</span>}
+                      {t.k === 'pic' && <img src={t.src} alt="" loading="lazy" />}
+                      {t.k === 'pic' && (
+                        <span class={`badge ${b.badge.round ? 'is-round' : ''}`} style={b.badge.bg ? `background:${b.badge.bg}` : undefined}>
+                          <img src={b.badge.src} alt="" style={b.badge.pad ? `padding:${b.badge.pad}` : undefined} />
+                        </span>
+                      )}
                     </div>
                   ))}
                   </div>
@@ -309,19 +319,31 @@ const split = (t: string) => { const m = t.match(/^(.+?[.!?])\s+(.*)$/s); return
     filter: grayscale(1) contrast(1.05); transition: filter 700ms ease; }
   /* everything in grey until the row is opened; then the product's own colours come back */
   .is-open .tile { filter: none; }
-  .tile img, .tile video { display: block; width: 100%; height: 100%; object-fit: cover; box-sizing: border-box; transition: transform 600ms var(--ease-out); }
+  .tile > img, .tile > video { display: block; width: 100%; height: 100%; object-fit: cover; box-sizing: border-box; transition: transform 600ms var(--ease-out); }
   .t-quote { background: var(--bb); color: var(--bc); display: grid; place-items: center; padding: 0 clamp(18px, 2.2vw, 36px); }
   .t-quote p { width: 100%; font-family: var(--bf), var(--font); font-weight: 800; line-height: 1.02; letter-spacing: -0.03em; text-wrap: balance; text-align: center;
     font-size: calc(var(--H) * 0.16 * var(--bs) * var(--qs, 1)); }
   .t-quote .by { display: block; margin-top: 0.9em; font-family: var(--font); font-size: max(12px, 0.34em); font-weight: 650; letter-spacing: 0; line-height: 1.3; opacity: 0.8; }
-  .t-word { display: grid; place-items: center; }
-  .t-word span { font-family: 'Shiftwize Jakarta', var(--font); font-style: italic; font-weight: 800; letter-spacing: -0.02em; font-size: 13cqw; }
+  /* the product's logo over its clip, with a soft wash behind it so the clip still shows through */
+  .logo { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 0.28em; pointer-events: none;
+    font-size: calc(var(--H) * 0.2 * var(--ls)); }
+  .logo.is-dark { color: #fff; background: radial-gradient(closest-side, rgb(0 0 0 / 0.62), rgb(0 0 0 / 0.22) 72%, transparent); text-shadow: 0 1px 14px rgb(0 0 0 / 0.45); } /* taste-skill-ignore: scrim over the clip so the logo reads */
+  .logo.is-light { background: radial-gradient(closest-side, rgb(255 255 255 / 0.94), rgb(255 255 255 / 0.6) 72%, transparent); } /* taste-skill-ignore: scrim over the clip so the logo reads */
+  .logo span { font-family: var(--bf), var(--font); font-weight: 800; letter-spacing: -0.03em; line-height: 1; white-space: nowrap; }
+  .logo .it { font-style: italic; letter-spacing: -0.01em; }
+  .logo .lm { width: 1.05em; height: 1.05em; border-radius: 22%; box-shadow: 0 1px 10px rgb(0 0 0 / 0.3); } /* taste-skill-ignore: lifts the mark off the clip */
+  .logo .lw { width: 80%; height: auto; }
+  /* the product's mark, small in each photo's bottom-right corner */
+  .badge { position: absolute; right: 10px; bottom: 10px; width: clamp(26px, calc(var(--H) * 0.13), 38px); aspect-ratio: 1; border-radius: 22%; overflow: hidden;
+    box-shadow: 0 1px 6px rgb(0 0 0 / 0.35); } /* taste-skill-ignore: keeps the mark readable on any photo */
+  .badge.is-round { border-radius: 50%; }
+  .badge img { display: block; width: 100%; height: 100%; object-fit: contain; box-sizing: border-box; }
 
   /* a row you can open: on hover the plus turns red and the pictures lean in a touch */
   @media (hover: hover) and (pointer: fine) {
     .row:hover .plus { background: var(--accent); }
     .row:hover .nm { color: var(--accent); }
-    .row:hover .tile img, .row:hover .tile video { transform: scale(1.03); }
+    .row:hover .tile > img, .row:hover .tile > video { transform: scale(1.03); }
   }
   .is-open .plus { background: var(--accent); transform: rotate(45deg); }
   .is-open .nm { color: var(--accent); }
