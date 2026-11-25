@@ -1,0 +1,27 @@
+---
+// Each product's details now live on the Products page; these addresses send visitors to that product's section,
+// so older links (home page, About, search results) keep working.
+import { getCollection } from 'astro:content';
+export async function getStaticPaths() {
+  const products = await getCollection('products', (p) => !p.data.hidden);
+  return products.map((p) => ({ params: { slug: p.id }, props: { name: p.data.name } }));
+}
+const { slug } = Astro.params;
+const { name } = Astro.props;
+const to = `/products/#${slug}`;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{name} · Ka Technology</title>
+    <meta http-equiv="refresh" content={`0; url=${to}`} />
+    <link rel="canonical" href={`https://ka-tch.com${to}`} />
+    <meta name="robots" content="noindex" />
+  </head>
+  <body>
+    <p>{name} has moved to <a href={to}>our products page</a>.</p>
+    <script is:inline define:vars={{ to }}>location.replace(to);</script>
+  </body>
+</html>

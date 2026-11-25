@@ -1,0 +1,35 @@
+---
+import { img, srcset } from '../data/site';
+interface Props { title: string; lede?: string; image?: string; imageAlt?: string; imageW?: number; imageH?: number }
+const { title, lede, image, imageAlt = '', imageW = 1600, imageH = 1000 } = Astro.props;
+---
+<header class="ph wrap">
+  <div class="grid12 top">
+    <h1 class="t-display title lines"><span class="line"><span data-line style="--i:0">{title}</span></span></h1>
+    {Astro.slots.has('lede')
+      ? <p class="t-lead lede" data-load style="--d:300ms"><slot name="lede" /></p>
+      : lede && <p class="t-lead lede" data-load style="--d:300ms">{lede}</p>}
+    <slot />
+  </div>
+  {image && (
+    <figure class="photo band" data-open>
+      <img src={img(image)} srcset={srcset(image)} sizes="100vw" width={imageW} height={imageH} alt={imageAlt} fetchpriority="high" />
+    </figure>
+  )}
+</header>
+
+<style>
+  .ph { padding-top: clamp(24px, 5vh, 72px); padding-bottom: clamp(64px, 9vw, 128px); }
+  /* the description starts level with the top of the title, whatever the length of either */
+  .top { row-gap: 28px; align-items: start; }
+  .title { grid-column: 1 / 7; }
+  /* the description's capitals line up with the top of the title's lowercase letters (Noto Sans: x-height
+     top sits 0.409em into a t-display line; a capital's top sits 0.367em into a t-lead line) */
+  .lede { grid-column: 7 / -1; max-width: 40ch; padding-top: calc(var(--t-display) * 0.409 - 0.367em); }
+  .band { margin-top: clamp(40px, 6vw, 80px); aspect-ratio: 16 / 6; }
+  @media (max-width: 860px) {
+    .title, .lede { grid-column: 1 / -1; }
+    .lede { padding-top: 0; }
+    .band { aspect-ratio: 4 / 3; margin-inline: calc(var(--margin) * -1); }
+  }
+</style>

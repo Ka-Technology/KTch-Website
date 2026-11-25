@@ -1,0 +1,100 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import { site, img } from '../data/site';
+const jobs = await getCollection('jobs', (j) => j.data.open);
+const ways = [
+  { name: 'Real client work, day one.', text: 'You ship software that real businesses use, not practice projects.', pic: 'pdx-skyline', alt: 'Downtown Portland’s towers with Mount Hood behind, seen from Pittock Mansion.' },
+  { name: 'Profit sharing.', text: 'Developers share in the profit of the projects they work on.', pic: 'pdx-square', alt: 'Pioneer Courthouse Square with flower beds laid out in front of the old courthouse.' },
+  { name: 'Flexible hours.', text: 'Part-time-friendly involvement that fits around school or another job.', pic: 'pdx-tilikum', alt: 'Tilikum Crossing’s cable-stayed span over the Willamette River.' },
+];
+const noRoles = ['No open roles right now.'];
+const mail = (subject: string) => `mailto:${site.email}?subject=${encodeURIComponent(subject)}`;
+---
+<Base og="careers" title="Careers" description="Join Ka Technology: a small, remote-friendly team of AI-native developers shipping real software for real businesses.">
+  <PageHead title="Build with us" lede="We’re a small, remote-friendly team that ships real software for real businesses. We look for AI-native developers: people who know how to build with AI and use it well." />
+
+  <!-- How we work: three promises, each led by a large red numeral -->
+  <section class="wrap how" aria-labelledby="how-t">
+    <h2 id="how-t" class="t-h2">How we work</h2>
+    <ol class="nums" data-reveal>
+      {ways.map((w, i) => (
+        <li>
+          <span class="n" aria-hidden="true">{i + 1}</span>
+          <div class="wt"><h3>{w.name}</h3><p>{w.text}</p></div>
+          <figure class="photo wp"><img src={img(w.pic, 1600)} srcset={`${img(w.pic, 800)} 800w, ${img(w.pic, 1600)} 1600w`} sizes="(max-width: 860px) 100vw, 52vw" width="1600" height="485" alt={w.alt} loading="lazy" /></figure>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <!-- Open roles: the last section before the footer. With no roles open it reads like the big closing question
+       on the other pages (same size, same two-line split, same line and link underneath). -->
+  {jobs.length > 0 ? (
+    <section class="roles field" aria-labelledby="roles-t">
+      <div class="wrap grid12">
+        <h2 id="roles-t" class="t-h2 bh">Open roles</h2>
+        <div class="rl" data-reveal>
+          <ul>
+            {jobs.map((j) => (
+              <li>
+                <h3>{j.data.title}</h3>
+                <p class="jm">{j.data.type} · {j.data.location}</p>
+                <p>{j.data.summary}</p>
+                <a class="link" href={mail(`Application: ${j.data.title}`)}><span class="arrow">Apply by email</span></a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
+  ) : (
+    <section class="noroles" aria-labelledby="roles-t">
+      <div class="wrap nr-inner">
+        <h2 id="roles-t" class="t-display lines nr-h" style={`--len:${Math.max(...noRoles.map((t) => t.length))}`} data-reveal>
+          {noRoles.map((t) => <span class="line"><span>{t}</span></span>)}
+        </h2>
+        <p class="nr-foot" data-reveal>Send us a note anyway. Tell us what you’ve built and what you’d like to build next. <a class="link go" href={mail('Working with Ka Technology')}><span class="arrow">Email {site.email}</span></a></p>
+      </div>
+    </section>
+  )}
+</Base>
+
+<style>
+  .how { padding-bottom: var(--section); }
+
+  /* How we work · big numerals */
+  /* each row: numeral, its text, and a wide photo running to the right edge; the photos stack 6px apart */
+  .nums { --N: clamp(64px, 8vw, 140px); --H: clamp(28px, 2.9vw, 48px);
+    list-style: none; margin-top: clamp(36px, 4vw, 64px); display: grid; gap: 6px; }
+  .nums li { display: grid; grid-template-columns: clamp(64px, 8vw, 140px) minmax(0, 1fr) minmax(0, 52%); column-gap: var(--gap); align-items: center; }
+  .n { align-self: start; font-size: var(--N); font-weight: 850; letter-spacing: -0.06em; line-height: 0.8; color: var(--accent); }
+  /* line the heading's capitals up with the numeral's top (Noto Sans: cap top sits 0.074em into a 0.8 line, 0.199em into a 1.05 line) */
+  .wt { display: grid; gap: 8px; margin-top: calc(var(--N) * 0.074 - var(--H) * 0.199); align-self: start; }
+  .nums h3 { font-size: var(--H); letter-spacing: -0.04em; line-height: 1.05; }
+  .nums p { font-size: clamp(18px, 1.5vw, 24px); line-height: 1.35; max-width: 34ch; }
+  /* Portland landmarks, always in grey */
+  .wp { aspect-ratio: 3.2 / 1; margin-right: calc(var(--margin) * -1); }
+
+  /* Open roles */
+  .roles { padding-block: clamp(80px, 9vw, 140px); }
+  .bh { grid-column: 1 / 6; }
+  .rl { grid-column: 6 / -1; }
+  .rl ul { list-style: none; display: grid; gap: 40px; }
+  .rl h3 { font-size: var(--t-lead); }
+  .jm { color: var(--muted); font-weight: 600; margin: 4px 0 10px; }
+  .nr-inner { display: flex; flex-direction: column; gap: clamp(32px, 4vw, 56px); padding-block: 0 clamp(80px, 8vw, 128px); }
+  .nr-h { font-size: min(var(--t-display), calc((100vw - 2 * var(--margin)) / (var(--len) * 0.54))); }
+  .nr-foot { font-size: var(--t-lead); max-width: 58ch; font-weight: 600; text-wrap: balance; }
+  .go { white-space: nowrap; font-weight: 750; }
+
+  @media (max-width: 860px) {
+    .nums { gap: 36px; }
+    .nums li { grid-template-columns: clamp(56px, 16vw, 80px) minmax(0, 1fr); row-gap: 16px; }
+    .wp { grid-column: 1 / -1; aspect-ratio: 5 / 2; margin-inline: calc(var(--margin) * -1); }
+    .bh, .rl { grid-column: 1 / -1; }
+    .rl { margin-top: 28px; }
+    .go { white-space: normal; }
+  }
+</style>

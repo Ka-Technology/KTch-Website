@@ -1,0 +1,90 @@
+---
+import { stripNames } from '../../data/site';
+---
+<section class="strip" aria-labelledby="strip-title">
+  <div class="wrap head">
+    <h2 id="strip-title" class="label">Teams we’ve worked with</h2>
+  </div>
+  <div class="wrap"><div class="track" tabindex="0" aria-label="Client names, scrolling. Drag to move." data-strip>
+    <ul class="row">
+      {stripNames.map((n) => <li>{n}</li>)}
+    </ul>
+    <ul class="row" aria-hidden="true">
+      {stripNames.map((n) => <li>{n}</li>)}
+    </ul>
+  </div></div>
+</section>
+
+<script>
+  // The names drift left on their own (one full pass every 60s), pause while hovered or focused, and can be
+  // grabbed and dragged either way; a flick keeps gliding briefly. The two copies make the loop seamless.
+  const track = document.querySelector<HTMLElement>('[data-strip]');
+  if (track) {
+    const rows = [...track.querySelectorAll<HTMLElement>('.row')];
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let width = rows[0].getBoundingClientRect().width;
+    let offset = 0, hover = false, focus = false, drag = false, lastX = 0, lastT = 0, vel = 0, prev = performance.now();
+    const place = () => {
+      offset = ((offset % width) + width) % width;
+      rows.forEach((r) => (r.style.transform = `translateX(${-offset}px)`));
+    };
+    const tick = (t: number) => {
+      const dt = Math.min(64, t - prev) / 1000; prev = t;
+      if (!drag) {
+        if (Math.abs(vel) > 5) { offset += vel * dt; vel *= Math.pow(0.04, dt); }   // glide after a flick
+        else { vel = 0; if (!still && !hover && !focus) offset += (width / 60) * dt; }
+      }
+      place();
+      requestAnimationFrame(tick);
+    };
+    track.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') hover = true; });
+    track.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') hover = false; });
+    track.addEventListener('focusin', () => (focus = true));
+    track.addEventListener('focusout', () => (focus = false));
+    track.addEventListener('pointerdown', (e) => {
+      drag = true; vel = 0; lastX = e.clientX; lastT = performance.now();
+      track.setPointerCapture(e.pointerId); track.classList.add('is-dragging');
+    });
+    track.addEventListener('pointermove', (e) => {
+      if (!drag) return;
+      const now = performance.now(), dx = e.clientX - lastX;
+      offset -= dx;
+      vel = -dx / Math.max(1, now - lastT) * 1000;
+      lastX = e.clientX; lastT = now;
+    });
+    const end = (e: PointerEvent) => {
+      if (!drag) return;
+      drag = false; track.classList.remove('is-dragging');
+      if (performance.now() - lastT > 80) vel = 0;   // held still before letting go: no glide
+      if (track.hasPointerCapture(e.pointerId)) track.releasePointerCapture(e.pointerId);
+    };
+    track.addEventListener('pointerup', end);
+    track.addEventListener('pointercancel', end);
+    addEventListener('resize', () => { width = rows[0].getBoundingClientRect().width; });
+    track.classList.add('is-live');
+    requestAnimationFrame(tick);
+  }
+</script>
+
+<style>
+  .strip { padding-block: clamp(72px, 9vw, 132px) 0; }
+  .head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
+  .label { font-size: var(--t-lead); letter-spacing: -0.02em; font-weight: 700; }
+  .track { margin-top: 24px; display: flex; overflow: hidden; background: var(--surface); padding-block: 26px; padding-inline: 24px; }
+  .track:focus-visible { outline-offset: -3px; }
+  /* once the script runs: grabbable, horizontal drags belong to the strip, vertical swipes still scroll the page */
+  .track.is-live { cursor: grab; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+  .track.is-dragging { cursor: grabbing; }
+  .row { display: flex; flex: none; list-style: none; gap: 0; will-change: transform; }
+  .row li {
+    flex: none; padding-inline: 0.7em; font-size: var(--t-h2); font-weight: 800;
+    letter-spacing: -0.035em; white-space: nowrap;
+  }
+  .row li::after { content: ""; display: inline-block; width: 0.32em; height: 0.32em; background: var(--accent); margin-left: 1.4em; vertical-align: 0.12em; }
+  /* without the script, the strip still drifts on its own */
+  @media (prefers-reduced-motion: no-preference) {
+    .track:not(.is-live) .row { animation: marquee 60s linear infinite; }
+    .track:not(.is-live):hover .row, .track:not(.is-live):focus-within .row { animation-play-state: paused; }
+  }
+  @keyframes marquee { to { transform: translateX(-100%); } }
+</style>

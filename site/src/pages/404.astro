@@ -1,0 +1,26 @@
+---
+import Base from '../layouts/Base.astro';
+import Symbol from '../components/Symbol.astro';
+---
+<Base title="Page not found">
+  <section class="wrap nf">
+    <div class="mark"><Symbol size={220} /></div>
+    <div class="txt" data-reveal>
+      <h1 class="t-display">Wrong turn.</h1>
+      <p class="t-lead">This page doesn’t exist, or it moved. Even the best paths have a dead end or two.</p>
+      <div class="actions">
+        <a class="button" href="/">Back to home</a>
+        <a class="button button--quiet" href="/contact">Contact us</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .nf { min-height: 64svh; display: grid; grid-template-columns: auto 1fr; gap: clamp(32px, 6vw, 96px); align-items: center; padding-block: var(--section); }
+  .mark { color: var(--accent); }
+  .txt { display: grid; gap: 24px; }
+  .txt p { max-width: 36ch; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; }
+  @media (max-width: 860px) { .nf { grid-template-columns: 1fr; } .mark :global(svg) { width: 120px; height: 120px; } }
+</style>

@@ -1,0 +1,49 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import { credits } from '../data/credits';
+import { img } from '../data/site';
+---
+<Base title="Photo credits" description="Sources and licences for the photographs of Portland used on ka-tch.com." strip={false}>
+  <PageHead title="Photo credits" lede="The pictures of Portland on this site come from open collections, and the home page video from free-licence footage. Thank you to the people who made them free to use." />
+
+  <section class="wrap list" aria-labelledby="cr-t">
+    <h2 id="cr-t" class="sr-only">Photographs</h2>
+    <ul>
+      {credits.map((c) => (
+        <li class="item" data-reveal>
+          <figure class="photo pic">
+            <img src={img(c.image, 800)} width="800" height={Math.round((800 * c.h) / c.w)} alt={c.title} loading="lazy" />
+          </figure>
+          <div class="text">
+            <h3>{c.title}</h3>
+            <dl>
+              <div><dt>By</dt><dd>{c.creator}</dd></div>
+              <div><dt>Licence</dt><dd>{c.licence}</dd></div>
+              <div><dt>Used on</dt><dd>{c.usedOn}</dd></div>
+            </dl>
+            <a class="link" href={c.page} rel="noopener"><span class="arrow">{c.sourceLabel ?? 'Source on Wikimedia Commons'}</span></a>
+          </div>
+        </li>
+      ))}
+    </ul>
+    <p class="note">All other photographs, the service images and team headshots, belong to Ka Technology.</p>
+  </section>
+</Base>
+
+<style>
+  .list { padding-bottom: var(--section); }
+  .list ul { list-style: none; display: grid; gap: clamp(40px, 5vw, 72px); }
+  .item { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gap); row-gap: 20px; align-items: start; }
+  .pic { grid-column: 1 / 5; aspect-ratio: 4 / 3; }
+  .text { grid-column: 6 / -1; display: grid; gap: 16px; justify-items: start; }
+  .text h3 { font-size: var(--t-lead); letter-spacing: -0.02em; line-height: 1.2; }
+  dl { margin: 0; width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px var(--gap); }
+  dt { font-size: var(--t-small); color: var(--muted); font-weight: 600; }
+  dd { margin: 2px 0 0; font-weight: 700; }
+  .note { margin-top: clamp(56px, 6vw, 88px); color: var(--muted); max-width: 60ch; }
+  @media (max-width: 860px) {
+    .pic, .text { grid-column: 1 / -1; }
+    dl { grid-template-columns: 1fr 1fr; }
+  }
+</style>

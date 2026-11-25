@@ -1,0 +1,52 @@
+---
+import { img, srcset } from '../data/site';
+---
+<section class="pdx" aria-labelledby="pdx-title">
+  <div class="mosaic">
+    <div class="tile t-text" data-reveal>
+      <h2 id="pdx-title" class="t-h2">Made in Portland</h2>
+      <p class="t-lead">Four friends from Oregon State’s computer science program started Ka Technology in May 2024 with one idea: small businesses deserve the same technology big companies have, without the price tag or the jargon.</p>
+      <a class="button" href="/about">Read our story</a>
+    </div>
+    <figure class="photo tile t-a drift">
+      <img src={img('st-johns-1938')} srcset="/images/st-johns-1938-800.webp 800w, /images/st-johns-1938-1600.webp 1078w" sizes="(max-width: 860px) 100vw, 33vw" width="1078" height="850" loading="lazy" alt="Portland’s St. Johns Bridge lit up at night in 1938." />
+    </figure>
+    <figure class="photo tile t-b">
+      <img src={img('union-station')} srcset={srcset('union-station')} sizes="(max-width: 860px) 50vw, 25vw" width="1600" height="2400" loading="lazy" alt="The clock tower of Portland's Union Station, with its Go By Train sign." />
+    </figure>
+    <figure class="photo tile t-c">
+      <img src={img('downtown-portland')} srcset={srcset('downtown-portland')} sizes="(max-width: 860px) 100vw, 50vw" width="1600" height="735" loading="lazy" alt="Downtown Portland and the Hawthorne Bridge over the Willamette River, seen from the Marquam Bridge." />
+    </figure>
+    <div class="tile t-fig">
+      <p class="fig">May 2024</p>
+      <p>Our first client project shipped three months later.</p>
+    </div>
+    <figure class="photo tile t-d">
+      <img src={img('vista-bridge')} srcset={srcset('vista-bridge')} sizes="(max-width: 860px) 100vw, 25vw" width="1600" height="900" loading="lazy" alt="Vista Bridge in Portland's West Hills, with downtown and Mount Hood behind it." />
+    </figure>
+  </div>
+</section>
+
+<style>
+  .mosaic { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: clamp(220px, 22vw, 360px); }
+  .tile { margin: 0; }
+  .t-text { grid-column: 1 / 3; grid-row: 1 / 3; padding: clamp(28px, 4vw, 64px); display: grid; gap: 28px; align-content: center; justify-items: start; }
+  .t-text { background: var(--bg); }
+  .t-text .t-lead { max-width: 34ch; }
+  .t-a { grid-column: 3 / 5; grid-row: 1; }
+  .t-b { grid-column: 3; grid-row: 2 / 4; }
+  .t-fig { grid-column: 4; grid-row: 2; background: var(--bg); padding: 28px; display: grid; align-content: center; gap: 8px; font-size: var(--t-body); font-weight: 600; }
+  .t-fig p:not(.fig) { color: var(--ink); }
+  .fig { color: var(--accent); font-size: var(--t-h2); font-weight: 850; letter-spacing: -0.045em; line-height: 1; }
+  .t-c { grid-column: 1 / 3; grid-row: 3; }
+  .t-d { grid-column: 4; grid-row: 3; }
+  @media (max-width: 860px) {
+    .mosaic { grid-template-columns: 1fr 1fr; grid-template-rows: auto; grid-auto-rows: 46vw; }
+    .t-text { grid-column: 1 / -1; grid-row: auto; padding: 40px var(--margin); }
+    .t-a { grid-column: 1 / -1; grid-row: auto; }
+    .t-b { grid-column: 1; grid-row: span 2; }
+    .t-fig { grid-column: 2; grid-row: auto; padding: 18px; }
+    .t-c { grid-column: 2; grid-row: auto; }
+    .t-d { grid-column: 1 / -1; grid-row: auto; }
+  }
+</style>

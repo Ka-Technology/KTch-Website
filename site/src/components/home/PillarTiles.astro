@@ -1,0 +1,126 @@
+---
+// What we do: a 2 by 2 of video tiles, sized from the screen height so all four fit on one desktop screen.
+// Each clip rests on its first frame; it plays while pointed at and rewinds to the start when the pointer leaves.
+// The name is a button stretched over the whole tile (opens the service pop-up); the example link sits above it.
+import { pillars, img } from '../../data/site';
+import PillarDialogs from './PillarDialogs.astro';
+---
+<section class="wwd wrap section" aria-labelledby="wwd-t">
+  <div class="head grid12" data-reveal>
+    <h2 id="wwd-t" class="t-h2">What we do</h2>
+    <p class="t-lead">Four kinds of work, one goal: fewer tedious hours. Open any one for the details.</p>
+  </div>
+  <div class="tiles">
+    {pillars.map((p) => (
+      <article class="tile">
+        <figure class="photo pic">
+          <video data-tile-video muted playsinline loop preload="none" width="960" height="540" aria-hidden="true"
+            style={p.slug === 'ai' ? 'object-position: 50% 85%' : undefined}
+            poster={img(`wwd-${p.slug}-poster`, 1600)}>
+            <source src={`/video/wwd-${p.slug}.mp4`} type="video/mp4" />
+          </video>
+        </figure>
+        <div class="card">
+          <h3><button type="button" class="hit" data-open-dialog={`dlg-${p.slug}`} aria-haspopup="dialog">{p.name}<span class="plus" aria-hidden="true">+</span></button></h3>
+          <p class="pitch">{p.pitch}</p>
+          {p.caseStudy && <a class="proof link" href={p.caseStudy.href}><span class="arrow">{p.caseStudy.label}</span></a>}
+        </div>
+      </article>
+    ))}
+  </div>
+  <PillarDialogs />
+</section>
+
+<script>
+  // Play while pointed at (or focused); on leave, run the clip backwards to its first frame, fast.
+  // The clips are all-keyframe encodes, so seeking frame by frame is cheap.
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const tiles = [...document.querySelectorAll<HTMLElement>('.tiles .tile')];
+  const REWIND_MS = 450; // longest a rewind takes, whatever the position
+
+  const near = new IntersectionObserver((entries) => entries.forEach((e) => {
+    if (!e.isIntersecting) return;
+    const v = e.target.querySelector('video'); if (v && v.preload !== 'auto') { v.preload = 'auto'; v.load(); }
+    near.unobserve(e.target);
+  }), { rootMargin: '400px 0px' });
+
+  tiles.forEach((tile) => {
+    const v = tile.querySelector<HTMLVideoElement>('video[data-tile-video]');
+    if (!v || reduce) return;
+    near.observe(tile);
+    let raf = 0;
+    const stopRewind = () => { cancelAnimationFrame(raf); raf = 0; };
+    const play = () => { stopRewind(); v.play().catch(() => {}); };
+    const rewind = () => {
+      v.pause(); stopRewind();
+      const speed = Math.max(3, v.currentTime / (REWIND_MS / 1000)); // seconds of clip per second
+      let last = performance.now(), busy = false;
+      const step = (now: number) => {
+        const dt = (now - last) / 1000; last = now;
+        if (!busy) {
+          const t = Math.max(0, v.currentTime - dt * speed);
+          busy = true; v.currentTime = t;
+          v.addEventListener('seeked', () => { busy = false; }, { once: true });
+          if (t === 0) { raf = 0; return; }
+        }
+        raf = requestAnimationFrame(step);
+      };
+      if (v.currentTime > 0) raf = requestAnimationFrame(step);
+    };
+    if (fine) {
+      tile.addEventListener('pointerenter', play);
+      tile.addEventListener('pointerleave', rewind);
+    } else {
+      // touch screens: play while the tile is mostly on screen
+      new IntersectionObserver(([e]) => (e.isIntersecting ? play() : rewind()), { threshold: 0.6 }).observe(tile);
+    }
+    tile.addEventListener('focusin', play);
+    tile.addEventListener('focusout', rewind);
+  });
+</script>
+
+<style>
+  /* How we work follows straight on; a full section gap here read as a hole */
+  .wwd { padding-bottom: clamp(56px, 6vw, 96px); }
+  .head { margin-bottom: clamp(24px, 3.5vh, 44px); row-gap: 16px; align-items: end; }
+  .head h2 { grid-column: 1 / 6; }
+  .head p { grid-column: 7 / -1; max-width: 42ch; }
+  /* two rows that share what is left of the screen after the heading */
+  .tiles {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    grid-auto-rows: clamp(300px, calc((100svh - 240px) / 2), 460px);
+  }
+  /* photo on top, then a text band of one fixed height, the same on every tile */
+  .tile { position: relative; min-width: 0; overflow: clip; display: grid; grid-template-rows: minmax(0, 1fr) var(--band); --band: 96px; }
+  .pic { min-height: 0; }
+  .pic video { display: block; width: 100%; height: 100%; object-fit: cover; filter: var(--photo-filter); }
+  .card {
+    background: var(--ink); color: var(--bg); padding: 16px 22px;
+    display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto 1fr; gap: 6px 20px; align-items: baseline; align-content: start;
+  }
+  h3 { font-size: clamp(19px, 1.9vw, 30px); font-weight: 850; letter-spacing: -0.04em; line-height: 1.05; }
+  .hit { all: unset; cursor: pointer; }
+  /* the whole tile opens the pop-up */
+  .hit::after { content: ""; position: absolute; inset: 0; z-index: 1; }
+  .hit:focus-visible { outline: none; }
+  .tile:has(.hit:focus-visible) { outline: 3px solid var(--accent); outline-offset: 4px; }
+  .plus { color: var(--accent); display: inline-block; margin-left: 0.4em; transition: transform var(--t-hover) var(--ease-out); }
+  .pitch { grid-column: 1 / -1; font-size: var(--t-small); line-height: 1.4; color: var(--bg); opacity: 0.82; max-width: 62ch; }
+  .proof { grid-column: 2; grid-row: 1; justify-self: end; position: relative; z-index: 2; color: var(--bg); font-weight: 700; font-size: var(--t-small); white-space: nowrap; }
+  @media (hover: hover) and (pointer: fine) {
+    .tile:hover .plus { transform: rotate(90deg); }
+    .proof:hover { color: var(--accent); }
+  }
+  /* descriptions wrap to two lines on narrower screens */
+  @media (max-width: 1240px) { .tile { --band: 120px; } }
+  @media (max-width: 860px) {
+    .head h2, .head p { grid-column: 1 / -1; }
+    .tiles { grid-template-columns: 1fr; grid-auto-rows: auto; gap: 16px; }
+    .tile { grid-template-rows: auto auto; }
+    h3 { font-size: clamp(22px, 6vw, 28px); }
+    .pic { aspect-ratio: 16 / 9; }
+    .card { grid-template-columns: 1fr; grid-template-rows: auto; }
+    .proof { grid-column: 1; grid-row: 3; justify-self: start; margin-top: 6px; }
+  }
+</style>

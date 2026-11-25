@@ -1,0 +1,134 @@
+---
+import '../styles/global.css';
+import fontUrl from '@fontsource-variable/noto-sans/files/noto-sans-latin-wght-normal.woff2?url';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../data/site';
+
+interface Props {
+  title?: string;          // page name; omitted on Home
+  description?: string;
+  og?: string;             // og image slug in /og/
+  strip?: boolean;         // Portland photo strip above the footer
+}
+const { title, description = site.description, og = 'default', strip = true } = Astro.props;
+const fullTitle = title ? `${title} · Ka Technology` : 'Ka Technology';
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogImage = new URL(`/og/${og}.png`, Astro.site).href;
+const social = site.social.filter((s) => s.href).map((s) => s.href);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': `${site.url}/#org`,
+      name: site.name,
+      legalName: site.legal,
+      url: site.url,
+      logo: `${site.url}/icon-512.png`,
+      email: site.email,
+      telephone: '+1-971-344-6299',
+      slogan: site.slogan,
+      sameAs: social,
+    },
+    {
+      '@type': 'LocalBusiness',
+      '@id': `${site.url}/#business`,
+      name: site.name,
+      url: site.url,
+      image: `${site.url}/icon-512.png`,
+      email: site.email,
+      telephone: '+1-971-344-6299',
+      address: { '@type': 'PostalAddress', addressLocality: 'Portland', addressRegion: 'OR', addressCountry: 'US' },
+      areaServed: 'Portland, Oregon',
+      parentOrganization: { '@id': `${site.url}/#org` },
+      sameAs: social,
+    },
+  ],
+};
+---
+<!doctype html>
+<html lang="en" id="top">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="theme-color" content="#0b0b0c" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#fafaf9" media="(prefers-color-scheme: light)" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="preload" as="font" type="font/woff2" href={fontUrl} crossorigin />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Ka Technology" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <script is:inline>
+      (function () {
+        var d = document.documentElement;
+        d.classList.add('js');
+        try { var t = localStorage.getItem('ka-theme'); if (t === 'light' || t === 'dark') d.setAttribute('data-theme', t); } catch (e) {}
+      })();
+    </script>
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer strip={strip} />
+
+    <script>
+      // Theme toggle: system by default; a click stores an explicit choice.
+      const root = document.documentElement;
+      const btn = document.querySelector<HTMLButtonElement>('[data-theme-toggle]');
+      const isDark = () =>
+        root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+      const label = () => btn?.setAttribute('aria-label', isDark() ? 'Switch to light theme' : 'Switch to dark theme');
+      label();
+      btn?.addEventListener('click', () => {
+        const next = isDark() ? 'light' : 'dark';
+        root.dataset.theme = next;
+        try { localStorage.setItem('ka-theme', next); } catch (e) {}
+        label();
+      });
+
+      // Mobile menu
+      const menuBtn = document.querySelector<HTMLButtonElement>('[data-menu-button]');
+      const menu = document.getElementById('mobile-menu');
+      menuBtn?.addEventListener('click', () => {
+        const open = menuBtn.getAttribute('aria-expanded') === 'true';
+        menuBtn.setAttribute('aria-expanded', String(!open));
+        menuBtn.textContent = open ? 'Menu' : 'Close';
+        if (menu) menu.hidden = open;
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && menu && !menu.hidden) { menu.hidden = true; menuBtn?.setAttribute('aria-expanded', 'false'); if (menuBtn) menuBtn.textContent = 'Menu'; menuBtn?.focus(); }
+      });
+
+      // Section entrances: once, staggered children.
+      const els = document.querySelectorAll('[data-reveal]');
+      if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver((entries) => {
+          for (const e of entries) if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
+        }, { rootMargin: '0px 0px -10% 0px', threshold: 0.08 });
+        els.forEach((el) => io.observe(el));
+      } else {
+        els.forEach((el) => el.classList.add('is-in'));
+      }
+    </script>
+  </body>
+</html>

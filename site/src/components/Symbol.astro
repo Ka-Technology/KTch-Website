@@ -1,0 +1,12 @@
+---
+// Ka Technology 3.0 symbol alone, drawn as a stroke so it takes currentColor.
+// Both traces start at the tips of the plus, so the plus forms first.
+interface Props { size?: number; class?: string; title?: string }
+const { size = 36, class: cls = '', title } = Astro.props;
+---
+<svg class={cls} width={size} height={size} viewBox="0 0 115 115" fill="none" stroke="currentColor"
+  stroke-width="6.7" stroke-linecap="round" stroke-linejoin="round" role={title ? 'img' : undefined}
+  aria-hidden={title ? undefined : 'true'} aria-label={title}>
+  <path class="ka-draw ka-trace-a" pathLength="1" d="M4.07 99.6H111.01V4.06H15.16V54.89" />
+  <path class="ka-draw ka-trace-b" pathLength="1" d="M15.16 111.14V75.73H39.16V28.67H87.01V75.73H60.79" />
+</svg>

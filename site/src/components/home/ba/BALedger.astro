@@ -1,0 +1,65 @@
+---
+// Before and after, as a ledger: every chore at once, read across: the chore, what it cost, what it costs now.
+// The grey shows only in the gutters between cells (no outer frame); the cells are in the page colour,
+// except the result column, which is filled.
+import { chores } from '../../../data/chores';
+---
+<section class="ledger wrap section" aria-labelledby="ledger-t">
+  <div class="top grid12" data-reveal>
+    <h2 id="ledger-t" class="t-h2 heading">Before and after</h2>
+    <p class="t-lead intro">AI is a tool, not a replacement. We use it, plus good software, to take the tedious part off your plate.</p>
+  </div>
+
+  <div class="table" role="table" aria-label="Chores before and after">
+    <div class="row head" role="row">
+      <span role="columnheader">Chore</span>
+      <span role="columnheader">Before</span>
+      <span role="columnheader">After</span>
+    </div>
+    {chores.map((c) => (
+      <div class="row" role="row" data-reveal>
+        <div class="cell chore" role="cell">
+          <h3>{c.tab}</h3>
+          <a class="link t-small" href={c.href}><span class="arrow">{c.short}</span></a>
+        </div>
+        <div class="cell before" role="cell">
+          <p class="big">{c.before.big}</p>
+          <p class="note">{c.before.note}</p>
+        </div>
+        <div class="cell after" role="cell">
+          <p class="big">{c.after.big}</p>
+          <p class="note">{c.after.note}</p>
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .heading { grid-column: 1 / 6; }
+  .intro { grid-column: 7 / -1; max-width: 40ch; }
+  .table { margin-top: clamp(36px, 7vh, 88px); display: grid; gap: 6px; background: var(--surface); }
+  .row { display: grid; grid-template-columns: 1.1fr 1.5fr 1.5fr; gap: 6px; }
+  .head span { font-size: var(--t-small); font-weight: 700; color: var(--muted); padding: 0 clamp(20px, 2.2vw, 32px) 12px; background: var(--bg); }
+  .cell { padding: clamp(20px, 2.2vw, 32px); display: grid; gap: 14px; align-content: start; }
+  .chore { background: var(--bg); grid-template-rows: 1fr auto 1fr; align-content: stretch; }
+  .chore h3 { grid-row: 2; }
+  .chore a { grid-row: 3; align-self: end; justify-self: start; }
+  .chore h3 { font-size: var(--t-lead); letter-spacing: -0.02em; line-height: 1.2; }
+  .before { background: var(--bg); }
+  .after { background: var(--ink); color: var(--bg); }
+  .big { font-size: clamp(40px, 4.6vw, 76px); font-weight: 850; letter-spacing: -0.05em; line-height: 0.9; white-space: nowrap; }
+  .before .big { color: var(--muted); }
+  .after .big { color: var(--accent); }
+  .note { max-width: 34ch; }
+  @media (max-width: 860px) {
+    .heading, .intro { grid-column: 1 / -1; }
+    .intro { margin-top: 20px; }
+    .head { display: none; }
+    .row { grid-template-columns: 1fr 1fr; }
+    .chore { grid-column: 1 / -1; grid-template-rows: auto; gap: 8px; }
+    .chore h3, .chore a { grid-row: auto; }
+    .big { font-size: clamp(32px, 9vw, 48px); }
+  }
+  @media (max-width: 520px) { .row { grid-template-columns: 1fr; } }
+</style>

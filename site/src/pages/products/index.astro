@@ -1,0 +1,436 @@
+---
+// Our software as a stack of rows. Each row is a strip of the product's world: its clip (grey), its tagline
+// set in the product's own typeface and colours, its brand marks and art. Clicking a row opens it in place to show
+// the product itself (screenshots) and everything about it. One row open at a time.
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import PageHead from '../../components/PageHead.astro';
+import CloseCTA from '../../components/CloseCTA.astro';
+import { img } from '../../data/site';
+const products = (await getCollection('products', (p) => !p.data.hidden)).sort((a, b) => a.data.order - b.data.order);
+
+type Tile =
+  | { k: 'clip'; r: number }
+  | { k: 'quote'; r: number; text?: string; by?: string; fs?: number }
+  | { k: 'pic'; r: number; src: string; alt: string };
+// each product's own type and colours (taken from its code and live site); used only in its tiles.
+// Its strip: the clip with the product's logo over it, its own lines, and photos of its world (credited on /credits),
+// each photo carrying the product's mark small in its bottom-right corner.
+type Logo = { src?: string; text?: string; italic?: boolean; size?: number };
+type Badge = { src: string };
+const ph = (n: string, r = 1.33): Tile => ({ k: 'pic', r, src: `/images/${n}-800.webp`, alt: '' });
+const brand: Record<string, { font: string; bg: string; fg: string; fs: number; logo: Logo; badge: Badge; tiles: Tile[] }> = {
+  // Kept: its logo as on habitkept.com (the K mark and the name), people keeping the habits Kept offers, its own lines
+  kept: { font: "'Kept Bricolage'", bg: '#F6F4EF', fg: '#1C2143', fs: 1.2,
+    logo: { text: 'Kept', size: 1.35 },
+    badge: { src: '/images/pb-kept-mark.webp' },
+    tiles: [
+    { k: 'clip', r: 1.25 },
+    { k: 'quote', r: 2 },
+    ph('pw-kept-h2'),
+    ph('pw-kept-h5', 1.1),
+    ph('pw-kept-h1'),
+    { k: 'quote', r: 2.9, text: 'I will read every day for 28 days, or $25 goes to a charity I pick.', fs: 0.72 },
+    ph('pw-kept-h6'),
+    ph('pw-kept-h4'),
+    ph('pw-kept-h3'),
+    { k: 'quote', r: 2.1, text: 'Be first to keep your word.' },
+    ph('pw-kept-h0'),
+    ph('pw-kept-h7', 1.1),
+  ] },
+  // DoIGetGas: its name as doigetgas.com sets it, its pump icon, its lines and this week's price
+  doigetgas: { font: "'Gas Space Grotesk'", bg: '#0F0A08', fg: '#F3ECE4', fs: 1,
+    logo: { text: 'Do I Get Gas?', size: 1.05 },
+    badge: { src: '/images/pb-gas-icon.svg' },
+    tiles: [
+    { k: 'quote', r: 1.8 },
+    ph('pw-gas-0'),
+    { k: 'clip', r: 1.85 },
+    { k: 'quote', r: 1.8, text: 'Pump prices lag crude.' },
+    ph('pw-gas-4', 1.6),
+    ph('pw-gas-2', 1.6),
+    { k: 'quote', r: 2, text: 'Regular gas is $3.81 a gallon.', by: 'U.S. average, week of Nov 16 · EIA' },
+    ph('pw-gas-1'),
+    ph('pw-gas-5'),
+    { k: 'quote', r: 2.4, text: 'Crude oil is the biggest input to the cost of gasoline.', fs: 0.8 },
+    ph('pw-gas-3'),
+  ] },
+  // RealDoc: its gradient logo (as on realdoc.app) and round brandmark, classrooms and houses, Tammy Sue's words
+  realdoc: { font: "'RealDoc Geist'", bg: '#0A4A74', fg: '#FFFFFF', fs: 0.8,
+    logo: { src: '/images/pb-realdoc-logo-white.webp' },
+    badge: { src: '/images/pb-realdoc-badge.webp' },
+    tiles: [
+    ph('pw-rd-c0', 0.9),
+    { k: 'clip', r: 1.25 },
+    { k: 'quote', r: 2.2 },
+    ph('pw-rd-0'),
+    ph('pw-rd-c3'),
+    { k: 'quote', r: 2.3, text: '“This app has saved me so many hours!”', by: 'Tammy Sue Schuck, Principal Broker, Keller Williams Eugene-Springfield' },
+    ph('pw-rd-2', 0.8),
+    ph('pw-rd-c4'),
+  ] },
+  // Shiftwize: its name and bolt, cafés and kitchens, and its own lines
+  shiftwize: { font: "'Shiftwize Jakarta'", bg: '#00AFFE', fg: '#04121F', fs: 1,
+    logo: { text: 'SHIFTWIZE', italic: true, size: 1.05 },
+    badge: { src: '/images/pb-shiftwize-bolt.svg' },
+    tiles: [
+    { k: 'clip', r: 1.85 },
+    ph('pw-sw-2'),
+    { k: 'quote', r: 1.9 },
+    ph('pw-sw-0'),
+    { k: 'quote', r: 1.8, text: 'Set your availability.' },
+    ph('pw-sw-3'),
+    { k: 'quote', r: 1.9, text: 'Hard rules it never breaks.' },
+  ] },
+};
+// every name is set at the size that fits the longest one
+const nameLen = Math.max(...products.map((p, i) => `${i + 1}. ${p.data.name}`.length));
+const sumR = (id: string) => brand[id].tiles.reduce((t, x) => t + x.r, 0);
+const isPhone = (id: string) => id === 'kept';
+const shots: Record<string, { w: number[]; alt: string }> = {
+  kept: { w: [400, 800], alt: 'The Kept app’s Challenges screen, with free habit trackers for reading and working out.' },
+  doigetgas: { w: [800, 1600], alt: 'DoIGetGas showing its gas-price gauge pointing to “Might fall”, above this week’s U.S. average prices.' },
+  realdoc: { w: [800, 1600], alt: 'RealDoc’s certificate form filled in for an Oregon class: course details, a CSV upload and a signature picker.' },
+  shiftwize: { w: [800, 1073], alt: 'Shiftwize’s availability planner: a week grid of preferred and available hours.' },
+};
+// a second picture of the product itself, under the main screen when the row is open
+const extra: Record<string, { src: string; alt: string }> = {
+  realdoc: { src: '/images/pb-realdoc-qr-1600.webp', alt: 'RealDoc’s QR-code page beside the sign-in form it opens for a class.' },
+};
+// The opened panel, built from the site's own parts. Each detail gets a short heading over the product file's own
+// words (split or trimmed, never new claims). `built` replaces the plain tech list where that list reads badly
+// (null leaves the line out); `split` moves everything after the problem's first sentence into a smaller paragraph.
+const panel: Record<string, { details: { h: string; t: string }[]; built?: string | null; split?: boolean }> = {
+  kept: { details: [
+    { h: 'Pay your way', t: 'By card or Apple Pay, or with stablecoins on Solana, where the stake waits in an escrow program that can only send it back to you or to your charity.' },
+    { h: 'Kept never keeps the stake', t: 'There’s a small, upfront service fee.' },
+  ] },
+  doigetgas: { built: 'Built with Next.js and Tailwind CSS, on daily crude-oil and weekly gas prices from the EIA. Runs on Vercel.', details: [
+    { h: 'Free to use', t: 'Supported by donations.' },
+    { h: 'This week’s prices', t: 'U.S. average prices for regular, midgrade and premium, from the EIA.' },
+  ] },
+  realdoc: { built: 'Built with Next.js, Tailwind CSS, Python (Flask), MySQL, Redis, Stripe, and Google sign-in with Google Forms, Drive and Gmail. Runs on Railway.', details: [
+    { h: 'In use today', t: 'Used by Keller Williams Eugene-Springfield.' },
+    { h: 'Title companies too', t: 'Title companies in Oregon have used it as well.' },
+    { h: 'State templates built in', t: 'Oregon and Arizona templates come ready, and custom CE templates are supported.' },
+  ] },
+  shiftwize: { split: true, built: 'Built with Python and linear and constraint optimization, with a web app that takes spreadsheet uploads.', details: [
+    { h: 'Hard rules it never breaks', t: 'Availability, max hours, shift-lead coverage, consecutive days, no overstaffing.' },
+    { h: 'Soft goals it works toward', t: 'Hit staffing targets, spread hours fairly, avoid split shifts.' },
+    { h: 'Peak hours covered', t: 'Peak-hour coverage met across test weeks.' },
+  ] },
+};
+const listJoin = (a: string[]) => a.length > 1 ? `${a.slice(0, -1).join(', ')} and ${a[a.length - 1]}` : a[0] ?? '';
+const shotSrc = (id: string) => `/images/shot-${id}-${shots[id].w[1]}.webp`;
+const shotSet = (id: string) => shots[id].w.map((w) => `/images/shot-${id}-${w}.webp ${w}w`).join(', ');
+const host = (u: string) => u.replace(/^https?:\/\//, '').replace(/\/$/, '');
+const split = (t: string) => { const m = t.match(/^(.+?[.!?])\s+(.*)$/s); return m ? [m[1], m[2]] : [t, '']; };
+---
+<Base og="products" title="Products" description="Kept, DoIGetGas, RealDoc and Shiftwize: software Ka Technology builds and runs itself.">
+  <PageHead title="Our software" lede="Besides client work, we build our own products. Some started as a client’s problem that turned out to be everyone’s problem." />
+
+  <section class="rows" aria-label="Our products" data-rows>
+    {products.map((p, i) => {
+      const d = p.data; const b = brand[p.id];
+      const [lead, more] = split(d.problem);
+      return (
+        <article class="prod" id={p.id} data-prod style={`--bf:${b.font};--bb:${b.bg};--bc:${b.fg};--bs:${b.fs}`}>
+          <div class="row" data-row>
+            <h2 class="name" style={`--len:${nameLen}`}>
+              <button type="button" class="open" aria-expanded="false" aria-controls={`more-${p.id}`} data-open>
+                <span class="nm">{i + 1}. {d.name}</span>
+                <span class="plus" aria-hidden="true"></span>
+                <span class="sr">, show details</span>
+              </button>
+            </h2>
+            <div class="strip" data-strip aria-hidden="true" style={`--dur:${Math.round(sumR(p.id) * 6.5)}s`}>
+              <div class={`track ${i % 2 ? 'is-rev' : ''}`}>
+                {[0, 1].map(() => (
+                  <div class="set">
+                  {b.tiles.map((t) => (
+                    <div class={`tile t-${t.k}`} style={`--r:${t.r}`}>
+                      {t.k === 'clip' && <video muted loop playsinline preload="none" poster={img(`prod-${p.id}-poster`, 800)}><source src={`/video/prod-${p.id}.mp4`} type="video/mp4" /></video>}
+                      {t.k === 'clip' && (
+                        <div class="logo" style={`--ls:${b.logo.size ?? 1}`}>
+                          {b.logo.src && <img src={b.logo.src} alt="" />}
+                          {b.logo.text && <span class={b.logo.italic ? 'it' : undefined}>{b.logo.text}</span>}
+                        </div>
+                      )}
+                      {t.k === 'quote' && <p style={t.fs ? `--qs:${t.fs}` : undefined}>{t.text ?? d.tagline}{t.by && <span class="by">{t.by}</span>}</p>}
+                      {t.k === 'pic' && <img src={t.src} alt="" loading="lazy" />}
+                      {t.k === 'pic' && (
+                        <img class="badge" src={b.badge.src} alt="" />
+                      )}
+                    </div>
+                  ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div class="more" id={`more-${p.id}`} data-more>
+            <div class="more-in">
+              <div class={`mk ${isPhone(p.id) ? 'is-phone' : ''}`}>
+                <div class="mk-pic">
+                  <div class="shot">
+                    {!isPhone(p.id) && <div class="bar" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span>{d.url && <span class="url">{host(d.url)}</span>}</div>}
+                    <img src={shotSrc(p.id)} srcset={shotSet(p.id)} sizes={isPhone(p.id) ? '(max-width: 860px) 60vw, 320px' : '(max-width: 860px) 90vw, 40vw'} alt={shots[p.id].alt} loading="lazy" />
+                  </div>
+                  {extra[p.id] && <img class="extra" src={extra[p.id].src} alt={extra[p.id].alt} loading="lazy" />}
+                </div>
+                <div class="mk-text">
+                  <h3 class="t-h2">{d.name}</h3>
+                  <p class="mk-pitch">{panel[p.id].split ? lead : d.problem}</p>
+                  {panel[p.id].split && more && <p class="mk-more">{more}</p>}
+                  <div class="mk-how">
+                    <h4 class="mk-hh">How it works</h4>
+                    <ol>
+                      {d.how_it_works.map((st, n) => <li><span class="mk-n" aria-hidden="true">{n + 1}</span><p>{st}</p></li>)}
+                    </ol>
+                  </div>
+                  <ul class="mk-offers">
+                    {panel[p.id].details.map((x) => <li><h4>{x.h}</h4><p>{x.t}</p></li>)}
+                  </ul>
+                  <p class="mk-meta">{d.status} since {d.year}.{panel[p.id].built !== null && <><br />{panel[p.id].built ?? `Built with ${listJoin(d.tech)}.`}</>}</p>
+                  {(d.url || d.cta_url) && (
+                    <p class="mk-links">
+                      {d.url && <a class="link" href={d.url} rel="noopener"><span class="arrow">Visit {host(d.url)}</span></a>}
+                      {d.cta_url && d.cta_url !== d.url && <a class="link" href={d.cta_url} rel="noopener"><span class="arrow">{d.cta_label ?? 'Learn more'}</span></a>}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+      );
+    })}
+  </section>
+
+  <CloseCTA title={['Your problem might be', 'everyone’s, too.']} text="Some of our products started as one client’s request. If yours sounds familiar, let’s talk." />
+</Base>
+
+<script>
+  // Rows open in place, one at a time; the whole row is clickable (the name is the real button). Clips play only
+  // while their row is on screen. A link to /products/#id opens that product.
+  const root = document.querySelector<HTMLElement>('[data-rows]');
+  if (root) {
+    const prods = [...root.querySelectorAll<HTMLElement>('[data-prod]')];
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const set = (el: HTMLElement, open: boolean) => {
+      el.classList.toggle('is-open', open);
+      el.querySelector('[data-open]')!.setAttribute('aria-expanded', String(open));
+      el.querySelector<HTMLElement>('[data-more]')!.inert = !open;
+    };
+    root.classList.add('is-live');
+    prods.forEach((el) => set(el, false));
+    // Opening a product below an open one: the one above folds shut in view while the page follows it, so the
+    // tapped row stays where the visitor's finger was and the new one opens downwards from there.
+    const toggle = (el: HTMLElement, scroll = false) => {
+      const opening = !el.classList.contains('is-open');
+      const top = el.getBoundingClientRect().top;
+      let above = false;
+      prods.forEach((o) => {
+        if (o === el || !o.classList.contains('is-open')) return;
+        if (o.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING) above = true;
+        set(o, false);
+      });
+      if (above) {
+        const t0 = performance.now();
+        const hold = () => {
+          const d = el.getBoundingClientRect().top - top;
+          if (Math.abs(d) > 0.5) window.scrollBy({ top: d, behavior: 'instant' });
+          if (performance.now() - t0 < 750) requestAnimationFrame(hold);
+        };
+        requestAnimationFrame(hold);
+      }
+      set(el, opening);
+      if (opening) history.replaceState(null, '', `#${el.id}`);
+      if (opening && scroll) el.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'start' });
+    };
+    prods.forEach((el) => {
+      const btn = el.querySelector<HTMLButtonElement>('[data-open]')!;
+      btn.addEventListener('click', (e) => { e.stopPropagation(); toggle(el); });
+      el.querySelector('[data-row]')!.addEventListener('click', () => toggle(el));
+    });
+    // The strips drift on their own, alternate rows the other way. Each can be grabbed and dragged either way
+    // (a flick keeps gliding briefly); a drag never opens the row, only a plain click does.
+    root.querySelectorAll<HTMLElement>('[data-strip]').forEach((strip, i) => {
+      const track = strip.querySelector<HTMLElement>('.track')!;
+      const first = track.querySelector<HTMLElement>('.set')!;
+      const dir = i % 2 ? -1 : 1;
+      let width = first.getBoundingClientRect().width, offset = dir < 0 ? width / 2 : 0;
+      let down = false, moved = false, startX = 0, lastX = 0, lastT = 0, vel = 0, prev = performance.now();
+      const speed = () => width / parseFloat(getComputedStyle(strip).getPropertyValue('--dur'));
+      const place = () => { offset = ((offset % width) + width) % width; track.style.transform = `translateX(${-offset}px)`; };
+      const tick = (t: number) => {
+        const dt = Math.min(64, t - prev) / 1000; prev = t;
+        if (!down) {
+          if (Math.abs(vel) > 5) { offset += vel * dt; vel *= Math.pow(0.04, dt); }
+          else { vel = 0; if (!still) offset += dir * speed() * dt; }
+        }
+        place(); requestAnimationFrame(tick);
+      };
+      strip.addEventListener('pointerdown', (e) => {
+        if (e.button !== 0) return;
+        down = true; moved = false; vel = 0; startX = lastX = e.clientX; lastT = performance.now();
+      });
+      strip.addEventListener('pointermove', (e) => {
+        if (!down) return;
+        if (!moved && Math.abs(e.clientX - startX) > 6) { moved = true; strip.setPointerCapture(e.pointerId); strip.classList.add('is-dragging'); }
+        if (!moved) return;
+        const now = performance.now(), dx = e.clientX - lastX;
+        offset -= dx; vel = (-dx / Math.max(1, now - lastT)) * 1000; lastX = e.clientX; lastT = now;
+      });
+      const end = (e: PointerEvent) => {
+        if (!down) return;
+        down = false; strip.classList.remove('is-dragging');
+        if (performance.now() - lastT > 80) vel = 0;
+        if (strip.hasPointerCapture(e.pointerId)) strip.releasePointerCapture(e.pointerId);
+      };
+      strip.addEventListener('pointerup', end);
+      strip.addEventListener('pointercancel', end);
+      // the click that ends a drag is swallowed here, before it reaches the row
+      strip.addEventListener('click', (e) => { if (moved) { e.stopPropagation(); moved = false; } }, true);
+      strip.addEventListener('dragstart', (e) => e.preventDefault());
+      addEventListener('resize', () => { width = first.getBoundingClientRect().width; });
+      strip.classList.add('is-live');
+      requestAnimationFrame(tick);
+    });
+    const fromHash = () => { const t = prods.find((el) => `#${el.id}` === location.hash); if (t && !t.classList.contains('is-open')) toggle(t, true); };
+    fromHash(); addEventListener('hashchange', fromHash);
+    if (!still) {
+      const io = new IntersectionObserver((es) => es.forEach((e) => {
+        const v = e.target as HTMLVideoElement;
+        if (e.isIntersecting) { if (v.preload !== 'auto') { v.preload = 'auto'; v.load(); } v.play().catch(() => {}); } else v.pause();
+      }), { rootMargin: '0px 0px -10% 0px' });
+      root.querySelectorAll('video').forEach((v) => io.observe(v));
+    }
+  }
+</script>
+
+<style>
+  /* each product's own typeface, used only inside its own tiles */
+  @font-face { font-family: 'Kept Bricolage'; src: url('/fonts/kept-bricolage-800.woff2') format('woff2'); font-weight: 800; font-display: swap; }
+  @font-face { font-family: 'Gas Space Grotesk'; src: url('/fonts/gas-spacegrotesk-700.woff2') format('woff2'); font-weight: 800; font-display: swap; }
+  @font-face { font-family: 'RealDoc Geist'; src: url('/fonts/realdoc-geist-700.woff2') format('woff2'); font-weight: 800; font-display: swap; }
+  @font-face { font-family: 'Shiftwize Jakarta'; src: url('/fonts/shiftwize-jakarta-800.woff2') format('woff2'); font-weight: 800; font-display: swap; }
+  @font-face { font-family: 'Shiftwize Jakarta'; src: url('/fonts/shiftwize-jakarta-800i.woff2') format('woff2'); font-weight: 800; font-style: italic; font-display: swap; }
+
+  .rows { --H: clamp(190px, 18vw, 300px); display: grid; gap: clamp(14px, 1.4vw, 22px); padding-bottom: clamp(8px, 1vw, 16px); }
+
+  /* a row: the product's name on its side, then its strip running to the right edge */
+  .row { display: grid; grid-template-columns: calc(var(--margin) + clamp(56px, 5.4vw, 92px)) minmax(0, 1fr); height: var(--H); }
+  .name { position: relative; height: var(--H); }
+  /* the name reads up from the row's bottom edge, with its plus right on top of it, so the two read as one control */
+  .open { all: unset; box-sizing: border-box; cursor: pointer; position: absolute; inset: 0; display: flex; flex-direction: column-reverse; align-items: center; justify-content: flex-start; gap: 14px;
+    padding: 0 0 0 var(--margin); }
+  .nm { writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; font-weight: 800; letter-spacing: -0.04em; line-height: 1; transition: color 200ms ease;
+    font-size: min(clamp(34px, 3.8vw, 64px), calc((var(--H) - 52px) / (var(--len) * 0.56))); }
+  .plus { position: relative; flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--ink); transition: transform 350ms var(--ease-out), background-color 200ms ease; }
+  .plus::before, .plus::after { content: ""; position: absolute; left: 50%; top: 50%; width: 12px; height: 2px; background: var(--bg); transform: translate(-50%, -50%); }
+  .plus::after { transform: translate(-50%, -50%) rotate(90deg); }
+  .open:focus-visible .plus { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+  /* the strip drifts sideways for ever (two copies of the tiles make the loop seamless); rows alternate direction */
+  .strip { height: 100%; min-width: 0; overflow: hidden; cursor: pointer; }
+  /* once the script runs: grab to drag; vertical swipes still scroll the page */
+  .strip.is-live { cursor: grab; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+  .strip.is-dragging { cursor: grabbing; }
+  .strip img { -webkit-user-drag: none; }
+  .track { will-change: transform; }
+  .track { display: flex; width: max-content; height: 100%; }
+  .set { display: flex; gap: 6px; padding-right: 6px; height: 100%; }
+  @media (prefers-reduced-motion: no-preference) {
+    .strip:not(.is-live) .track { animation: drift var(--dur) linear infinite; }
+    .track.is-rev { animation-direction: reverse; }
+  }
+  @keyframes drift { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  .tile { position: relative; flex: none; width: calc(var(--H) * var(--r)); height: 100%; overflow: hidden; background: var(--surface); container-type: size;
+    filter: grayscale(1) contrast(1.05); transition: filter 700ms ease; }
+  /* everything in grey until the row is opened; then the product's own colours come back */
+  .is-open .tile { filter: none; }
+  .tile > img:not(.badge), .tile > video { display: block; width: 100%; height: 100%; object-fit: cover; box-sizing: border-box; transition: transform 600ms var(--ease-out); }
+  .t-quote { background: var(--bb); color: var(--bc); display: grid; place-items: center; padding: 0 clamp(18px, 2.2vw, 36px); }
+  .t-quote p { width: 100%; font-family: var(--bf), var(--font); font-weight: 800; line-height: 1.02; letter-spacing: -0.03em; text-wrap: balance; text-align: center;
+    font-size: calc(var(--H) * 0.16 * var(--bs) * var(--qs, 1)); }
+  .t-quote .by { display: block; margin-top: 0.9em; font-family: var(--font); font-size: max(12px, 0.34em); font-weight: 650; letter-spacing: 0; line-height: 1.3; opacity: 0.8; }
+  /* the product's logo over its clip, in white, with a soft dark wash behind it so the clip still shows through;
+     set larger than any of the row's lines */
+  .logo { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; color: #fff;
+    font-size: calc(var(--H) * 0.2 * var(--ls));
+    background: radial-gradient(closest-side, rgb(0 0 0 / 0.55), rgb(0 0 0 / 0.2) 72%, transparent); /* taste-skill-ignore: scrim over the clip so the logo reads */
+    text-shadow: 0 1px 14px rgb(0 0 0 / 0.4); } /* taste-skill-ignore: lifts the logo off the clip */
+  .logo span { font-family: var(--bf), var(--font); font-weight: 800; letter-spacing: -0.03em; line-height: 1; white-space: nowrap; }
+  .logo .it { font-style: italic; letter-spacing: -0.01em; }
+  .logo img { width: 84%; height: auto; filter: drop-shadow(0 1px 10px rgb(0 0 0 / 0.35)); } /* taste-skill-ignore: lifts the logo off the clip */
+  /* the product's mark on its own, small in each photo's bottom-right corner */
+  .tile > .badge { position: absolute; right: 10px; bottom: 10px; width: clamp(26px, calc(var(--H) * 0.13), 38px); height: auto; object-fit: contain;
+    filter: drop-shadow(0 1px 3px rgb(0 0 0 / 0.5)); transition: none; } /* taste-skill-ignore: keeps the mark readable on any photo */
+
+  /* a row you can open: on hover the plus turns red and the pictures lean in a touch */
+  @media (hover: hover) and (pointer: fine) {
+    .row:hover .plus { background: var(--accent); }
+    .row:hover .nm { color: var(--accent); }
+    .row:hover .tile > img:not(.badge), .row:hover .tile > video { transform: scale(1.03); }
+  }
+  .is-open .plus { background: var(--accent); transform: rotate(45deg); }
+  .is-open .nm { color: var(--accent); }
+
+  /* the opened row: the product's screens on the left, everything about it on the right */
+  .rows.is-live .more { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 520ms var(--ease-out); }
+  .rows.is-live .is-open .more { grid-template-rows: 1fr; }
+  .more-in { overflow: hidden; min-height: 0; }
+  .rows.is-live .mk { opacity: 0; transition: opacity 300ms ease; }
+  .rows.is-live .is-open .mk { opacity: 1; transition-delay: 150ms; }
+  /* The opened panel, in the site's own parts: the product's screens, then its name as a section heading, the problem
+     as its pitch, steps under big red numerals (as on Careers), details under red dashes (as on Services). */
+  /* starts where the photo strip starts; the phone, then the text right beside it */
+  .mk { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: clamp(48px, 6vw, 112px); align-items: start;
+    padding: clamp(48px, 6vw, 96px) var(--margin) clamp(64px, 8vw, 128px) calc(var(--margin) + clamp(56px, 5.4vw, 92px)); }
+  .mk-pic { width: clamp(340px, 38vw, 640px); display: grid; gap: 6px; }
+  .mk.is-phone .mk-pic { width: clamp(240px, 21vw, 320px); }
+  .shot { background: #fafaf9; overflow: hidden; }
+  .shot img, .extra { width: 100%; display: block; }
+  /* the phone's frame is the page's ink: dark on the light page, white on the dark one */
+  .mk.is-phone .shot { border: 7px solid var(--ink); border-radius: 30px; background: none; }
+  /* a quiet browser top: three dots and the address in a pill, centred (no address for a product without a site) */
+  .bar { height: 32px; display: grid; grid-template-columns: 52px minmax(0, 1fr) 52px; align-items: center; padding: 0 12px; background: var(--surface-2); }
+  .dots { display: flex; gap: 6px; }
+  .dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--muted); opacity: 0.4; }
+  .url { justify-self: center; width: min(100%, 260px); height: 20px; border-radius: 6px; background: var(--bg); display: grid; place-items: center;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.01em; color: var(--muted); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .mk-text { display: grid; gap: 24px; align-content: start; max-width: 960px; }
+  .mk-pitch { font-size: var(--t-lead); line-height: 1.4; max-width: 34ch; font-weight: 600; }
+  .mk-offers { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 32px var(--gap); margin-top: 24px; }
+  .mk-offers li { display: grid; gap: 8px; align-content: start; padding-top: 18px; position: relative; }
+  .mk-offers li::before { content: ""; position: absolute; top: 0; left: 0; width: 28px; height: 6px; background: var(--accent); }
+  .mk-offers h4 { font-size: var(--t-lead); letter-spacing: -0.02em; line-height: 1.15; }
+  .mk-offers p { max-width: 40ch; }
+  .mk-more { max-width: 60ch; margin-top: -8px; }
+  .mk-meta { color: var(--muted); font-size: var(--t-small); margin-top: 8px; }
+  .mk-links { display: flex; flex-wrap: wrap; gap: 12px 32px; }
+  .mk-how { margin-top: 24px; }
+  .mk-hh { font-size: var(--t-lead); letter-spacing: -0.02em; }
+  .mk-how ol { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap); margin-top: 24px; }
+  .mk-how li { display: grid; gap: 16px; align-content: start; }
+  .mk-n { font-size: clamp(56px, 5.6vw, 96px); font-weight: 850; letter-spacing: -0.06em; line-height: 0.8; color: var(--accent); }
+  .mk-how p { line-height: 1.45; max-width: 30ch; }
+  @media (max-width: 860px) {
+    .mk { grid-template-columns: minmax(0, 1fr); row-gap: 40px; padding-inline: var(--margin); }
+    .mk-pic { width: 100%; }
+    .mk.is-phone .mk-pic { width: min(260px, 70%); margin-inline: auto; }
+    .mk-offers, .mk-how ol { grid-template-columns: 1fr; }
+    .mk-how ol { gap: 32px; }
+  }
+  @media (max-width: 860px) {
+    .rows { --H: 180px; gap: 28px; }
+    .row { grid-template-columns: 1fr; height: auto; }
+    .name { height: auto; padding-inline: var(--margin); margin-bottom: 12px; }
+    .open { position: static; flex-direction: row; justify-content: flex-start; gap: 12px; width: 100%; padding: 0; }
+    .nm { writing-mode: horizontal-tb; transform: none; font-size: clamp(30px, 8vw, 40px); }
+    .strip { height: var(--H); }
+  }
+</style>

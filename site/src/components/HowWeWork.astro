@@ -1,0 +1,58 @@
+---
+// How we work, as a track: a red bar runs left to right through three stops as the section scrolls in;
+// the last stop has no end, because "Stick around" doesn't.
+const steps = [
+  { name: 'Listen.', text: 'We start with your problem, not our favorite tech.' },
+  { name: 'Build.', text: 'Small team, fast iterations, regular demos.' },
+  { name: 'Stick around.', text: 'We maintain and improve what we ship.' },
+];
+---
+<section class="ht wrap section" aria-labelledby="ht-t" data-track>
+  <div class="grid12 top" data-reveal>
+    <h2 id="ht-t" class="t-h2 heading">How we work</h2>
+    <p class="t-lead para">Your messy, scattered process goes in. One clear tool comes out, and we keep it running.</p>
+  </div>
+  <div class="track" aria-hidden="true"><span class="fill"></span></div>
+  <ol class="steps">
+    {steps.map((s, i) => (
+      <li style={`--k:${i}`}>
+        <span class="stop" aria-hidden="true"></span>
+        <h3>{s.name}</h3>
+        <p>{s.text}</p>
+      </li>
+    ))}
+  </ol>
+</section>
+
+<script>
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } }), { threshold: 0.4 });
+  document.querySelectorAll('[data-track]').forEach((el) => io.observe(el));
+</script>
+
+<style>
+  .heading { grid-column: 1 / 6; }
+  .para { grid-column: 7 / -1; max-width: 40ch; }
+  .track { position: relative; margin-top: clamp(64px, 8vw, 112px); height: 8px; background: var(--surface-2); margin-right: calc(var(--margin) * -1); }
+  .fill { position: absolute; inset: 0; background: var(--accent); transform-origin: left; }
+  .steps { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap); margin-top: -8px; }
+  .steps li { position: relative; display: grid; gap: 12px; align-content: start; padding-top: 52px; }
+  .stop { position: absolute; top: -10px; left: 0; width: 28px; height: 28px; background: var(--accent); }
+  .steps h3 { font-size: clamp(40px, 4.6vw, 80px); letter-spacing: -0.045em; line-height: 1; }
+  .steps p { max-width: 30ch; font-size: var(--t-lead); line-height: 1.4; }
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.js) [data-track] .fill { transform: scaleX(0); transition: transform 1600ms var(--ease-in-out); }
+    :global(.js) [data-track].is-in .fill { transform: scaleX(1); }
+    :global(.js) [data-track] .steps li { opacity: 0; transform: translateY(16px); transition: opacity 600ms var(--ease-out), transform 700ms var(--ease-out); transition-delay: calc(var(--k) * 450ms + 150ms); }
+    :global(.js) [data-track].is-in .steps li { opacity: 1; transform: none; }
+    :global(.js) [data-track] .stop { opacity: 0; transform: scale(0.6); transition: opacity 300ms var(--ease-out), transform 400ms var(--ease-out); transition-delay: calc(var(--k) * 450ms + 100ms); }
+    :global(.js) [data-track].is-in .stop { opacity: 1; transform: none; }
+  }
+  @media (max-width: 860px) {
+    .heading, .para { grid-column: 1 / -1; }
+    .para { margin-top: 20px; }
+    .track { display: none; }
+    .steps { grid-template-columns: 1fr; margin-top: 48px; gap: 0; border-left: 8px solid var(--accent); }
+    .steps li { padding: 0 0 40px 32px; }
+    .stop { top: 4px; left: -18px; }
+  }
+</style>

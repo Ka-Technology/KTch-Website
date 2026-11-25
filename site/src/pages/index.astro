@@ -1,0 +1,28 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/home/Hero.astro';
+import ClientStrip from '../components/home/ClientStrip.astro';
+import BALedger from '../components/home/ba/BALedger.astro';
+import PillarTiles from '../components/home/PillarTiles.astro';
+import WorkIndex from '../components/WorkIndex.astro';
+import ProductsBand from '../components/ProductsBand.astro';
+import HowWeWork from '../components/HowWeWork.astro';
+import PortlandMosaic from '../components/PortlandMosaic.astro';
+import Testimonials from '../components/Testimonials.astro';
+import CloseCTA from '../components/CloseCTA.astro';
+---
+<Base strip={false}>
+  <Hero />
+  <ClientStrip />
+  <BALedger />
+  <PillarTiles />
+  <HowWeWork />
+  <WorkIndex heading="Featured client work" picks={[
+    'projects/cida-analytics', 'projects/apex-performance',
+    'projects/real-accounting', 'projects/scrubs-and-more', 'projects/hopewell-ranch', 'projects/milligans',
+  ]} />
+  <ProductsBand />
+  <PortlandMosaic />
+  <Testimonials />
+  <CloseCTA />
+</Base>

@@ -1,0 +1,194 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import CloseCTA from '../components/CloseCTA.astro';
+import { img, srcset } from '../data/site';
+const team = (await getCollection('team', (t) => t.data.current)).sort((a, b) => a.data.order - b.data.order);
+const products = await getCollection('products', (p) => !p.data.hidden);
+import { stripNames } from '../data/site';
+// beside the story: four facts already stated elsewhere on the site (the counts follow the content)
+const facts: [string, string][] = [['May 2024', 'Founded'], [String(stripNames.length), 'Teams we’ve worked with'], [String(products.length), 'Products of our own'], ['Portland', 'Home base']];
+const initials = (n: string) => n.split(' ').map((w) => w[0]).join('').slice(0, 2);
+// What we believe: the three beliefs from the spec. The grey sentence after each name takes turns rewording
+// itself (same number of words, each word close in length), so the bold names never move.
+const values = [
+  { name: 'Meaningful choices.', texts: ['Tech should give you options, not lock you in.', 'Apps should open new choices, not trap you in.'] },
+  { name: 'Human first.', texts: ['AI handles the tedious parts; people keep the meaningful ones.', 'AI handles the routine tasks; people keep the worthwhile ones.', 'AI absorbs the dullest parts; people keep the satisfying ones.'] },
+  { name: 'Partners, not vendors.', texts: ['On bigger projects we sometimes take equity or revenue share, because we want to be invested in your growth.', 'On larger projects we sometimes take equity or revenue share, because we want to be partners in your growth.', 'On bigger projects we sometimes take equity or revenue share, because we want to be invested in your future.'] },
+];
+for (const v of values) { const base = v.texts[0].split(' ').map((w) => w.length).join(); if (v.texts.some((t) => t.split(' ').map((w) => w.length).join() !== base)) throw new Error(`word lengths differ: ${v.name}`); }
+---
+<Base og="about" title="About" description="Ka Technology started in May 2024 with four friends from Oregon State University, bringing local businesses the technology big companies have.">
+  <PageHead title="Our story" lede="Small enough to care. Skilled enough to ship. We bring local businesses the technology big companies have."
+    image="hawthorne-pan" imageAlt="A panorama of Portland’s Hawthorne Bridge spanning the Willamette River." imageH={441} />
+
+  <section class="wrap grid12 story" aria-label="How Ka Technology started">
+    <div class="side-pic">
+      <figure class="photo">
+        <img src={img('third-street-1910', 800)} width="800" height="1199" loading="lazy" alt="Third Street in downtown Portland in 1910, with streetcars and shop awnings." />
+      </figure>
+    </div>
+    <div class="prose text" data-reveal>
+      <p class="t-lead first">Ka Technology started with four friends from Oregon State University and one observation: great young engineers were struggling to find work, and local businesses were struggling to find tech help. We set out to bring the two together.</p>
+      <p>Our first products came from real frustrations. One of us worked as a real-estate broker and watched the office’s principal broker spend close to an hour every week typing out continuing-education certificates by hand. We built <a class="link" href="/products/realdoc">RealDoc</a> to do it in one click. A title company later used it across its Oregon branch.</p>
+      <p>Since then we’ve built AI document platforms, schedulers, gym software and websites for businesses across the Portland area. We still believe what we wrote on day one: AI is a tool, not a replacement. Its job is to give people more time, and more meaningful choices.</p>
+      <ul class="facts" aria-label="Ka Technology in numbers">
+        {facts.map(([n, l]) => <li><span class="fn">{n}</span><span class="fl">{l}</span></li>)}
+      </ul>
+    </div>
+  </section>
+
+  <section class="values field" aria-labelledby="values-t">
+    <div class="wrap mf">
+      <h2 id="values-t" class="mf-h">What we believe</h2>
+      <p class="mf-text" data-manifesto>
+        {values.map((v, k) => (
+          <>
+            <strong>{v.name}</strong>{' '}
+            <span class="sr">{v.texts[0]}</span>
+            <span class="alt" aria-hidden="true" data-alts={JSON.stringify(v.texts)}>{v.texts[0].split(' ').map((w, wi, arr) => <><span class="w">{w}</span>{wi < arr.length - 1 ? ' ' : ''}</>)}</span>{k < values.length - 1 ? ' ' : ''}
+          </>
+        ))}
+      </p>
+    </div>
+  </section>
+
+  <section class="team wrap" aria-labelledby="team-t">
+    <div class="th" data-reveal>
+      <h2 id="team-t" class="t-h2">The Dream Team</h2>
+      <p class="t-lead">Engineers, a former broker and a data scientist, building together since day one.</p>
+    </div>
+    <ul class="tg" data-reveal>
+      {team.map((m) => (
+        <li class="member">
+          {m.data.photo
+            ? <figure class="photo mp"><img src={m.data.photo} width="900" height="900" alt={`Portrait of ${m.data.name}`} loading="lazy" /></figure>
+            : <div class="mp mono" aria-hidden="true"><span>{initials(m.data.name)}</span></div>}
+          <h3>{m.data.name}</h3>
+          <p class="role">{m.data.title}</p>
+          <p class="bio">{m.data.bio}</p>
+          {m.data.linkedin && <a class="link" href={m.data.linkedin} rel="noopener">LinkedIn</a>}
+        </li>
+      ))}
+    </ul>
+    <p class="join">Want to build with us? <a class="link" href="/careers"><span class="arrow">See careers</span></a></p>
+  </section>
+  <CloseCTA />
+</Base>
+
+<script>
+  // Fix every word slot to the width of its widest version, then take turns rewording one sentence at a time:
+  // each word scrambles briefly and settles on its new spelling. The bold names never move.
+  const root = document.querySelector<HTMLElement>('[data-manifesto]');
+  if (root) {
+    const alts = [...root.querySelectorAll<HTMLElement>('.alt')];
+    const sets = alts.map((a) => (JSON.parse(a.dataset.alts!) as string[]).map((t) => t.split(' ')));
+    const slots = alts.map((a) => [...a.querySelectorAll<HTMLElement>('.w')]);
+    const widths = slots.map((s) => s.map(() => 0));
+    // measure a word in the slot itself (same font, weight and size as it will be drawn)
+    const measure = (el: HTMLElement, text: string) => {
+      const keep = [el.textContent, el.style.width, el.style.letterSpacing] as const;
+      el.style.width = 'auto'; el.style.letterSpacing = '0px'; el.textContent = text;
+      const w = el.getBoundingClientRect().width;
+      el.textContent = keep[0]; el.style.width = keep[1]; el.style.letterSpacing = keep[2];
+      return w;
+    };
+    // spread a word's letters a hair so it fills its slot (capped, so it never looks stretched); the rest is centred
+    const settle = (el: HTMLElement, i: number, k: number) => {
+      const text = el.textContent || '';
+      const room = widths[i][k] - measure(el, text);
+      const em = parseFloat(getComputedStyle(el).fontSize);
+      el.style.letterSpacing = room > 0.5 && text.length > 1 ? `${Math.min(room / text.length, em * 0.03)}px` : '';
+    };
+    const fit = () => {
+      alts.forEach((a, i) => {
+        slots[i].forEach((el, k) => {
+          let w = 0;
+          for (const words of sets[i]) w = Math.max(w, measure(el, words[k]));
+          widths[i][k] = Math.ceil(w);
+          el.style.width = `${widths[i][k]}px`;
+          settle(el, i, k);
+        });
+      });
+    };
+    fit();
+    document.fonts?.ready.then(fit);
+    document.fonts?.addEventListener?.('loadingdone', fit);
+    addEventListener('load', fit);
+    addEventListener('resize', fit);
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const pool = 'abcdefghijklmnopqrstuvwxyz';
+      const now = sets.map(() => 0);
+      const morph = (el: HTMLElement, to: string, delay: number, i: number, k: number) => {
+        const from = el.textContent || ''; const len = to.length; const t0 = performance.now() + delay; const dur = 520;
+        const step = (t: number) => {
+          const p = (t - t0) / dur;
+          if (p < 0) return requestAnimationFrame(step);
+          if (p >= 1) { el.textContent = to; settle(el, i, k); return; }
+          el.style.letterSpacing = '';
+          let out = '';
+          for (let c = 0; c < len; c++) out += c / len < p ? to[c] : /[a-z]/i.test(to[c]) ? pool[(Math.random() * 26) | 0] : to[c];
+          el.textContent = out; requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      };
+      let turn = 0;
+      const tick = () => {
+        const i = turn % alts.length; turn++;
+        now[i] = (now[i] + 1) % sets[i].length;
+        slots[i].forEach((el, k) => { if (el.textContent !== sets[i][now[i]][k]) morph(el, sets[i][now[i]][k], k * 45, i, k); });
+      };
+      let timer = 0;
+      const io = new IntersectionObserver(([e]) => { clearInterval(timer); if (e.isIntersecting) { window.setTimeout(tick, 350); timer = window.setInterval(tick, 2600); } }, { threshold: 0.35 });
+      io.observe(root);
+    }
+  }
+</script>
+
+<style>
+  .story { row-gap: 40px; align-items: start; }
+  .side-pic { grid-column: 1 / 5; }
+  /* the photo runs the full height of the story and its facts, so both columns end together */
+  .side-pic { align-self: stretch; }
+  .side-pic .photo { height: 100%; min-height: 420px; }
+  .text { grid-column: 6 / -1; max-width: 62ch; }
+  .first { font-weight: 600; margin-bottom: 0.4em; }
+  .text .facts { padding: 0; }
+  .text .facts li { margin: 0; padding-left: 0; }
+  .facts { list-style: none; margin-top: clamp(32px, 4vw, 56px); display: grid; grid-template-columns: 1fr 1fr; gap: clamp(24px, 3vw, 40px) var(--gap); }
+  .facts li { display: grid; gap: 6px; padding-top: 16px; position: relative; }
+  .facts li::before { content: ""; position: absolute; top: 0; left: 0; width: 28px; height: 5px; background: var(--accent); }
+  .fn { font-size: clamp(36px, 3.6vw, 60px); font-weight: 850; letter-spacing: -0.05em; line-height: 1; }
+  .fl { font-weight: 600; color: var(--muted); }
+  .values { margin-top: var(--section); padding-block: clamp(80px, 9vw, 140px); }
+  /* the team follows the beliefs closely; the closing section brings its own space after */
+  .team { padding-top: clamp(64px, 7vw, 104px); }
+  .th { display: grid; gap: 18px; margin-bottom: 56px; }
+  .th p { max-width: 46ch; }
+  .tg { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 56px var(--gap); }
+  .member { display: grid; gap: 8px; align-content: start; }
+  .mp { aspect-ratio: 1; margin-bottom: 12px; }
+  /* the headshots are designed brand pieces (colour, red ka outline): shown as made, not greyed */
+  .mp img { filter: none; }
+  .mono { background: var(--surface); display: grid; place-items: end start; padding: 20px; }
+  .mono span { font-size: var(--t-display); font-weight: 850; letter-spacing: -0.06em; line-height: 0.8; color: var(--muted); }
+  .member h3 { font-size: var(--t-lead); letter-spacing: -0.02em; }
+  .role { font-weight: 600; color: var(--accent-text); font-size: var(--t-small); }
+  .bio { max-width: 34ch; }
+  .join { margin-top: clamp(40px, 4vw, 56px); font-size: var(--t-lead); font-weight: 600; }
+  @media (max-width: 860px) {
+    .side-pic, .text { grid-column: 1 / -1; }
+    .side-pic { order: 2; }
+    .side-pic .photo { height: auto; min-height: 0; aspect-ratio: 4 / 3; }
+        .tg { grid-template-columns: 1fr 1fr; gap: 40px 16px; }
+  }
+
+  /* What we believe, as one manifesto across the page; the grey words reword themselves in place */
+  .mf { display: grid; gap: clamp(28px, 3vw, 48px); }
+  .mf-h { font-size: var(--t-display); letter-spacing: -0.05em; line-height: 0.95; }
+  .mf-text { font-size: clamp(26px, 3.3vw, 56px); font-weight: 650; letter-spacing: -0.035em; line-height: 1.18; color: var(--muted); }
+  .mf-text strong { color: var(--accent); font-weight: 850; }
+  .alt .w { display: inline-block; white-space: nowrap; text-align: center; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+</style>

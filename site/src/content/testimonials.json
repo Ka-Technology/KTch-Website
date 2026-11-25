@@ -1,0 +1,8 @@
+[
+  { "id": "tammy", "quote": "", "name": "Tammy Sue Schuck", "title": "Principal Broker", "company": "Keller Williams Eugene-Springfield", "photo": "", "project": "realdoc" },
+  { "id": "carson", "quote": "", "name": "Carson Horton", "title": "Co-founder", "company": "CIDA Analytics", "photo": "", "project": "cida-analytics" },
+  { "id": "blake", "quote": "", "name": "Blake", "title": "", "company": "Scrubs & More", "photo": "", "project": "scrubs-and-more" },
+  { "id": "nathan", "quote": "", "name": "Nathan Gantz", "title": "", "company": "Real Accounting", "photo": "", "project": "real-accounting" },
+  { "id": "jake", "quote": "", "name": "Jake Kapusansky", "title": "", "company": "Kap & Company", "photo": "", "project": "milligans" },
+  { "id": "hopewell", "quote": "", "name": "", "title": "", "company": "Hopewell Ranch", "photo": "", "project": "hopewell-ranch" }
+]
