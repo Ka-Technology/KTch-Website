@@ -225,20 +225,25 @@ const split = (t: string) => { const m = t.match(/^(.+?[.!?])\s+(.*)$/s); return
     };
     root.classList.add('is-live');
     prods.forEach((el) => set(el, false));
-    // Opening a product below an open one: the one above shuts at once and the page holds still under the tapped
-    // row, so the new one opens downwards from where the visitor is instead of the page jumping up past it.
+    // Opening a product below an open one: the one above folds shut in view while the page follows it, so the
+    // tapped row stays where the visitor's finger was and the new one opens downwards from there.
     const toggle = (el: HTMLElement, scroll = false) => {
       const opening = !el.classList.contains('is-open');
       const top = el.getBoundingClientRect().top;
-      const snapped: HTMLElement[] = [];
+      let above = false;
       prods.forEach((o) => {
         if (o === el || !o.classList.contains('is-open')) return;
-        if (o.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING) { o.classList.add('is-snap'); snapped.push(o); }
+        if (o.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING) above = true;
         set(o, false);
       });
-      if (snapped.length) {
-        window.scrollBy({ top: el.getBoundingClientRect().top - top, behavior: 'instant' });
-        requestAnimationFrame(() => requestAnimationFrame(() => snapped.forEach((o) => o.classList.remove('is-snap'))));
+      if (above) {
+        const t0 = performance.now();
+        const hold = () => {
+          const d = el.getBoundingClientRect().top - top;
+          if (Math.abs(d) > 0.5) window.scrollBy({ top: d, behavior: 'instant' });
+          if (performance.now() - t0 < 750) requestAnimationFrame(hold);
+        };
+        requestAnimationFrame(hold);
       }
       set(el, opening);
       if (opening) history.replaceState(null, '', `#${el.id}`);
@@ -378,7 +383,6 @@ const split = (t: string) => { const m = t.match(/^(.+?[.!?])\s+(.*)$/s); return
   .rows.is-live .more { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 520ms var(--ease-out); }
   .rows.is-live .is-open .more { grid-template-rows: 1fr; }
   .more-in { overflow: hidden; min-height: 0; }
-  .rows.is-live .is-snap .more, .rows.is-live .is-snap .mk { transition: none; }
   .rows.is-live .mk { opacity: 0; transition: opacity 300ms ease; }
   .rows.is-live .is-open .mk { opacity: 1; transition-delay: 150ms; }
   /* The opened panel, in the site's own parts: the product's screens, then its name as a section heading, the problem
