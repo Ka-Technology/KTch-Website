@@ -11,9 +11,9 @@ challenge: >-
   accounts still ran on the old domain. Client emails looked suspicious, and nobody could log in
   under the new name.
 results:
-  - "Finished on May 25, 2025."
-  - "One inbox per person, on the new brand."
-  - "Not a single email lost."
+  - "13+ staff moved to the new domain without losing a single email."
+  - "Client emails carry the new brand, so they no longer look suspicious."
+  - "Every account signs in under the new name."
 tech: [Google Workspace, Google Apps Manager (GAM)]
 quote_id: nathan
 built:

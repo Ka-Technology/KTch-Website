@@ -11,8 +11,9 @@ challenge: >-
   A $2,500 page from a fundraising platform went unused, outreach was minimal, and the site lacked
   depth and transparency.
 results:
-  - "Approved by the ranch team, Jodi and Amanda."
-  - "Donations, memorials and a shop, all on the ranch’s own site."
+  - "A beautifully redesigned, modern site."
+  - "The depth and transparency donors look for."
+  - "Giving built in, from donations and memorials to a shop."
 tech: [Web design, Online shop, Donations]
 quote_id: hopewell
 built:

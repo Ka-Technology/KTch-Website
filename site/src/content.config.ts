@@ -8,6 +8,7 @@ const projects = defineCollection({
   schema: z.object({
     title: z.string(),
     client: z.string(),
+    heading: z.string().optional(),
     industry: z.string(),
     location: z.string().optional(),
     year: z.string(),

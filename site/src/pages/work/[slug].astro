@@ -31,7 +31,7 @@ const meta = [d.services.map((x) => serviceLabel[x]).join(', '), d.year, d.locat
 ---
 <Base title={`${d.client}: ${d.title}`} description={d.summary} og={`work-${project.id}`}>
   <article>
-    <PageHead title={d.client}>
+    <PageHead title={d.heading ?? d.client}>
       <Fragment slot="lede">{d.summary}<span class="cs-meta">{meta}</span>{stack && <span class="cs-meta cs-stack">{stack}</span>}</Fragment>
     </PageHead>
     <div class="wrap cs-body">
