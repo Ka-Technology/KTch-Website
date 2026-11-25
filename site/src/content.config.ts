@@ -17,6 +17,7 @@ const projects = defineCollection({
     challenge: z.string(),
     results: z.array(z.string()).default([]),
     tech: z.array(z.string()).default([]),
+    built: z.array(z.object({ h: z.string(), t: z.string() })).default([]),
     quote_id: z.string().optional(),
     cover_image: z.string(),
     cover_alt: z.string(),
