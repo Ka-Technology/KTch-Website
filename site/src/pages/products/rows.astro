@@ -90,7 +90,7 @@ const isPhone = (id: string) => id === 'kept';
 const shots: Record<string, { w: number[]; alt: string }> = {
   kept: { w: [400, 800], alt: 'The Kept app’s Challenges screen, with free habit trackers for reading and working out.' },
   doigetgas: { w: [800, 1600], alt: 'DoIGetGas showing its gas-price gauge pointing to “Might fall”, above this week’s U.S. average prices.' },
-  realdoc: { w: [800, 1600], alt: 'RealDoc’s certificate form: course details, a CSV upload and a signature picker.' },
+  realdoc: { w: [800, 1600], alt: 'RealDoc’s certificate form filled in for an Oregon class: course details, a CSV upload and a signature picker.' },
   shiftwize: { w: [800, 1073], alt: 'Shiftwize’s availability planner: a week grid of preferred and available hours.' },
 };
 // a second picture of the product itself, under the main screen when the row is open
@@ -105,13 +105,14 @@ const panel: Record<string, { details: { h: string; t: string }[]; built?: strin
     { h: 'Pay your way', t: 'By card or Apple Pay, or with stablecoins on Solana, where the stake waits in an escrow program that can only send it back to you or to your charity.' },
     { h: 'Kept never keeps the stake', t: 'There’s a small, upfront service fee.' },
   ] },
-  doigetgas: { built: null, details: [
+  doigetgas: { built: 'Built with Next.js and Tailwind CSS, on daily crude-oil and weekly gas prices from the EIA. Runs on Vercel.', details: [
     { h: 'Free to use', t: 'Supported by donations.' },
     { h: 'This week’s prices', t: 'U.S. average prices for regular, midgrade and premium, from the EIA.' },
   ] },
-  realdoc: { built: 'Runs on AWS.', details: [
+  realdoc: { built: 'Built with Next.js, Tailwind CSS, Python (Flask), MySQL, Redis, Stripe, and Google sign-in with Google Forms, Drive and Gmail. Runs on Railway.', details: [
     { h: 'In use today', t: 'Used by Keller Williams Eugene-Springfield.' },
-    { h: 'Before that', t: 'Previously used by title companies in Oregon.' },
+    { h: 'Title companies too', t: 'Title companies in Oregon have used it as well.' },
+    { h: 'State templates built in', t: 'Oregon and Arizona templates come ready, and custom CE templates are supported.' },
   ] },
   shiftwize: { split: true, built: 'Built with Python and linear and constraint optimization, with a web app that takes spreadsheet uploads.', details: [
     { h: 'Hard rules it never breaks', t: 'Availability, max hours, shift-lead coverage, consecutive days, no overstaffing.' },
@@ -173,7 +174,7 @@ const split = (t: string) => { const m = t.match(/^(.+?[.!?])\s+(.*)$/s); return
               <div class={`mk ${isPhone(p.id) ? 'is-phone' : ''}`}>
                 <div class="mk-pic">
                   <div class="shot">
-                    {!isPhone(p.id) && <div class="bar"><span>{d.url ? host(d.url) : `${d.name.toLowerCase()}.app`}</span></div>}
+                    {!isPhone(p.id) && <div class="bar" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span>{d.url && <span class="url">{host(d.url)}</span>}</div>}
                     <img src={shotSrc(p.id)} srcset={shotSet(p.id)} sizes={isPhone(p.id) ? '(max-width: 860px) 60vw, 320px' : '(max-width: 860px) 90vw, 40vw'} alt={shots[p.id].alt} loading="lazy" />
                   </div>
                   {extra[p.id] && <img class="extra" src={extra[p.id].src} alt={extra[p.id].alt} loading="lazy" />}
@@ -194,7 +195,7 @@ const split = (t: string) => { const m = t.match(/^(.+?[.!?])\s+(.*)$/s); return
                   <p class="mk-meta">{d.status} since {d.year}.{panel[p.id].built !== null && <><br />{panel[p.id].built ?? `Built with ${listJoin(d.tech)}.`}</>}</p>
                   {(d.url || d.cta_url) && (
                     <p class="mk-links">
-                      {d.url && <a class="link" href={d.url} rel="noopener"><span class="arrow">{d.cta_url === d.url && d.cta_label ? d.cta_label : `Visit ${host(d.url)}`}</span></a>}
+                      {d.url && <a class="link" href={d.url} rel="noopener"><span class="arrow">Visit {host(d.url)}</span></a>}
                       {d.cta_url && d.cta_url !== d.url && <a class="link" href={d.cta_url} rel="noopener"><span class="arrow">{d.cta_label ?? 'Learn more'}</span></a>}
                     </p>
                   )}
@@ -378,7 +379,12 @@ const split = (t: string) => { const m = t.match(/^(.+?[.!?])\s+(.*)$/s); return
   .shot img, .extra { width: 100%; display: block; }
   /* the phone's frame is the page's ink: dark on the light page, white on the dark one */
   .mk.is-phone .shot { border: 7px solid var(--ink); border-radius: 30px; background: none; }
-  .bar { height: 28px; display: flex; align-items: center; padding: 0 12px; background: var(--surface-2); font-size: 11px; font-weight: 600; color: var(--muted); }
+  /* a quiet browser top: three dots and the address in a pill, centred (no address for a product without a site) */
+  .bar { height: 32px; display: grid; grid-template-columns: 52px minmax(0, 1fr) 52px; align-items: center; padding: 0 12px; background: var(--surface-2); }
+  .dots { display: flex; gap: 6px; }
+  .dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--muted); opacity: 0.4; }
+  .url { justify-self: center; width: min(100%, 260px); height: 20px; border-radius: 6px; background: var(--bg); display: grid; place-items: center;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.01em; color: var(--muted); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
   .mk-text { display: grid; gap: 24px; align-content: start; max-width: 960px; }
   .mk-pitch { font-size: var(--t-lead); line-height: 1.4; max-width: 34ch; font-weight: 600; }
   .mk-offers { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 32px var(--gap); margin-top: 24px; }

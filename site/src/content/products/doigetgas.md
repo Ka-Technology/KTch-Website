@@ -12,7 +12,7 @@ how_it_works:
   - Tells you plainly whether to fill up now or wait.
 features:
   - Free to use, and supported by donations.
-tech: [Forecasting, Web]
+tech: [Next.js, Tailwind CSS, EIA open data, Vercel]
 cta_label: Check today’s forecast
 cta_url: https://doigetgas.com
 cover_image: fw-doigetgas

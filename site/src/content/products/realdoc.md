@@ -9,13 +9,13 @@ problem: >-
   Tammy Sue Schuck, a principal broker at Keller Williams Eugene-Springfield, spent about an hour
   every week typing continuing-education certificates by hand.
 how_it_works:
-  - A QR code at class creates the attendance sheet automatically.
-  - One click generates every attendee’s certificate, signed and zipped.
-  - Oregon and Arizona templates are built in.
+  - Type in the class details once, and RealDoc makes a QR code that opens the class’s sign-in form.
+  - Attendees scan it at class to sign in. Afterwards, download the attendee list from your Google Drive.
+  - Upload the list and pick a saved signature. Every certificate comes back filled in, in one zip file.
 features:
   - Used by Keller Williams Eugene-Springfield.
   - Previously used by title companies in Oregon.
-tech: [Web app, AWS]
+tech: [Next.js, Tailwind CSS, Python (Flask), MySQL, Redis, Stripe, Google Forms, Drive and Gmail, Railway]
 cta_label: Visit RealDoc
 cta_url: https://realdoc.app
 cover_image: fw-realdoc
