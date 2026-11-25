@@ -1,7 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
 import { site, img } from '../data/site';
-const formId = import.meta.env.PUBLIC_FORMSPREE_ID as string | undefined;
+// Formspree form that delivers to info@ka-tch.com (the ID is public: it appears in the page's HTML). An env value overrides it.
+const formId = (import.meta.env.PUBLIC_FORMSPREE_ID as string | undefined) || 'meagvwaz';
 const action = formId ? `https://formspree.io/f/${formId}` : `mailto:${site.email}`;
 const topics = ['AI', 'Software', 'Automation', 'Analytics', 'Website', 'Not sure'];
 ---
