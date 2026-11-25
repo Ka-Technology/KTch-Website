@@ -98,6 +98,15 @@ const extra: Record<string, { src: string; alt: string }> = {
   realdoc: { src: '/images/pb-realdoc-qr-1600.webp', alt: 'RealDoc’s QR-code page beside the sign-in form it opens for a class.' },
   shiftwize: { src: '/images/pb-shiftwize-prefs-800.webp', alt: 'Shiftwize’s scheduling preferences and team context, such as a critical gap on Friday.' },
 };
+// MOCKUP (Kept only): the opened panel built from the site's own parts. Each detail gets a short heading; the words
+// are the product file's own, split, not new claims.
+const mock: Record<string, { details: { h: string; t: string }[] }> = {
+  kept: { details: [
+    { h: 'Pay your way', t: 'By card or Apple Pay, or with stablecoins on Solana, where the stake waits in an escrow program that can only send it back to you or to your charity.' },
+    { h: 'Kept never keeps the stake', t: 'There’s a small, upfront service fee.' },
+  ] },
+};
+const listJoin = (a: string[]) => a.length > 1 ? `${a.slice(0, -1).join(', ')} and ${a[a.length - 1]}` : a[0] ?? '';
 const shotSrc = (id: string) => `/images/shot-${id}-${shots[id].w[1]}.webp`;
 const shotSet = (id: string) => shots[id].w.map((w) => `/images/shot-${id}-${w}.webp ${w}w`).join(', ');
 const host = (u: string) => u.replace(/^https?:\/\//, '').replace(/\/$/, '');
@@ -148,6 +157,33 @@ const split = (t: string) => { const m = t.match(/^(.+?[.!?])\s+(.*)$/s); return
 
           <div class="more" id={`more-${p.id}`} data-more>
             <div class="more-in">
+              {mock[p.id] ? (
+                <div class="wrap mk" style={`--bb:${b.bg}`}>
+                  <div class="grid12 mk-top">
+                    <div class="mk-pic">
+                      <img src={shotSrc(p.id)} srcset={shotSet(p.id)} sizes="(max-width: 860px) 70vw, 24vw" alt={shots[p.id].alt} loading="lazy" />
+                    </div>
+                    <div class="mk-text">
+                      <h3 class="t-h2">{d.name}</h3>
+                      <p class="mk-pitch">{d.problem}</p>
+                      <ul class="mk-offers">
+                        {mock[p.id].details.map((x) => <li><h4>{x.h}</h4><p>{x.t}</p></li>)}
+                      </ul>
+                      <p class="mk-meta">{d.status} since {d.year}. Built with {listJoin(d.tech)}.</p>
+                      <p class="mk-links">
+                        {d.url && <a class="link" href={d.url} rel="noopener"><span class="arrow">Visit {host(d.url)}</span></a>}
+                        {d.cta_url && <a class="link" href={d.cta_url} rel="noopener"><span class="arrow">{d.cta_label ?? 'Learn more'}</span></a>}
+                      </p>
+                    </div>
+                  </div>
+                  <div class="mk-how">
+                    <h4 class="mk-hh">How it works</h4>
+                    <ol>
+                      {d.how_it_works.map((st, n) => <li><span class="mk-n" aria-hidden="true">{n + 1}</span><p>{st}</p></li>)}
+                    </ol>
+                  </div>
+                </div>
+              ) : (
               <div class="wrap grid12 body">
                 <div class="pics">
                   <div class={`shot ${isPhone(p.id) ? 'is-phone' : ''}`}>
@@ -183,6 +219,7 @@ const split = (t: string) => { const m = t.match(/^(.+?[.!?])\s+(.*)$/s); return
                   {d.url && <a class="button visit" href={d.url} rel="noopener">Visit {host(d.url)}</a>}
                 </div>
               </div>
+              )}
             </div>
           </div>
         </article>
@@ -372,6 +409,34 @@ const split = (t: string) => { const m = t.match(/^(.+?[.!?])\s+(.*)$/s); return
   .feats li { padding-left: 1.1em; position: relative; }
   .feats li::before { content: ""; position: absolute; left: 0; top: 0.62em; width: 0.4em; height: 0.4em; background: var(--ink); }
 
+
+  /* MOCKUP (Kept): the opened panel in the site's own parts. Picture left, the product's name as a section heading,
+     the problem as its pitch, details under red dashes (as on Services), steps under big red numerals (as on Careers). */
+  .mk { padding-block: clamp(48px, 6vw, 96px) clamp(64px, 8vw, 128px); display: grid; gap: clamp(56px, 6vw, 96px); }
+  .mk-top { row-gap: 48px; align-items: start; }
+  .mk-pic { grid-column: 1 / 6; aspect-ratio: 4 / 5; background: var(--bb); display: grid; place-items: center; overflow: hidden; }
+  .mk-pic img { width: 52%; border: 7px solid #0b0b0c; border-radius: 30px; display: block; }
+  .mk-text { grid-column: 7 / -1; display: grid; gap: 24px; align-content: start; }
+  .mk-pitch { font-size: var(--t-lead); line-height: 1.4; max-width: 34ch; font-weight: 600; }
+  .mk-offers { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 32px var(--gap); margin-top: 16px; }
+  .mk-offers li { display: grid; gap: 8px; align-content: start; padding-top: 18px; position: relative; }
+  .mk-offers li::before { content: ""; position: absolute; top: 0; left: 0; width: 28px; height: 6px; background: var(--accent); }
+  .mk-offers h4 { font-size: var(--t-lead); letter-spacing: -0.02em; line-height: 1.15; }
+  .mk-offers p { max-width: 40ch; }
+  .mk-meta { color: var(--muted); font-size: var(--t-small); margin-top: 8px; max-width: 56ch; }
+  .mk-links { display: flex; flex-wrap: wrap; gap: 12px 32px; }
+  .mk-hh { font-size: var(--t-lead); letter-spacing: -0.02em; }
+  .mk-how ol { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap); margin-top: 28px; }
+  .mk-how li { display: grid; gap: 18px; align-content: start; }
+  .mk-n { font-size: clamp(64px, 7vw, 120px); font-weight: 850; letter-spacing: -0.06em; line-height: 0.8; color: var(--accent); }
+  .mk-how p { font-size: var(--t-lead); line-height: 1.35; max-width: 30ch; }
+  @media (max-width: 860px) {
+    .mk-pic, .mk-text { grid-column: 1 / -1; }
+    .mk-pic { aspect-ratio: 1 / 1; }
+    .mk-pic img { width: 44%; }
+    .mk-offers, .mk-how ol { grid-template-columns: 1fr; }
+    .mk-how ol { gap: 32px; }
+  }
   @media (max-width: 860px) {
     .rows { --H: 180px; gap: 28px; }
     .row { grid-template-columns: 1fr; height: auto; }
