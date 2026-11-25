@@ -34,11 +34,12 @@ def fm(path, key):
     return m.group(1).strip().strip('"') if m else ''
 
 card('default', 'Giving people the power of meaningful choices.')
-for slug, t in [('services', 'Consulting services'), ('work', 'Our work'), ('products', 'Our software'), ('about', 'Our story'), ('careers', 'Build with us'), ('contact', "Let's talk.")]:
+for slug, t in [('services', 'Consulting services'), ('work', 'Our work'), ('products', 'Products'), ('about', 'Our story'), ('careers', 'Build with us'), ('contact', 'Let’s talk.')]:
     card(slug, t)
 for p in glob.glob('src/content/projects/*.md'):
-    s = os.path.basename(p)[:-3]; card(f'work-{s}', f"{fm(p, 'client')}: {fm(p, 'title')}")
+    s = os.path.basename(p)[:-3]; name = fm(p, 'heading') or fm(p, 'client')
+    card(f'work-{s}', f"{name}: {fm(p, 'title')}".replace("'", '’'))
 for p in glob.glob('src/content/products/*.md'):
     if fm(p, 'hidden') == 'true': continue  # hidden products get no preview image
-    s = os.path.basename(p)[:-3]; card(f'product-{s}', f"{fm(p, 'name')}: {fm(p, 'tagline')}")
+    s = os.path.basename(p)[:-3]; card(f'product-{s}', f"{fm(p, 'name')}: {fm(p, 'tagline')}".replace("'", '’'))
 print('ok')
