@@ -11,11 +11,18 @@ challenge: >-
   test report meant printing a template, feeding it back through the printer, scanning it and
   emailing it: 5–6 minutes, once or twice a day.
 results:
-  - A manual print-and-scan routine replaced with one step.
+  - "A print, feed, scan and email routine replaced with one step."
+  - "No more printing and scanning for each report."
 tech: [Python, PDF generation]
+built:
+  - h: "Results on the branded template"
+    t: "Each test’s results are placed on APEX’s own template automatically."
+  - h: "Ready to send"
+    t: "Out comes a finished PDF, ready to email."
+stack: "Built with Python and automated PDF generation."
 cover_image: fw-apex
 cover_alt: An empty, modern gym floor lined with weight machines.
 order: 5
 ---
 
-A script that overlays each test's results on APEX's branded template automatically and outputs a ready-to-send PDF.
+A script that does the whole routine in one step.

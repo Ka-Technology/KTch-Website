@@ -11,15 +11,21 @@ challenge: >-
   accounts still ran on the old domain. Client emails looked suspicious, and nobody could log in
   under the new name.
 results:
-  - Finished on May 25, 2025.
-  - One inbox per person, on the new brand.
+  - "Finished on May 25, 2025."
+  - "One inbox per person, on the new brand."
+  - "Not a single email lost."
 tech: [Google Workspace, Google Apps Manager (GAM)]
 quote_id: nathan
+built:
+  - h: "The new name comes first"
+    t: "Made realaccounting.biz the primary Google Workspace domain and moved every user over."
+  - h: "Nothing lost"
+    t: "Kept the old domain as an alias, so no email was lost."
+  - h: "Groups rebuilt"
+    t: "Rebuilt the groups and scripted the clean-up with Google Apps Manager (GAM)."
 cover_image: svc-automation
 cover_alt: Two people working on laptops at a shared wooden table.
 order: 4
 ---
 
-- **Made realaccounting.biz the primary** Google Workspace domain and moved every user over.
-- **Kept the old domain as an alias**, so no email was lost.
-- **Rebuilt the groups** and scripted the clean-up with Google Apps Manager (GAM).
+Done inside Real Accounting’s own Google Workspace.

@@ -3,7 +3,7 @@ import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import CloseCTA from '../../components/CloseCTA.astro';
 import PageHead from '../../components/PageHead.astro';
-import { serviceLabel, pillarOf, img, srcset } from '../../data/site';
+import { serviceLabel, img } from '../../data/site';
 
 export async function getStaticPaths() {
   const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
@@ -14,163 +14,72 @@ const d = project.data;
 const { Content } = await render(project);
 const testimonials = await getCollection('testimonials');
 const quote = d.quote_id ? testimonials.find((t) => t.data.id === d.quote_id && t.data.quote.trim())?.data : undefined;
-const big = !['svc-software', 'svc-automation'].includes(d.cover_image);
-// MOCKUP (CIDA only): the case study in the same parts as the Products panels. A picture of the client's world
-// beside the story: the challenge as a pitch, what we built under red dashes, results, then one plain line on the build.
-const mock = project.id === 'cida-analytics';
-const pic = { name: 'pw-cida-0', w: 1280, alt: 'The brick front of the Empress Condominiums in Northwest Portland.' };
+// A case study in the same parts as the Products panels: a picture of the client's world beside the story
+// (the challenge as a pitch, what we built under red dashes, results under big red numerals), one plain line on
+// the build, and the next case study. CIDA's photo is its own; the rest use their cover photo.
+const own: Record<string, { name: string; w: number; alt: string }> = {
+  'cida-analytics': { name: 'pw-cida-0', w: 1280, alt: 'The brick front of the Empress Condominiums in Northwest Portland.' },
+};
+const small = ['svc-software', 'svc-automation'].includes(d.cover_image);
+const pic = own[project.id]
+  ? { src: `/images/${own[project.id].name}-${own[project.id].w}.webp`, set: `/images/${own[project.id].name}-800.webp 800w, /images/${own[project.id].name}-${own[project.id].w}.webp ${own[project.id].w}w`, alt: own[project.id].alt }
+  : { src: img(d.cover_image, small ? 800 : 1600), set: small ? undefined : `${img(d.cover_image, 800)} 800w, ${img(d.cover_image, 1600)} 1600w`, alt: d.cover_alt };
 const [lead, rest] = (() => { const m = d.challenge.match(/^(.+?[.!?])\s+(.*)$/s); return m ? [m[1], m[2]] : [d.challenge, '']; })();
 const listJoin = (a: string[]) => (a.length > 1 ? `${a.slice(0, -1).join(', ')} and ${a[a.length - 1]}` : a[0] ?? '');
+const stack = d.stack ?? (d.tech.length ? `Built with ${listJoin(d.tech)}.` : '');
 const meta = [d.services.map((x) => serviceLabel[x]).join(', '), d.year, d.location, d.status].filter(Boolean).join(' · ');
 ---
 <Base title={`${d.client}: ${d.title}`} description={d.summary} og={`work-${project.id}`}>
-  {mock ? (
-    <article class="cs">
-      <PageHead title={d.client}>
-        <Fragment slot="lede">{d.summary}<span class="cs-meta">{meta}</span></Fragment>
-      </PageHead>
-      <div class="wrap cs-body">
-        <figure class="cs-pic photo"><img src={`/images/${pic.name}-${pic.w}.webp`} srcset={`/images/${pic.name}-800.webp 800w, /images/${pic.name}-${pic.w}.webp ${pic.w}w`} sizes="(max-width: 860px) 100vw, 40vw" width="1280" height="960" alt={pic.alt} /></figure>
-        <div class="cs-text">
-          <section aria-labelledby="ch">
-            <h2 id="ch" class="cs-h">The challenge</h2>
-            <p class="cs-pitch">{lead}</p>
-            {rest && <p class="cs-more">{rest}</p>}
-          </section>
-          <section aria-labelledby="built">
-            <h2 id="built" class="cs-h">What we built</h2>
-            <div class="cs-intro"><Content /></div>
-            <ul class="cs-offers">{d.built.map((x) => <li><h3>{x.h}</h3><p>{x.t}</p></li>)}</ul>
-          </section>
-          {d.results.length > 0 && (
-            <section aria-labelledby="res">
-              <h2 id="res" class="cs-h">Results</h2>
-              <ol class="cs-res">{d.results.map((r, n) => <li><span class="cs-n" aria-hidden="true">{n + 1}</span><p>{r}</p></li>)}</ol>
-            </section>
-          )}
-          {quote && (
-            <figure class="q">
-              <blockquote>{quote.quote}</blockquote>
-              <figcaption><strong>{quote.name}</strong>{quote.title && `, ${quote.title}`}, {quote.company}</figcaption>
-            </figure>
-          )}
-          {d.tech.length > 0 && <p class="cs-stack">Built with {listJoin(d.tech)}.</p>}
-        </div>
-      </div>
-      <nav class="wrap cs-next" aria-label="Next case study">
-        <a class="link" href={`/work/${next.id}`}><span class="arrow">Next: {next.data.client}</span></a>
-      </nav>
-    </article>
-  ) : (
   <article>
-    <header class="wrap hd">
-      <h1 class="t-display lines"><span class="line"><span data-line style="--i:0">{d.client}</span></span></h1>
-      <div class="grid12 sub">
-        <div class="lede" data-load style="--d:300ms">
-          <p class="t-lead summary">{d.summary}</p>
-          {d.tech.length > 0 && (
-            <div class="tech-wrap">
-              <h2 class="tech-h">Tech used</h2>
-              <ul class="tech">{d.tech.map((t) => <li>{t}</li>)}</ul>
-            </div>
-          )}
+    <PageHead title={d.client}>
+      <Fragment slot="lede">{d.summary}<span class="cs-meta">{meta}</span></Fragment>
+    </PageHead>
+    <div class="wrap cs-body">
+      <figure class="cs-pic photo"><img src={pic.src} srcset={pic.set} sizes="(max-width: 860px) 100vw, 40vw" width="1280" height="960" alt={pic.alt} /></figure>
+      <div class="cs-text">
+        <section aria-label="The challenge">
+          <p class="cs-pitch">{lead}</p>
+          {rest && <p class="cs-more">{rest}</p>}
+        </section>
+        <section aria-labelledby="built">
+          <h2 id="built" class="cs-h">What we built</h2>
+          <div class="cs-intro"><Content /></div>
+          {d.built.length > 0 && <ul class="cs-offers">{d.built.map((x) => <li><h3>{x.h}</h3><p>{x.t}</p></li>)}</ul>}
+        </section>
+        {d.results.length > 0 && (
+          <section aria-labelledby="res">
+            <h2 id="res" class="cs-h">Results</h2>
+            <ol class="cs-res">{d.results.map((r, n) => <li><span class="cs-n" aria-hidden="true">{n + 1}</span><p>{r}</p></li>)}</ol>
+          </section>
+        )}
+        {quote && (
+          <figure class="q">
+            <blockquote>{quote.quote}</blockquote>
+            <figcaption><strong>{quote.name}</strong>{quote.title && `, ${quote.title}`}, {quote.company}</figcaption>
+          </figure>
+        )}
+        <div class="cs-end">
+          {stack && <p class="cs-stack">{stack}</p>}
+          <nav aria-label="Next case study"><a class="link cs-next" href={`/work/${next.id}`}><span class="arrow">Next: {next.data.client}</span></a></nav>
         </div>
-        <dl class="facts" data-load style="--d:380ms">
-          <div><dt>Project</dt><dd>{d.title}</dd></div>
-          <div><dt>Services</dt><dd>{d.services.map((s) => serviceLabel[s]).join(', ')}</dd></div>
-          <div><dt>When</dt><dd>{d.year}</dd></div>
-          <div><dt>Status</dt><dd>{d.status}</dd></div>
-          {d.location && <div><dt>Where</dt><dd>{d.location}</dd></div>}
-        </dl>
       </div>
-    </header>
-
-    <figure class="photo cover wrap-bleed" data-open>
-      <img src={img(d.cover_image, big ? 1600 : 800)} srcset={big ? srcset(d.cover_image) : undefined} sizes="100vw" width="1600" height="900" alt={d.cover_alt} />
-    </figure>
-
-    <section class="wrap grid12 block" aria-labelledby="ch">
-      <h2 id="ch" class="t-h2 bh">The challenge</h2>
-      <p class="t-lead body" data-reveal><span>{d.challenge}</span></p>
-    </section>
-
-    <section class="wrap grid12 block" aria-labelledby="built">
-      <h2 id="built" class="t-h2 bh">What we built</h2>
-      <div class="prose body" data-reveal><Content /></div>
-    </section>
-
-    {d.results.length > 0 && (
-      <section class="results field" aria-labelledby="res">
-        <div class="wrap grid12">
-          <h2 id="res" class="t-h2 bh">Results</h2>
-          <ul class="rl" data-reveal>{d.results.map((r) => <li>{r}</li>)}</ul>
-        </div>
-      </section>
-    )}
-
-    {quote && (
-      <section class="wrap grid12 block" aria-label="What the client said">
-        <figure class="q body">
-          <blockquote>{quote.quote}</blockquote>
-          <figcaption><strong>{quote.name}</strong>{quote.title && `, ${quote.title}`}, {quote.company}</figcaption>
-        </figure>
-      </section>
-    )}
-
-    <nav class="wrap nextp" aria-label="Next case study">
-      <a href={`/work/${next.id}`}><span class="nl">Next case study</span><span class="nn arrow">{next.data.client}</span></a>
-      <p class="allw"><a class="link" href={`/services#${pillarOf(d.services[0]).slug}`}>Back to {pillarOf(d.services[0]).short} services</a></p>
-    </nav>
+    </div>
   </article>
-  )}
   <CloseCTA title={['Have a similar', 'problem?']} />
 </Base>
 
 <style>
-  .hd { padding-top: clamp(24px, 5vh, 64px); }
-  .sub { margin-top: 36px; row-gap: 32px; }
-  .lede { grid-column: 1 / 7; display: grid; gap: 28px; align-content: start; }
-  .summary { max-width: 36ch; font-weight: 600; }
-  .tech-wrap { display: grid; gap: 10px; }
-  .tech-h { font-size: var(--t-small); font-weight: 600; letter-spacing: 0; line-height: 1.45; color: var(--muted); }
-  .facts { grid-column: 8 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 18px var(--gap); margin: 0; }
-  .facts dt { font-size: var(--t-small); color: var(--muted); font-weight: 600; }
-  .facts dd { margin: 2px 0 0; font-weight: 700; }
-  .cover { margin-top: clamp(48px, 7vw, 96px); aspect-ratio: 16 / 7; }
-  .block { padding-top: var(--section); row-gap: 28px; }
-  .bh { grid-column: 1 / 6; }
-  .body { grid-column: 6 / -1; max-width: 62ch; }
-  .results { margin-top: var(--section); padding-block: clamp(80px, 9vw, 140px); }
-  .rl { grid-column: 6 / -1; list-style: none; display: grid; gap: 22px; }
-  .rl li { font-size: var(--t-lead); font-weight: 700; letter-spacing: -0.015em; line-height: 1.3; padding-left: 1.1em; position: relative; }
-  .rl li::before { content: ""; position: absolute; left: 0; top: 0.5em; width: 0.4em; height: 0.4em; background: var(--accent); }
-  .tech { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
-  .tech li { background: var(--surface-2); padding: 8px 14px; font-weight: 600; }
-  .q blockquote { margin: 0; font-size: var(--t-lead); line-height: 1.35; }
-  .q figcaption { margin-top: 16px; }
-  .nextp { padding-block: var(--section); }
-  .nextp a { display: grid; gap: 8px; text-decoration: none; }
-  .nl { font-weight: 600; color: var(--muted); }
-  .allw { margin-top: 28px; }
-  .nn { font-size: var(--t-h2); font-weight: 800; letter-spacing: -0.04em; line-height: 1; transition: color var(--t-hover) ease; }
-  @media (hover: hover) and (pointer: fine) { .nextp a:hover .nn { color: var(--accent-text); } }
-  @media (max-width: 860px) {
-    .lede, .facts, .bh, .body, .rl { grid-column: 1 / -1; }
-    .cover { aspect-ratio: 4 / 3; }
-  }
-
-  /* MOCKUP (CIDA): the case study in the Products panels' parts */
   .cs-meta { display: block; margin-top: 16px; color: var(--muted); font-size: var(--t-small); font-weight: 600; letter-spacing: 0; }
-  .cs-body { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: clamp(48px, 6vw, 112px); align-items: start;
-    padding-top: 0; }
+  /* the picture and the story side by side; the page then runs straight into the closing question, as Products does */
+  .cs-body { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: clamp(48px, 6vw, 112px); align-items: start; }
   .cs-pic { position: sticky; top: 96px; aspect-ratio: 4 / 5; }
   .cs-pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .cs-text { display: grid; gap: clamp(48px, 5vw, 72px); align-content: start; max-width: 900px; }
   .cs-text section { display: grid; gap: 20px; }
   .cs-h { font-size: var(--t-lead); letter-spacing: -0.02em; }
   .cs-pitch { font-size: clamp(24px, 2.3vw, 34px); line-height: 1.25; letter-spacing: -0.02em; font-weight: 700; max-width: 30ch; }
-  .cs-more { max-width: 60ch; }
-  .cs-intro :global(p) { max-width: 60ch; }
+  .cs-more, .cs-intro :global(p) { max-width: 60ch; }
+  .cs-intro :global(em) { font-style: italic; }
   .cs-offers { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 32px var(--gap); margin-top: 12px; }
   .cs-offers li { display: grid; gap: 8px; align-content: start; padding-top: 18px; position: relative; }
   .cs-offers li::before { content: ""; position: absolute; top: 0; left: 0; width: 28px; height: 6px; background: var(--accent); }
@@ -181,8 +90,11 @@ const meta = [d.services.map((x) => serviceLabel[x]).join(', '), d.year, d.locat
   .cs-res li { display: grid; gap: 16px; align-content: start; }
   .cs-n { font-size: clamp(56px, 5.6vw, 96px); font-weight: 850; letter-spacing: -0.06em; line-height: 0.8; color: var(--accent); }
   .cs-res p { font-size: var(--t-lead); font-weight: 700; letter-spacing: -0.015em; line-height: 1.3; max-width: 22ch; }
+  .q blockquote { margin: 0; font-size: var(--t-lead); line-height: 1.35; max-width: 40ch; }
+  .q figcaption { margin-top: 16px; }
+  .cs-end { display: grid; gap: 24px; justify-items: start; }
   .cs-stack { color: var(--muted); font-size: var(--t-small); }
-  .cs-next { padding-block: clamp(56px, 7vw, 104px) 0; font-size: var(--t-lead); }
+  .cs-next { font-size: var(--t-lead); }
   @media (max-width: 860px) {
     .cs-body { grid-template-columns: minmax(0, 1fr); row-gap: 40px; }
     .cs-pic { position: static; aspect-ratio: 4 / 3; }

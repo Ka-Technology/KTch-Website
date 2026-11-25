@@ -11,16 +11,21 @@ challenge: >-
   A $2,500 page from a fundraising platform went unused, outreach was minimal, and the site lacked
   depth and transparency.
 results:
-  - The ranch team, Jodi and Amanda, signed off happily on the final version.
+  - "Approved by the ranch team, Jodi and Amanda."
+  - "Donations, memorials and a shop, all on the ranch’s own site."
 tech: [Web design, Online shop, Donations]
 quote_id: hopewell
+built:
+  - h: "Programs, animals and events"
+    t: "So visitors see the ranch’s work."
+  - h: "A shop"
+    t: "Featuring the book Project Solomon."
+  - h: "Ways to give"
+    t: "Donate buttons, memorials and a new Support Us hub."
+stack: ""
 cover_image: fw-hopewell
 cover_alt: Horses, black and white, running across an open ranch field.
 order: 6
 ---
 
-A rebuilt site, delivered with our partner Kap & Company:
-
-- **Programs, animals and events**, so visitors see the ranch's work.
-- **A shop**, featuring the book *Project Solomon*.
-- **Donate buttons, memorials** and a new **Support Us** hub.
+A rebuilt site, delivered with our partner Kap & Company.

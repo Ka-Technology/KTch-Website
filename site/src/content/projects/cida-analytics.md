@@ -13,9 +13,9 @@ challenge: >-
   reserve studies to bylaws and meeting minutes, and CIDA wanted to grow from Oregon to the whole
   West Coast.
 results:
-  - A demo the CIDA founders called beautiful and clean.
-  - Report prep moves from reading documents to checking them.
-  - Built to grow with CIDA beyond Oregon.
+  - "A modern, cloud-hosted platform built around CIDA’s workflow."
+  - "Report prep moves from reading documents to checking them."
+  - "Built to grow with CIDA beyond Oregon."
 tech: [Python, React, Postgres, AI language models]
 built:
   - h: Every document in one place

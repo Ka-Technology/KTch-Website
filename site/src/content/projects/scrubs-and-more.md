@@ -12,18 +12,25 @@ challenge: >-
   In-person sales had dropped, and the website looked like 2010, with no personal touch and lots of
   stock photos.
 results:
-  - Launched in August 2025 with a more personal, human brand online.
+  - "Launched in August 2025."
+  - "A more personal, human brand online."
+  - "Real customer photos in place of stock."
 tech: [Web design, Responsive build]
 quote_id: blake
+built:
+  - h: "Who they are"
+    t: "Told with real customer photos instead of stock."
+  - h: "Popular products and sales"
+    t: "Front and centre."
+  - h: "A sizing FAQ"
+    t: "So customers can order with confidence."
+  - h: "Testimonials and contact"
+    t: "To bring people back into the shop."
+stack: "Designed and built to work on any screen."
 cover_image: fw-scrubs
 cover_alt: Racks of patterned scrub tops in a uniform shop.
 featured: true
 order: 3
 ---
 
-A refreshed, modern site covering:
-
-- **Who they are**, told with real customer photos instead of stock.
-- **Popular products and sales**, front and centre.
-- **A sizing FAQ**, so customers can order with confidence.
-- **Testimonials and contact**, to bring people back into the shop.
+A refreshed, modern site.
