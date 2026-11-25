@@ -93,17 +93,30 @@ const shots: Record<string, { w: number[]; alt: string }> = {
   realdoc: { w: [800, 1600], alt: 'RealDoc’s certificate form: course details, a CSV upload and a signature picker.' },
   shiftwize: { w: [800, 1073], alt: 'Shiftwize’s availability planner: a week grid of preferred and available hours.' },
 };
-// a second picture of the product itself, shown beside the main screen when the row is open
+// a second picture of the product itself, under the main screen when the row is open
 const extra: Record<string, { src: string; alt: string }> = {
   realdoc: { src: '/images/pb-realdoc-qr-1600.webp', alt: 'RealDoc’s QR-code page beside the sign-in form it opens for a class.' },
-  shiftwize: { src: '/images/pb-shiftwize-prefs-800.webp', alt: 'Shiftwize’s scheduling preferences and team context, such as a critical gap on Friday.' },
 };
-// MOCKUP (Kept only): the opened panel built from the site's own parts. Each detail gets a short heading; the words
-// are the product file's own, split, not new claims.
-const mock: Record<string, { details: { h: string; t: string }[] }> = {
+// The opened panel, built from the site's own parts. Each detail gets a short heading over the product file's own
+// words (split or trimmed, never new claims). `built` replaces the plain tech list where that list reads badly
+// (null leaves the line out); `split` moves everything after the problem's first sentence into a smaller paragraph.
+const panel: Record<string, { details: { h: string; t: string }[]; built?: string | null; split?: boolean }> = {
   kept: { details: [
     { h: 'Pay your way', t: 'By card or Apple Pay, or with stablecoins on Solana, where the stake waits in an escrow program that can only send it back to you or to your charity.' },
     { h: 'Kept never keeps the stake', t: 'There’s a small, upfront service fee.' },
+  ] },
+  doigetgas: { built: null, details: [
+    { h: 'Free to use', t: 'Supported by donations.' },
+    { h: 'This week’s prices', t: 'U.S. average prices for regular, midgrade and premium, from the EIA.' },
+  ] },
+  realdoc: { built: 'Runs on AWS.', details: [
+    { h: 'In use today', t: 'Used by Keller Williams Eugene-Springfield.' },
+    { h: 'Before that', t: 'Previously used by title companies in Oregon.' },
+  ] },
+  shiftwize: { split: true, built: 'Built with Python and linear and constraint optimization, with a web app that takes spreadsheet uploads.', details: [
+    { h: 'Hard rules it never breaks', t: 'Availability, max hours, shift-lead coverage, consecutive days, no overstaffing.' },
+    { h: 'Soft goals it works toward', t: 'Hit staffing targets, spread hours fairly, avoid split shifts.' },
+    { h: 'Peak hours covered', t: 'Peak-hour coverage met across test weeks.' },
   ] },
 };
 const listJoin = (a: string[]) => a.length > 1 ? `${a.slice(0, -1).join(', ')} and ${a[a.length - 1]}` : a[0] ?? '';
@@ -157,69 +170,36 @@ const split = (t: string) => { const m = t.match(/^(.+?[.!?])\s+(.*)$/s); return
 
           <div class="more" id={`more-${p.id}`} data-more>
             <div class="more-in">
-              {mock[p.id] ? (
-                <div class="wrap mk" style={`--bb:${b.bg}`}>
-                  <div class="grid12 mk-top">
-                    <div class="mk-pic">
-                      <img src={shotSrc(p.id)} srcset={shotSet(p.id)} sizes="(max-width: 860px) 70vw, 24vw" alt={shots[p.id].alt} loading="lazy" />
-                    </div>
-                    <div class="mk-text">
-                      <h3 class="t-h2">{d.name}</h3>
-                      <p class="mk-pitch">{d.problem}</p>
-                      <ul class="mk-offers">
-                        {mock[p.id].details.map((x) => <li><h4>{x.h}</h4><p>{x.t}</p></li>)}
-                      </ul>
-                      <p class="mk-meta">{d.status} since {d.year}. Built with {listJoin(d.tech)}.</p>
-                      <p class="mk-links">
-                        {d.url && <a class="link" href={d.url} rel="noopener"><span class="arrow">Visit {host(d.url)}</span></a>}
-                        {d.cta_url && <a class="link" href={d.cta_url} rel="noopener"><span class="arrow">{d.cta_label ?? 'Learn more'}</span></a>}
-                      </p>
-                    </div>
+              <div class={`mk ${isPhone(p.id) ? 'is-phone' : ''}`}>
+                <div class="mk-pic">
+                  <div class="shot">
+                    {!isPhone(p.id) && <div class="bar"><span>{d.url ? host(d.url) : `${d.name.toLowerCase()}.app`}</span></div>}
+                    <img src={shotSrc(p.id)} srcset={shotSet(p.id)} sizes={isPhone(p.id) ? '(max-width: 860px) 60vw, 320px' : '(max-width: 860px) 90vw, 40vw'} alt={shots[p.id].alt} loading="lazy" />
                   </div>
+                  {extra[p.id] && <img class="extra" src={extra[p.id].src} alt={extra[p.id].alt} loading="lazy" />}
+                </div>
+                <div class="mk-text">
+                  <h3 class="t-h2">{d.name}</h3>
+                  <p class="mk-pitch">{panel[p.id].split ? lead : d.problem}</p>
+                  {panel[p.id].split && more && <p class="mk-more">{more}</p>}
                   <div class="mk-how">
                     <h4 class="mk-hh">How it works</h4>
                     <ol>
                       {d.how_it_works.map((st, n) => <li><span class="mk-n" aria-hidden="true">{n + 1}</span><p>{st}</p></li>)}
                     </ol>
                   </div>
-                </div>
-              ) : (
-              <div class="wrap grid12 body">
-                <div class="pics">
-                  <div class={`shot ${isPhone(p.id) ? 'is-phone' : ''}`}>
-                    {!isPhone(p.id) && <div class="bar"><span>{d.url ? host(d.url) : `${d.name.toLowerCase()}.app`}</span></div>}
-                    <img src={shotSrc(p.id)} srcset={shotSet(p.id)} sizes="(max-width: 860px) 90vw, 55vw" alt={shots[p.id].alt} loading="lazy" />
-                  </div>
-                  {extra[p.id] && <img class="extra" src={extra[p.id].src} alt={extra[p.id].alt} loading="lazy" />}
-                </div>
-                <div class="facts">
-                  <p class="meta">{d.status}, since {d.year}</p>
-                  <div class="blk">
-                    <h3 class="k">The problem</h3>
-                    <p class="lead">{lead}</p>
-                    {more && <p class="dim">{more}</p>}
-                  </div>
-                  <div class="blk">
-                    <h3 class="k">What we built</h3>
-                    <p>{d.summary}</p>
-                  </div>
-                  {d.how_it_works.length > 0 && (
-                    <div class="blk">
-                      <h3 class="k">How it works</h3>
-                      <ol class="how">{d.how_it_works.map((s) => <li>{s}</li>)}</ol>
-                    </div>
+                  <ul class="mk-offers">
+                    {panel[p.id].details.map((x) => <li><h4>{x.h}</h4><p>{x.t}</p></li>)}
+                  </ul>
+                  <p class="mk-meta">{d.status} since {d.year}.{panel[p.id].built !== null && <><br />{panel[p.id].built ?? `Built with ${listJoin(d.tech)}.`}</>}</p>
+                  {(d.url || d.cta_url) && (
+                    <p class="mk-links">
+                      {d.url && <a class="link" href={d.url} rel="noopener"><span class="arrow">{d.cta_url === d.url && d.cta_label ? d.cta_label : `Visit ${host(d.url)}`}</span></a>}
+                      {d.cta_url && d.cta_url !== d.url && <a class="link" href={d.cta_url} rel="noopener"><span class="arrow">{d.cta_label ?? 'Learn more'}</span></a>}
+                    </p>
                   )}
-                  {d.features.length > 0 && (
-                    <div class="blk">
-                      <h3 class="k">The details</h3>
-                      <ul class="feats">{d.features.map((f) => <li>{f}</li>)}</ul>
-                    </div>
-                  )}
-                  {d.tech.length > 0 && <p class="tech">Built with {d.tech.join(', ')}.</p>}
-                  {d.url && <a class="button visit" href={d.url} rel="noopener">Visit {host(d.url)}</a>}
                 </div>
               </div>
-              )}
             </div>
           </div>
         </article>
@@ -385,55 +365,40 @@ const split = (t: string) => { const m = t.match(/^(.+?[.!?])\s+(.*)$/s); return
   .rows.is-live .more { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 520ms var(--ease-out); }
   .rows.is-live .is-open .more { grid-template-rows: 1fr; }
   .more-in { overflow: hidden; min-height: 0; }
-  .body { padding-block: clamp(40px, 5vw, 72px) clamp(56px, 7vw, 104px); row-gap: 40px; }
-  .rows.is-live .body { opacity: 0; transition: opacity 300ms ease; }
-  .rows.is-live .is-open .body { opacity: 1; transition-delay: 150ms; }
-  .pics { grid-column: 1 / 8; display: grid; gap: 6px; align-content: start; }
-  .facts { grid-column: 8 / -1; display: grid; gap: 26px; align-content: start; justify-items: start; }
-  .shot { width: 100%; background: #fafaf9; display: grid; grid-template-rows: auto 1fr; overflow: hidden; }
-  .shot img { width: 100%; display: block; }
-  .shot.is-phone { width: min(300px, 70%); grid-template-rows: 1fr; border: 7px solid #0b0b0c; border-radius: 30px; justify-self: center; }
+  .rows.is-live .mk { opacity: 0; transition: opacity 300ms ease; }
+  .rows.is-live .is-open .mk { opacity: 1; transition-delay: 150ms; }
+  /* The opened panel, in the site's own parts: the product's screens, then its name as a section heading, the problem
+     as its pitch, steps under big red numerals (as on Careers), details under red dashes (as on Services). */
+  /* starts where the photo strip starts; the phone, then the text right beside it */
+  .mk { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: clamp(48px, 6vw, 112px); align-items: start;
+    padding: clamp(48px, 6vw, 96px) var(--margin) clamp(64px, 8vw, 128px) calc(var(--margin) + clamp(56px, 5.4vw, 92px)); }
+  .mk-pic { width: clamp(340px, 38vw, 640px); display: grid; gap: 6px; }
+  .mk.is-phone .mk-pic { width: clamp(240px, 21vw, 320px); }
+  .shot { background: #fafaf9; overflow: hidden; }
+  .shot img, .extra { width: 100%; display: block; }
+  /* the phone's frame is the page's ink: dark on the light page, white on the dark one */
+  .mk.is-phone .shot { border: 7px solid var(--ink); border-radius: 30px; background: none; }
   .bar { height: 28px; display: flex; align-items: center; padding: 0 12px; background: var(--surface-2); font-size: 11px; font-weight: 600; color: var(--muted); }
-  .extra { width: 100%; display: block; }
-  .shot.is-phone + .extra { margin-top: 18px; }
-  .meta { font-weight: 700; font-size: var(--t-small); color: var(--muted); }
-  .blk { display: grid; gap: 10px; max-width: 56ch; }
-  .k { font-size: var(--t-small); font-weight: 800; }
-  .lead { font-size: var(--t-lead); font-weight: 650; line-height: 1.35; }
-  .dim, .tech { color: var(--muted); }
-  .tech { font-size: var(--t-small); max-width: 56ch; }
-  .how { list-style: none; counter-reset: s; display: grid; gap: 8px; }
-  .how li { counter-increment: s; display: grid; grid-template-columns: 1.6em 1fr; }
-  .how li::before { content: counter(s); font-weight: 800; }
-  .feats { list-style: none; display: grid; gap: 8px; }
-  .feats li { padding-left: 1.1em; position: relative; }
-  .feats li::before { content: ""; position: absolute; left: 0; top: 0.62em; width: 0.4em; height: 0.4em; background: var(--ink); }
-
-
-  /* MOCKUP (Kept): the opened panel in the site's own parts. Picture left, the product's name as a section heading,
-     the problem as its pitch, details under red dashes (as on Services), steps under big red numerals (as on Careers). */
-  .mk { padding-block: clamp(48px, 6vw, 96px) clamp(64px, 8vw, 128px); display: grid; gap: clamp(56px, 6vw, 96px); }
-  .mk-top { row-gap: 48px; align-items: start; }
-  .mk-pic { grid-column: 1 / 6; aspect-ratio: 4 / 5; background: var(--bb); display: grid; place-items: center; overflow: hidden; }
-  .mk-pic img { width: 52%; border: 7px solid #0b0b0c; border-radius: 30px; display: block; }
-  .mk-text { grid-column: 7 / -1; display: grid; gap: 24px; align-content: start; }
+  .mk-text { display: grid; gap: 24px; align-content: start; max-width: 960px; }
   .mk-pitch { font-size: var(--t-lead); line-height: 1.4; max-width: 34ch; font-weight: 600; }
-  .mk-offers { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 32px var(--gap); margin-top: 16px; }
+  .mk-offers { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 32px var(--gap); margin-top: 24px; }
   .mk-offers li { display: grid; gap: 8px; align-content: start; padding-top: 18px; position: relative; }
   .mk-offers li::before { content: ""; position: absolute; top: 0; left: 0; width: 28px; height: 6px; background: var(--accent); }
   .mk-offers h4 { font-size: var(--t-lead); letter-spacing: -0.02em; line-height: 1.15; }
   .mk-offers p { max-width: 40ch; }
-  .mk-meta { color: var(--muted); font-size: var(--t-small); margin-top: 8px; max-width: 56ch; }
+  .mk-more { max-width: 60ch; margin-top: -8px; }
+  .mk-meta { color: var(--muted); font-size: var(--t-small); margin-top: 8px; }
   .mk-links { display: flex; flex-wrap: wrap; gap: 12px 32px; }
+  .mk-how { margin-top: 24px; }
   .mk-hh { font-size: var(--t-lead); letter-spacing: -0.02em; }
-  .mk-how ol { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap); margin-top: 28px; }
-  .mk-how li { display: grid; gap: 18px; align-content: start; }
-  .mk-n { font-size: clamp(64px, 7vw, 120px); font-weight: 850; letter-spacing: -0.06em; line-height: 0.8; color: var(--accent); }
-  .mk-how p { font-size: var(--t-lead); line-height: 1.35; max-width: 30ch; }
+  .mk-how ol { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap); margin-top: 24px; }
+  .mk-how li { display: grid; gap: 16px; align-content: start; }
+  .mk-n { font-size: clamp(56px, 5.6vw, 96px); font-weight: 850; letter-spacing: -0.06em; line-height: 0.8; color: var(--accent); }
+  .mk-how p { line-height: 1.45; max-width: 30ch; }
   @media (max-width: 860px) {
-    .mk-pic, .mk-text { grid-column: 1 / -1; }
-    .mk-pic { aspect-ratio: 1 / 1; }
-    .mk-pic img { width: 44%; }
+    .mk { grid-template-columns: minmax(0, 1fr); row-gap: 40px; padding-inline: var(--margin); }
+    .mk-pic { width: 100%; }
+    .mk.is-phone .mk-pic { width: min(260px, 70%); margin-inline: auto; }
     .mk-offers, .mk-how ol { grid-template-columns: 1fr; }
     .mk-how ol { gap: 32px; }
   }
@@ -444,7 +409,5 @@ const split = (t: string) => { const m = t.match(/^(.+?[.!?])\s+(.*)$/s); return
     .open { position: static; flex-direction: row; justify-content: flex-start; gap: 12px; width: 100%; padding: 0; }
     .nm { writing-mode: horizontal-tb; transform: none; font-size: clamp(30px, 8vw, 40px); }
     .strip { height: var(--H); }
-    .pics, .facts { grid-column: 1 / -1; }
-    .body { padding-block: 28px 16px; }
   }
 </style>
